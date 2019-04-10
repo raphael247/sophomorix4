@@ -68,6 +68,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_name_tokened
                                  AD_dn_fetch_multivalue
                                  AD_get_AD_for_check
+                                 AD_get_AD_for_check2
                                  AD_dns_get
                                  AD_create_new_webui_string
                                  AD_create_new_mail
@@ -707,6 +708,12 @@ my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                      admins=>"FALSE",
                                      sophomorix_config=>\%sophomorix_config,
                                    });
+my ($ref_AD_check2) = &AD_get_AD_for_check2({ldap=>$ldap,
+                                     root_dse=>$root_dse,
+                                     root_dns=>$root_dns,
+                                     admins=>"FALSE",
+                                     sophomorix_config=>\%sophomorix_config,
+                                   });
 
 
 # --dump-ad
@@ -716,6 +723,14 @@ if ($dump_ad==1){
                 jsoncomment => "AD Content",
                 log_level => $Conf::log_level,
                 hash_ref=>$ref_AD_check,
+                sophomorix_config=>\%sophomorix_config,
+              });
+    print "\n\nMatch2 follows\n";
+    &json_dump({json => $json,
+                jsoninfo => "SEARCH",
+                jsoncomment => "AD Content",
+                log_level => $Conf::log_level,
+                hash_ref=>$ref_AD_check2,
                 sophomorix_config=>\%sophomorix_config,
               });
 }
@@ -749,8 +764,8 @@ if ($dump_login_avoid==1){
 # and populated from AD by subs (AD identifiers): 
 # $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
 
-print Dumper (\%Match);
-print Dumper (\%Match2);
+#print Dumper (\%Match);
+#print Dumper (\%Match2);
 
 # no migration
 #&populate_ad_dynamic_identifiers_utf8();

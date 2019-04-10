@@ -1,0 +1,5235 @@
+
+https cloning:
+
+# cloning via https:
+(git clone https://github.com/linuxmuster/sophomorix4.git)
+
+# add https origin
+git remote add https-origin https://github.com/linuxmuster/sophomorix4.git
+
+# fetching via https (no password needed)
+git pull https-origin bionic
+
+# pushing via https
+git push https-origin bionic
+Username for 'https://github.com': ########
+Password for 'https://jeffbeck@github.com': ########
+
+############################################################
+upload to fleischsalat: scp ../sophomorix*3.42.1-3* fleischsalat:/srv/www/lmn7
+
+.ssh/config:
+###########################
+Host fleischsalat
+ HostName fleischsalat.linuxmuster.org
+ User ruediger
+ Port 22
+
+
+############################################################
+Todo:
+############################################################
+
+
+--analyze_encoding ist better in sophomorix-newfile???
+
+sophomorix-ceck non_umlaut tut nicht
+
+sophomorix-check --analyze /usr/share/sophomorix-developer/examplefiles/students.csv.mixed
+--> use of uninitialized error
+--> utf8,8859 OK -> forget it
+
+Herannaviegieren an den Bug:
+# sophomorix-newfile --name bsz.students.csv /usr/share/sophomorix-developer/examplefiles/students.csv.utf-8
+# make 
+# sophomorix-newfile --name students.csv /usr/share/sophomorix-developer/examplefiles/students.csv.utf-8
+
+
+BUg: wenn 2 dateien von 2 Schulen da sind 
+UND dieselben user darin vorkommen
+--> landen alle in der default-schule
+--> Lösung: 
+    ?sollen in richtiger schule angelegt werden ?
+    ? Fehler wegen identischen Eintrag? ignorieren? beide ignorieren?
+    1. Schritt: identische Zeilen ignorieren
+Idee beim Zeilendurchgehen:
+-- identischer identifier tritt auf
+   --> gleiche Schule, gleiche klasse: Zusatz-Zeile ignorieren
+   --> gleiche Schule, verschiedene Klasse: beide anlegen, oder keinen?
+   --> verschieden Schulen: beide ignorieren/beide anlegen? 
+
+Behebung: komplex:-(
+1. Schritt in users file erden daten aus files doppelt gespeichert:
+   users_file{id}  (alt, buggy, gleiche id in verschiedenen files wird überschrieben
+   users_file2{filename}{id} (zusatzliche hash mit subkey file key, kein überschreiben)
+2. filelist mit filename vor identifier
+3. Schritt zusätzlich neu
+   $Match{'ACTION'}{$line_new} old
+   $Match2{'ACTION'}{filename}{$line_new}
+   umgesetzt in: 
+     analyze_user_line zusätzlich befüllt, old immer noch
+   write_add_file umgestellt (final fertig)
+
+adding ref_AD_check -> 
+testen, update eines users der in 2 Schulen vorkommt
+
+
+
+
+
+school.conf:
+TEACHER_PREFIX=True/false  erzeugt bsz-bz
+
+
+
+dann kommen alle in die default schule
+
+Weiter: encoding in sophomorix-newfile beim kopieren anpassen, wenn eindeutig
+
+
+sophomorixUnid auch für Lehrer?
+FeatureRequest
+
+
+nextcloud: gruppen von gruppen gehen nicht
+Es wird nur an die user geshared, die DIREKT in der Gruppe sind, NICHT
+   an user die über Gruppenmitgliedschaften in der Gruppe sind.
+   --> also Gruppen von Gruppen werden nicht unterstützt.
+
+Haken setzen bei Fortgeschritten: 
+Fortgeschritten -> Ordnereinstellungen -> Eingebundene Gruppen
+                   Directory Settings  -> Nested Groups 
+
+   
+
+
+
+Frage: in devices 2 namen für dieselbe IP erlauben?
+
+
+ACL tests anpasst:
+OK 1) statt 
+        OWNER:BUILTIN\Administrators
+        OWNER:LINUXMUSTER\Administrator
+      schreibe
+        OWNER:LINUXMUSTER\Domain Admins
+OK 2) Zusatzzeile bei allen ACLs:
+        ACL:LINUXMUSTER\Domain Admins:ALLOWED/OI|CI|I/FULL
+
+
+GPO abernten:
+geernteter output muss nicht mehr editiert werden
+sondern erzeugt gleich ein template
+
+
+Befehl sophomorix-school --gpo-dump {dsffdgdghfh} --gpo-dump-path
+   /path/to/dump --name <school>
+
+Erzeugt folgendes:
+1) ldif dump mit 
+ldbsearch -b CN=Policies,CN=System,DC=linuxmuster,DC=lan -H /var/lib/samba/private/sam.ldb '(name={F3C758D9-E831-41FC-861E-1C66F8818BC9})' gPCMachineExtensionNames gPCUserExtensionNames versionNumber
+
+--> <school>.ldif
+
+2) verknüpfungsort, format noch nicht bekannt
+3) Verzeichnis der GPO mit Inhalt im sysvol/Policies
+
+
+Datei system
+
+
+
+rooms bug aus Migration Testen:
+
+Test if workstations are there:
+# sophomorix-device -d firewall -i
+# sophomorix-device -r no-pxe -i (rooms Bug: zeigt auch hardwareclass)
+
+Brauchts das noch? bei der Migration?
+server ~ # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-uid
+
+sophomorix-newfile:
+
+create subs from stuff in sophomorix-check:
+
+
+1) OK: $ref_encoding_data=&read_encoding_data();
+2) $enc=&analyze_encoding_new($abs_path_file,$ref_encoding_data)
+   check for special lines
+   give points
+   show if result is nonambiguous
+3) &iconv($from,$from_file,$to,$to_file)
+   (uses iconv) instead of copy
+
+4) make sophomorix-check use the same subs
+
+
+TODO: uidnumber gidnumber fixen
+
+
+
+TODO: sophomorix-newfile erzeugt schon utf8
+
+TODO: gpo test OK?
+
+AD_group_create wie be i user create ein hash, an den gidnumber angepappt wird
+
+
+A)
+
+smbcacls tut auf smb share nicht
+
+B)
+uidNumber raus beim user anlegen
+-> beim anlegen
+-> beim anzeigen, usw
+
+AD_user_create: uidnumber_wish : umbenennen in uidnumber_migration
+-> in ein sophomorixFeld rein
+option umbenennen
+
+C)
+gidNumber raus beim group anlegen
+-> beim anlegen
+-> beim anzeigen, usw
+ AD_group_create: gidnumber_wish umbenennen in 
+
+
+
+
+
+Tests anpassen
+-> Testschulen: file löschen
+   /etc/linuxmuster/sophomorix/next_free_gidnumber
+   /etc/linuxmuster/sophomorix/next_free_uidnumber
+
+issues angucken und fixen
+
+ntacl's update
+
+
+
+Prioliste:
+
+* statt mv sophomorix-transfer beim versetzen
+* sophomorix-device: exit with json error
+
+- --scopy/--move
+- neuer schulname in sophomorix.conf (Kurzzeichen, testen)
+  ? schoolsetup automatisch oder per Hand(wie jetzt)?(sophomorix-postinst <school>)
+
+
+------------------------------------------------------------
+OK:
+- d_ umsetzen, neue Orte im Baum
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+OK:   
+- s_ umsetzen:
+   Gruppe default-school -> s_default-school
+                     bsz -> s_bsz
+                     ...    
+   1) vorher alle Gruppen mit sophomorixType=school anzeigen lassen:
+      sophomorix-ldbsearch "(sophomorixType=school)" cn sAMAccountName dn sophomorixType
+      (Für jede Schule gibt eine solche Gruppe).
+   2) Neues Paket 3.63.x einspielen : (SCHOOLGROUP_PREFIX=s_)
+   3) sophomorix-school --recreate-all-schools
+      Testen:
+      --> neue gruppen müssten ZUSÄTZLICH da sein: s_bsz
+      --> neue ACL:
+          sophomorix-cacls /srv/samba/schools/default-school/
+          enthält die Zeile (s_<school>):  ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ
+   4) alte Gruppen löschen
+      samba-tool group delete bsz (und alle weiteren)
+   5) fertig
+   Zusatzinfo:
+   school.ntacl.template enthält als einziges @@SCHOOLNAME@@
+   --> diese ACL checken, bei schulgruppeGruppennamenänderung ändern
+   sophomorix-cacls /srv/samba/schools/default-school/
+   enthält die Zeile:  ACL:LINUXMUSTER\bsz:ALLOWED/0x0/READ
+   samba-tool group delete bsz (und alle weiteren)
+   ---> ACL:
+   ACL:S-1-5-21-1024969777-3138973310-22357969-1104:ALLOWED/0x0/READ
+   --> user nicht mehr gefunden
+------------------------------------------------------------
+
+
+TODO: globale devicegroups
+   
+   
+   
+   command.log: " werden nicht mitgeloggt, ist das OK?
+
+
+sophomorix-transfer:
+
+mitloggen per user ob vollständig ausgeteilt wurde
+wenn man als quelle ein dir hat und beim ziel den / vergisst -> nicht kopiert, ohne rückmeldung
+einsammeln an viele tut nicht, schleifen?
+
+export HISTSIZE=100000
+
+/etc/bash completion anschauen
+
+README for logonscripts wie man neue scripte ausrollt
+   
+überlegen, wenn eine Klasse gelöscht wird, die in einem Projekt
+   mitglied ist:
+wird dieser Eintrag gut entfernt aus dem Projekt?
+
+nextfree uidnumber:
+- aus /etc raus?
+- ins ldap?/nach /var?
+   - was passiert beim Datei löschen? -> wird wieder erzeugt, mit der niedrigstmöglichen uidnumber ab 10000
+      wiederverwerten von uid? -> ja, wenn sie frei ist
+      (auch in den logfiles schauen???? nicht wiederverwerten)
+
+      leere schuler.csv
+
+
+TODO:
+Daten moven von schule zu schule mit sophomorix-transfer statt linux mv
+
+
+sophomorix-transfer -scopy
+
+-> performance: do no recreate dirs found on scan
+-> copy to multiple users:
+   problem: first check everything, then copy all or nothing
+-> logging line schreiben per user (Fortschritt)
+
+
+Tests --scopy innerhalb Schule
+   A) OK
+   B) OK
+   C) todo --> dir is in the way of a file testen
+   D) OK
+   E) OK --> todo dir is in the way of a file testen
+
+Tests --move innerhalb Schule
+   A) OK
+   B) OK
+   C) todo --> dir is in the way of a file testen
+   D) OK
+   E) OK --> todo dir is in the way of a file testen
+
+
+--scopy von Schule zu Schule umsetzen
+   A) OK
+   B) OK
+   C) OK
+   D) OK
+   E) OK
+
+Tests --scopy von Schule zu Schule
+File overwrite testen! Todo
+   A) not needed
+   B) OK
+   C) OK
+   D) OK
+   E) OK
+
+--move von schule zu schule
+   A) not needed
+   B) Works, but delete file only if move was checked (target exists)
+   C) OK
+   D) OK
+   E) OK
+
+--move --home-from-user <user1> --home-to-user <user2> von schule zu schule
+   1) Umsetzung: todo
+   2) Tests: todo
+
+
+Vorhanden:                                   Neu:
+--from-user --> school home of user          --from-school <school>
+--from-path --> subpath                      -from-path <path>
+
+--scopy --info
+   - Listing of scans
+   - Warnings: Target aleady there, ... command will fail
+
+--scopy --delete-target (Vorsicht)
+------------------------------------------------------------
+
+
+
+sophomorix-device --dry-run
+exit with json error, return not 0
+
+issue #52, # 57
+
+empty hwk(exit in dry-run) and comment (updates every time if empty)
+
+
+
+
+test-1
+password cloning check
+
+wenn exammode eingestellt wird, dann:
+
+
+- examode account testen --> password, ntalc, dateisystem, ...
+
+quotatest schreiben:
+testen, ob quota tatsächlich gesetzt ist,
+    - usage testen sub verify_quotausage(...)
+    - 1 datei (bestimmte größe) reinkopieren als user ins user home -> sollte auf sein quota gehen
+      - testen, ob quota usage auch hoch geht.
+      
+
+repdir global: 2 acls nachliefern
+
+
+listen von transfer rekursiv??? im moment nicht
+--> wozu?
+
+
+
+AD_login_test:
+Test first if disabled bit is set, then test password
+(don't care about exammode)
+
+
+sophomorix-mail
+Use of uninitialized value $user_opt in string ne at /usr/share/perl5/Sophomorix/SophomorixSambaAD.pm line 4781.
+
+
+password clonen tut nicht beim anlegen eines examusers
+-> vgl. code bei sophomorix-passwd --clone-from-user <user1> --clone-to-user <user2>
+   tuts da?
+--> tut!
+
+ ------------------------------------------------------------
+????
+         schulgruppen samaccountname mit prefix s_
+      --> ulm muss alte schule löschen
+         hardwareclassen d_  --> devicegroup, globaldevicegroup
+         r_ NICHT bei Räumen: probleme abfangen
+
+
+
+         sophomorix-transfer
+         im smb-Dateinamen nicht erlaubt: \ / : ? " < > |
+         Leerzeichen in Dateinamen zulassen, sowie ...
+         
+ ------------------------------------------------------------
+         
+
+------------------------------------------------------------
+GPO
+
+gpo test:
+         uid anpassen in Drives.xml
+         Drives: clsid="{8FDDCC1A-0C3C-43cd-A6B4-71A6DF20DA8C} -> Ulm
+                         8FDDCC1A-0C3C-43cd-A6B4-71A6DF20DA8C  -> MSexample
+   --> uuids sind überall gleich -> nix anpassen
+
+
+Test 1: inherit Flag?
+
+Test 2: /usr/bin/samba-tool gpo aclcheck  -U administrator%`cat /etc/linuxmuster/.secret/administrator`
+--> zeigt keine Ausgabe: ist dann alles OK?
+
+Test 3: samba-tool gpo list <user>
+Zeigt dass die ACL gilt für den user (tut aber auch ohne ntacl sysvolreset)
+
+GPOs for user schwein42
+    sophomorix:school:default-school {CC37E8AA-D779-405A-957A-4269D83CE81A}
+
+Test 4:
+/usr/bin/samba-tool ntacl sysvolcheck
+-> ohne ausgabe, ist dann alles OK?
+
+Test 5:
+gpo anlegen -> per win tool aktivieren -> Drives.xml sichern
+gpo löschen 
+gpo anlegen
+Drives.xml reinkopieren
+samba-tool ntacl sysvolreset
+Wenn es dann tut liegts evtl. an den *.xml Dateien (Zeilenumruch, usw....) 
+
+
+Debuglevel einstellen von samba-tool: -d <num>
+
+Nach Arbeiten mit dem win tool ist
+gPCUserExtensionNames updated
+
+         
+          
+         ????? Beim entfernen der GPO auch verzeichnis löschen
+         ---> geschieht automatisch, so wies aussieht
+
+         
+      OK: sophomorix-postinst overwrite files in
+      OK: ordner lmn (mit denen vom paket)
+      OK:    ordner custom: anlegen, wenn noch nicht da, wenn da unberührt lassen
+      OK: linux
+         
+TODO:
+sophomorix-postinst -> read sophomorix.conf if school exists einbauen
+
+         
+--> GPO weiter nach Telefonat
+
+1) OK: Vorlagen GPO ins Paket
+
+2) OK: sophomorix-school erzeugt/updated beim Schule erstellen eine gpo
+   --> Falls schon da, Abbruch -> muss erstmal nicht abgefangen werden
+   --> display name: sophomorix:school:<schoolname>
+3) OK:
+   --> Verzeichnisbaum unter sysvol aktualisieren
+   A) Dateisystem der Schule wird erzeugt,
+       - unter sysvol:  
+         tree /var/lib/samba/sysvol/linuxmuster.local/Policies/{2...3}/
+                       ├── GPT.INI
+                       ├── Machine
+                       └── User
+       mit ntacls hinterlegen
+       (evtl. leere Dateien erzeugen)
+
+   B) OK:   Dateien ungepatched kopieren
+      OK: Dateien gepatched einspielen
+         - OK: Drives.xml
+         - TODO: Printers.xml -> muss aus devices.csv erzeugt werden?
+
+      GPT.INI
+      --> Version anpassen ?
+      --> displayName= anpassen ?
+      je Datei eine sub (Quelle/Ziel), mit denselben Ersetzungen, Zeilenweise
+      mit smbclient hochladen
+
+4) option um die gpo restlos zu entfernen (AD und filesystem)
+ OK: sophomorix-school --delete-gpo schulname
+     - Entfernt die GPO aus dem AD
+     - Entfernt die GPO aus dem Dateisystem unter  
+       /var/lib/samba/sysvol/linuxmuster.local/Policies
+       
+5) OK: samba-tool ntacl sysvolreset aktiviert die GPO
+
+------------------------------------------------------------
+
+Nur die Dateien, welche im Dateisystem liegen, zu kopieren reicht hier nicht um eine GPO einzurichten. Grund dafür ist, dass die Gruppenrichtlinien selbst Bestandteil des ADs selbst sind, also des Verzeichnisses.
+Um eine GPO zu erstellen muss diese also zunächst im AD angelegt werden.
+Dabei wird dann auch ein nahezu leerer Ordner im Dateisystem angelegt, welcher dann die eigentlichen Richtlinien enthält.
+
+Das nächste Samba Major-Release wird ein Feature enthalten, mit dem sich Gruppenrichtlinien per samba-tool in eine Datei herunterladen lassen und dann aus dem "Backup"-Ordner in einem AD auch wiederhergestellt werden können.
+
+Da das in den aktuellen stable-Releases noch nicht enthalten ist müssen die einzelnen Schritte manuell vorgenommen werden.
+
+Zuerst muss eine neue GPO, z.B. per samba-tool angelegt werden:
+samba-tool gpo create meineNeueGPO
+
+Mit 'samba-tool gpo listall' bekommen Sie die GUID und den Namen der GPO und damit den Ort im Dateisystem. z.B.
+/var/lib/samba/sysvol/meine.domain/Policies/{0D757E3B-769D-40BD-A7AB-C86B7983615E}/
+
+Hier können dann die Daten aus der vorher kopierten GPO eingefügt werden. Mit 'samba-tool ntacl sysvolreset' werden die erwarteten Berechtigungen angewandt.
+
+Anschließend ist die neue GPO meineNeueGPO mit den Richtlinien zur Anwendung verfügbar.
+
+------------------------------------------------------------
+
+
+         
+
+Filesystem:
+
+fehlende ACL's prüfen
+
+Hat keine NTACL:   1: No NTACL-test: /srv/samba/schools
+
+Tut nicht auf testsystem  
+  2: No NTACL-test: /srv/samba/schools/abc
+  3: No NTACL-test: /srv/samba/schools/lin
+  4: No NTACL-test: /srv/samba/schools/ghs
+NTACL ändert sich, wenn user angelegt werden in Schule
+Maybe add school creation to supertest, an check the school???
+
+
+make better: epoch_to_ymdhms using a module:
+- leading 0's
+- not utc, use local time
+- convert the filelisting in the json object to current time on the server 
+
+Tauschlaufwerke usw. wie funktioniert das?
+werden NICHT per netlogon scripte gemountet sonder über Gruppenrichtlinien
+
+Gibts nicht mehr: wurde auskommentiert:
+&Sophomorix::SophomorixAPI::fetch_error_string($return);
+-> Muss Ersatz her?
+
+
+
+sophomorix-class/project/group/... usw.
+Anzahl der memberuser(student/teacher/summe) angeben. Ist das schon so?
+
+
+fill sub AD_user_getquota_usage in SophomorixSamba.pm with content to do a query of quota usage
+- check if this is needed
+(sophomorix-query uses a quick lookup)
+
+add option --quota-usage (from SophomorixSamba.pm) to some scripts:
+sophomorix user -u <user>
+sophomorix-quota -u ..
+sophomorix-class ?
+...
+
+
+Befehle für 
+
+root@server /usr/lib/linuxmuster-webui/plugins (git)-[alpha] # grep -R sophomorix-
+lmn_settings/views.py:        sophomorixCommand = ['sophomorix-check', '--analyze-encoding', fileToCheck, '-jj']
+Binary file lmn_settings/views.pyc matches
+lm_quotas/views.py:            lines = subprocess.check_output(['sophomorix-class', '-i']).splitlines()
+lm_quotas/views.py:                    subprocess.check_call(['sophomorix-class', '-c', cls['name'], '--quota', '%s+%s' % (cls['quota']['home'], cls['quota']['var'])])
+lm_quotas/views.py:                    subprocess.check_call(['sophomorix-class', '-c', cls['name'], '--mailquota', cls['mailquota']])
+lm_quotas/views.py:            lines = subprocess.check_output(['sophomorix-project', '-i']).splitlines()
+lm_quotas/views.py:                    subprocess.check_call(['sophomorix-project', '-c', project['name'], '--addquota', '%s+%s' % (project['quota']['home'], project['quota']['var'])])
+lm_quotas/views.py:            subprocess.check_call('sophomorix-quota > /tmp/apply-sophomorix.log', shell=True)
+Binary file lm_quotas/views.pyc matches
+Binary file lmn_users/.views.py.swp matches
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--teacher', '--schoolbase', schoolname, '--user-full', '-jj']
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--student', '--schoolbase', schoolname, '--user-full', '-jj']
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--schooladministrator', '--user-full', '-jj']
+lmn_users/views.py:                sophomorixCommand = ['sophomorix-query', '--globaladministrator', '--user-full', '-jj']
+lmn_users/views.py:        sophomorixCommand = ['sophomorix-check', '-jj']
+lmn_users/views.py:            script += 'sophomorix-add >> %s;' % path
+lmn_users/views.py:            script += 'sophomorix-move >> %s;' % path
+lmn_users/views.py:            script += 'sophomorix-kill >> %s;' % path
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-user', '--info', '-jj', '-u', user]
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-passwd', '--set-firstpassword', '-jj', '-u', user]
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-passwd', '-u', user, '--pass', password, '-jj']
+lmn_users/views.py:            sophomorixCommand = ['sophomorix-passwd', '-u', user, '--pass', password, '-jj']
+lmn_users/views.py:                for l in subprocess.check_output('sophomorix-print --info', shell=True).splitlines()
+lmn_users/views.py:            cmd = 'sophomorix-print'
+lmn_users/resources/partial/check.modal.html:    <lm-log path="'/tmp/sophomorix-check.log'"></lm-log>
+Binary file lmn_users/views.pyc matches
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-session', '-i', '-jj']
+lmn_session/views.py:                        sophomorixCommand = ['sophomorix-session', '-i', '-jj']
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '-j', '--session', session, '--kill']
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '-j', '--session', session, '--comment', comment]
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '--create', '--supervisor', supervisor,  '-j', '--comment', comment]
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--unset', '--subdir', session, '-j', '--participants', participant]
+lmn_session/views.py:                    raise Exception('Error:\n' + str('sophomorix-exam-mode --set --supervisor ' + supervisor + ' -j --participants ' + participant))
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--set', '--supervisor', supervisor, '-j', '--participants', participant]
+lmn_session/views.py:                    raise Exception('Error:\n' + str('sophomorix-exam-mode --unset --subdir ' + session + ' -j --participants ' + participant))
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-managementgroup', \
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-managementgroup \
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-session', '--session', session,  '-j', '--participants', participantsCSV]
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-session --session ' + session + ' -j --participants ' + participantsCSV))
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--set', '--supervisor', supervisor, '-j', '--participants', examModeListCSV]
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-exam-mode --set --supervisor ' + supervisor + ' -j --participants ' + examModeListCSV))
+lmn_session/views.py:                    sophomorixCommand = ['sophomorix-exam-mode', '--unset', '--subdir', session, '-j', '--participants', noExamModeListCSV]
+lmn_session/views.py:                raise Exception('Error:\n' + str('sophomorix-exam-mode --unset --subdir ' + session + ' -j --participants ' + noExamModeListCSV))
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-query', '-jj', '--schoolbase', 'default-school', '--student', '--user-full', '--anyname', '*'+http_context.query['q']+'*']
+lmn_session/views.py:                sophomorixCommand = ['sophomorix-query', '-jj', '--schoolbase', 'default-school', '--sam', '*'+http_context.query['q']+'*']
+Binary file lmn_session/views.pyc matches
+Binary file lm_auth/api.pyc matches
+
+
+KA-user deaktivieren statt löschen 
+
+--> passwortliste ganze Schule
+
+--> Freifelder:
+
+    LOGINCHART_URL=Name|URL|Comment ... what more
+
+
+------------------------------------------------------------
+-> neuer branch
+ALLE scripte auf neue checkoptions umstellen
+-> zuerst alle Kombinationen erlauben
+-> loglevel in options-hash schreiben
+
+Vorgehensweise:
+
+1 ==========
+alt:
+
+$help=0;
+
+my $testopt=GetOptions(
+           "help|h" => \$help,
+...
+
+neu:
+############################################################
+# Option handling
+############################################################
+my %options=();
+my $testopt=GetOptions(\%options, 
+                       "help|h",
+
+
+Vorgehensweise:
+1) my $testopt kopieren und auskommentieren
+2) jeweils für 1 option durchgehen:
+   A) my $help auskommentieren
+   B) testopt hash umstellen
+   c) Aufrufe ersetzen:
+      ALT:   #if ($help==1) {
+      NEU:   if (defined $options{'help'}) {
+
+      ALT: if ($addasmins ne ""){
+      NEU: if (defined $options{'addadmins'}){
+add new option to \%options
+
+
+DONE: sophomorix-class (example script)
+      sophomorix-project
+      sophomorix-group
+NEXT: ???
+
+When all scrips that use check options are done:
+Finally: remove $options{'json'} from check_options call, since it is included in \%options
+
+------------------------------------------------------------
+
+next step: insread of giving json,log_level, .. to subs, give \%options reference
+
+
+
+
+------------------------------------------------------------
+---> Alle scripte müssen auf neuen hash umgestellt sein
+typeout reduzieren, je funktion
+options-hash übergeben
+  verbosity im options-hash nachschauen
+AD_school_create
+ohne -v:
+-> * School $school must be created RUNTIME (Start)
+-> * School $school already created RUNTIME (Start/End)
+-> * School $school must be created RUNTIME (End)
+mit -v wie bisher
+dito mit AD_group_create
+usw...
+------------------------------------------------------------
+
+
+sophomorix-device
+--> statt description sophomorixComment nutzen (rooms and hardwareclasses)
+
+--> testen der hwk-gruppen?
+
+--> OK: Zusatzoption --sync
+    macht dasselbe wie sophomorix-device
+--> OK: --dry-run/-n (wie rsync) (bisher No sync)    
+    -> Info an Thomas
+    -> Wenn Thomas fertig
+    OK: sophomorix-device zeigt dann die Hilfe
+--> TODO:
+    Abbruch bei syntaxfehler oder compatibilitätsfehler (Rechner heisst wie vorhandener user)
+    --> Ausgabe in JSON-Objekt
+
+
+
+
+Migration Bugs:
+
+Beim syncen der homes folgender Fehler:
+rsync: opendir "/mnt/vampire_daten_bsz/home/students/m1kk3t/tarlunko/Einstellungen/firefox" failed: Permission denied (13)
+
+/srv/linbo: Müssen die Rechner diesselbe IP haben?
+
+Link auf linbo in sophomorix Migration?
+
+Was passiert beim ändern der IP, wird linbo umgezogen?
+
+
+
+classen.map
+ - OK: man sollte sehen, ob es bei der gruppe um eine klasse oder raum handelt (oder ...)
+ - OK: nach analyze solte das änderbar sein.
+   (testen bei gruppen usw. 
+
+   OK: in extrastudents.csv with adminclasses
+   OK: in devices.csv with rooms --> devices.csv room feld editieren, bei devices rewrite
+
+   --> BSZ problems: group areca nicht in irgendeiner Datei
+                     group vm01
+
+Am Ende:
+--analyze: write file 
+  * OK: with users that should be added
+  * OK: with groups that should be added
+--test-migration
+  durchgehen, welche wirklich anglegt wurde (OK)
+  und welche nicht (not OK)
+   
+
+OK: performance: sophomorix-class --create 
+   --> option --skip-school-creation
+OK:    dito at project creation
+
+
+sophomorix-user -u user --title
+--> befüllf AD Attribute title (Dr. /Abteilungsleiter usw.)
+
+------------------------------------------------------------
+SEEMS to be fixed:
+we need to copy these files, so that students.csv and teachers.csv
+can be created (rewritten)
+
+cp /root/sophomorix-dump/data/etc/sophomorix/user/lehrer.txt
+        /root/sophomorix-dump/data/var/lib/sophomorix/tmp/lehrer.txt.tmp
+cp /root/sophomorix-dump/data/etc/sophomorix/user/schueler.txt
+          /root/sophomorix-dump/data/var/lib/sophomorix/tmp/schueler.txt.filter.tmp
+
+fixes: 
+    sophomorix-check aufrufen? damit 
+    lehrer.txt.tmp
+    schueler.txt.filter.tmp
+entstehen
+
+--> warum entstehen diese files?
+bsz: /var/lib/sophomorix/tmp/ enthält:
+   lehrer.txt.tmp             # entsteht, wenn kein filter script definiert ist (copy lehrer.txt)
+                              (andert 1. Spalte lehrer --> teachers)
+                              die lehrer.txt.tmp zum migrieren nehmen
+                              (alternativ)
+   (schueler.txt.filter.tmp)    # marked as tmp in filter script (von filter script erzeugt)
+                              (gibts nur am bsz, weil dessen filter script das erzeugt)
+                              --> NICHT zum Migrieren nehmen
+   schueler.txt.tmp           # entsteht, wenn kein filter script definiert ist (copy), 
+                              # ODER: target in filter script
+                              --> zum Migrieren nehmen
+------------------------------------------------------------
+
+
+sophomorix-passwd --test-passwd
+This tests also global-admin (is this needed? Passwoord is shown?)
+
+
+sophomorix-device --dns-test : is reverse kookup also checked?
+sophomorix-device -d firewall -i  --> Instead of Device: computer account
+sophomorix-device -r nopxe -i (zeigt fälschlicherweise auch hardwareklassen  --> neue option --hwc/hwk)
+
+sophomorix-tool --console color yellow/red usw
+
+add more commands to tests for a password test
+sophomorix-quota that calls smbcquota  usw, ... 
+
+AD_login test:
+add more tests (as shown in the comments of the sub: smbclient, kerberos, ...)
+
+
+
+
+------------------------------------------------------------
+create userlist/computerlist command: vgl. sophomorix-passwd
+allgemeine Umsetzung:
+
+
+
+sortiert:
+1) es gibt 'userlist_create' optionen,
+um für eine größereListe von usern etwas zu machen, 
+alt: --students/teachers/...   
+  --> neu --role student 
+      * ohne diese option: keine user
+      * mehrfach verwendbar, akkumulierend
+  --> neu --school 
+      * suchbereich
+      * ohne diese option: sucht in allen Schulen
+      * mehrfach verwendbar, sucht in mehreren Schulen
+  --> neu --type <adminclass> (USER in Gruppenn des typs ...., )
+      * ohne diese option: keine user
+      * mehrfach verwendbar, akkumulierend
+alt  --class      
+  --> neu --group <name>
+      * 
+      * mehrfach verwendbar, akkumulierend
+
+evtl. Zusatzoptionen:
+  --allschool  (einfach alle, admin???, lehrer????)-> gefährlich
+  besser --school global 
+
+Idee: soll role mandatory sein?
+      Ja:
+      --role addc, ....
+      --computer (option für ALLE ROLES_DEVICE mit computeraccount) 
+      nur wenn --role da, kann auch --school --class --type angegeben werden
+      nur manche Rollen erlaubt:
+      wenn Rolle nicht mandatory, wirds kompliziert, z.B. in einem Projekt/Klasse
+      --> passwortänderung incl. lehrer?
+      --> passwortänderung admins?
+
+Beispiele:
+  --role student : alle students aller Schulen
+    LISTS->GLOBAL->ROLE-> user1,2,3
+  --role student --school bsz : students der Schulen ...
+    LISTS->SCHOOL->ROLE-> user1,2,3
+  --group 7a --role student
+    LISTS->GLOBAL->GROUP->ROLE->user1,2,3 
+  --type extraclass --role student
+  --computer (one of the roles for computeraccount)
+
+
+2) sobald irgendeine 'userlist_create' option gesetzt ist,
+   triggert sie das erstellen von Listen:
+    AD_get_userlists (inclusive computer)
+    (AD_get_computerlists)
+
+    geht alle user durch (incl. computer)
+      * ordnet nach schule UND Rolle      LISTS->SCHOOL/GLOBAL->ROLE-> user1,2,3
+      * ordnet nach Gruppe UND Rolle      LISTS->SCHOOL/GLOBAL->GROUP->ROLE->user1,2,3
+      (* ordnet nach Gruppentyp UND Rolle  LISTS->SCHOOL/GLOBAL->GROUPTYPE->ROLE->user1,2,3)
+    + LOOKUP -> USER -> ROLE
+
+3) wird nun ein Befehl benutzt der einen oder mehrere user braucht
+   (z.B. sophomorix-passwd --user a,b,c,...
+   wird --user verwendet UND akkumulativ eine gesamt user list erzeugt (ohne doppelungen)
+   und der Befehl darauf angewendet 
+
+option --showlist
+zeigt die Liste der user an
+
+------------------------------------------------------------
+Testscript ACL's :
+
+find /srv/samba/ -type d listet alle möglichen Verzeichnisse von samba
+
+Dann als ein bestimmter user, via smb: diese Verzeichnisse abarbeiten:
+   Darf man direct auflisten
+   Darf man cd und auflisten
+   Darf man file anlegen (danach löschen)
+   Darf man löschen (vorher Datei wegsichern und acl sichern)-->later
+
+Die ganzen Verzeichnisse dann in Verschiedene Dateien speichen
+   user.directlist
+   user.cdlist
+   user.filecreate
+   ... 
+
+
+
+
+
+
+
+------------------------------------------------------------
+
+ 
+
+take care about ./changelog-sophomorix-source
+
+school.conf:   
+
+more logging (example see sophomorix-device)
+
+school.conf: 
+ WEBUI_PERMISSIONS=lm:printers: false,lm:quotas:apply: true
+auswerten
+
+OK: sophomorix-device, multiattribute IP,MAC, ..syncen
+   --- AD_group_update
+OK: je drucker(Computer) eine Gruppe anlegen mit dnsnodename 
+OK: Pflicht-Werte in sohomorix.ini testen
+OK: accountflag intern TRUE/FALSE statt 1/0
+
+sophomorix-vampire: 
+may/must file checks on dump(better) and analyze
+sophomorix-check aufrufen beim dump (sophomorix.add/move/kill leer?, ...) 
+
+Test1:
+smbcquotas: 
+   - override in school.conf testen
+   - override in quotaFeld des users testen
+   - project, class oberride testen
+   - dito mit mailquota calculated
+smbcquotas Tests von einer Schule auf alle erweitern (script für shareerstellung fehlt noch)
+
+sophomorix-ui:
+       (bei Rollenwechsel individuelle settings löschen)
+  was passiert, wenn schulkonsole ein Recht bei einer rolle zurückzieht?
+  sophomorix-ui entfernt dessen Einträge beim user? -> gut
+  Was ist in der School.conf?
+  --> Eintrag ignorieren, Warnung ausgeben
+
+Anmelden an exam account: einmalpasswort forcen, geht das. Konfigurierbar
+
+Ein Lehrer an mehreren Schulen
+--> Stammschule, nur da anlegen
+--> zugriff auf andere schulen auf andere weise ermöglichen
+
+sophomorix-device : creating DNSNode,DNSreverse und DNSZone: 
+  - adminDescription weg (nicht mehr befüllen)
+  - andersweitig dnsNode, ... erkennen
+  - dnsnode zusatzdate erkennen und updaten
+
+
+sophomorix-ui
+code cleanup: subs mit _old löschen -> besser: neues programm, das die custom felder befüllt?
+
+DNS:
+dns reverseLookup not removed when just changing the IP
+--> test this
+--> sync dns and reverse DNS seperately?
+
+sophomorix-print --caller/callercopy zusammenfassen
+sophomorix-print:
+  zeigt URL's für schulkonsole, moodle usw, ...
+  woher bekomme ich die Info?
+    * Domänennamen für Windowsanmeldung? ???
+    * URLSCHUKO (intranet)
+    * URLMAIL
+    * URLMOODLE
+    * more URLS
+  add them to school.conf? as 
+  [school]
+      URLMOODLE=
+      --> when empty, print in red: 
+      school.conf: URLMOODLE not configured
+      URLMOODLE=FALSE
+      --> print 
+
+
+--> sophomorix-print --school bsz  --> alle Schüler der Schule
+
+
+  JSON-Result object? see issue #14
+  Was braucht die Schulkonsole
+  --> ausgefüllt
+
+------------------------------------------------------------
+
+Neuer Befehl: sophomorix-room (nur informativ, kein setzen von werten)
+room attributes
+  sophomorix-room -i (all rooms)
+    LOOKUP
+        room_by_IP->  room
+        room_by_MAC-> room
+        room_by_name -> room
+        room_by_computer$ -> room
+        CLASSROOMS -> classroom --> DEFAULTS
+        PRINTERS -
+
+oder besser mit
+
+--type room,hardwareclass,printer(the hostgroup of the role printer)--> 
+ --role 
+
+
+  sophomorix-room -i -r <room>: 
+    sophomorixRoomIPs       (MultiValue)     sophomorixComputerIP       (SingleValue)
+    sophomorixRoomMACs      (MultiValue)     sophomorixComputerMAC      (SingleValue)
+    sophomorixRoomComputers (MultiValue)     sophomorixComputerRoom     (SingleValue)
+    sophomorixRoomDefaults  (Multivalue)     sophomorixComputerDefaults (Multivalue)
+    --> sophomorixTye: room, classroom
+
+   TODO:
+   OK: AD_get_AD_for_device muss neue Attribute abfragen
+   OK: updating (Room,IP,MAC at Computers)
+   TODO: updatig Rooms,IPs,MACs at room
+   --smbstatus -> zeigt an wer eingeloggt ist
+
+
+
+
+folgende Anmerkungen/Fragen:
+--------------------------------------------
+  OK: WEBUI_PERMISSIONS mit _
+
+  OK: roles exakt
+    siehe: sophomorix-samba --show-roletype
+     ROLES_USER:
+       * globaladministrator
+       * schooladministrator
+       * student
+       * teacher
+
+OK Rolle nicht erwähnt --> keine attribute befüllt: OK?
+
+OK Was muss genau ins attribute?
+   Attribute: <lm:linbo:configs: false>
+   <lm:linbo:configs:>
+
+OK: ich entferne whitespace hinten, bevor ich das attribut fülle?
+
+OK: alle zeilen kommen ins AD (Konfigurierbar in sophomorix-ui CALCLIST,CALCTRUELIST,CALCFALSELIST)
+
+OK: module_path true/false ist ohne ,(komma)
+
+BUG: sophomorix-session ..... "" soll alle user raus löschen:
+
+OK: --> test-1 update für neues UI
+
+OK: true UND false-Einträge kommen in sophomrixWebuiCalculated
+OK: module path muss bei der Rolle erwähnt werden (INI-Datei)->INI gibt vor, 
+    welche module_path in welcher Rolle erlaubt sind
+
+TODO: check performance of sophomorix-ui
+      im moment werden alle user upgedated
+      performanter zu checken, ob upgedatet werden soll, oder einfach immer jeden updaten
+
+
+TODO:
+
+sophomorix-room zeigt die attribute eines raum, evtl. mit eingeloggten usern
+
+
+
+
+- /etc/linuxmuster/sophomorix/global.devices.csv parsen und ohne prefix anlegen
+  --> im setup die server dort eintragen
+
+- Befehl um alle User-Rollen und Gruppen-Typen anzuzeigen
+  sophomorix-samba --roletype
+  --> mit anzahl der User in dieser Rolle
+
+- sophomorix-ui integrieren in sophomorix-add (und update???)
+  (Dann aus test-1 und test-5 raus)
+- NTACL- funktion bauen mit wenig output (evtl. auch ander smb-befehle)
+
+- sophomorix_config_hash
+  aufräumen, klarstellen
+  "ROLE_USER" wird das gebraucht? gibts bei LOOKUP
+   Besser so:
+   LOOKUP -> user     -> roles
+          -> computer -> roles
+          -> group    -> types
+   - testen auf doppelungen
+   - shortname lookup/existance in LOOKUP
+   ALL von anderen trennen 
+   ROLES_DEVICE -> ROLES_COMPUTER
+
+
+- run the complete system to a defined state
+  -> option in each test --defined-state
+  --> adds user, groups,projects ... and stops there 
+  --> configure AD searches in apachedirectorystudio
+      (read only configuration for Bug hunting)
+      config file for apachedirectorystudio:
+          SEARCHNAME;BASEDN;FILTER
+      script to apply the searches to a certain connection
+
+
+DRINGEND: 
+   OK: JSON output markieren
+
+   Zuerst: schema fertig machen
+   --> OK custom attributes
+   --> OK intrinsic attributes
+   --> OK: show sophomorix attributes
+   --> OK: make capital: in school.conf.master:
+
+   --> sophomorixUserToken
+             OK: schmema
+             OK: --> mit login angelegt, 
+             TODO: danach per sophomorix-user updatebar (Lehrerkürzel-Feld, falls nicht mit login gleich)
+   --> sophomorixFirstnameInitial
+       sophomorixSurnameInitial
+             OK: schema
+             OK: setting on user creation
+             OK: update on user update
+   --> OK: Testing the attributes in test-1, Test workflow:
+               sophomorixUserToken
+               sophomorixFirstnameInitial
+               sophomorixSurnameInitial
+               sophomorixCloudQuotaCalculated
+
+   --> OK: sophomorix-user -i zeigt neue Attribute
+
+   --> OK: Bei der Rolle in der school.ini eintragen:
+       CLOUDQUOTA_PERCENTAGE=100	   
+   --> OK:
+       --> multipliziert das Quotafeld der eigenen schule mit
+       CLOUDQUOTA_PERCENTAGE/100 und füllt damit (je nach Rolle)
+       das neu anzulegende Attribut: sophomorixCloudQuotaCalculated
+       --> Ausgabe,update mit sophomorix-quota
+
+--> OK: Zeitattribute umstellen oms syntax 
+   --> TODO: caching einstellen
+   --> TODO: searchflagsumstellung ohne Editor möglich?
+             geht das mit NET::LDAP module und update?
+
+  userPrincipalName ist user logon name (mit @linuxmuster.net)
+  sAMAcountname ist pre windows2000 logon name?
+
+
+  TODO: sophomorix-query shows custom and intrinsic attributes
+   (and other newly added stuff)
+  --> umgesetzt, TEST
+  --> MANAGEMENTGROUPS bei usern, TEST
+
+  userAccountControl:
+    OK: disabled/Enabled
+    TODO?: User cannot change password
+    TODO?: Password never expires
+    Todo?: Store password using reversible encryption
+  AccountExpires: Todo? setzen mit sophomorix-update???
+
+  userWorkstations (MultiValue: 
+         (Falsch?: sieht man da an welchen workstations der user angemeldet war?)
+         (Richtig?: An welcher workstation darf dich der user anmelden)
+         (Anmelden vermeiden der Schüler am Lehrerzimmerrechner, Klassenarbeitsmodus) 
+                    Anzeigen mit sophomorix-user -iv --user <sam>?)
+
+   TESTEN: single/multi custom/intrinsic usw. wieder leeren möglich?
+   
+   --> TODO: create function to update intrinsic and custom attributes
+       (and all that are just updated by option, no question asked: sophomorixComment)
+       rename options to attribut name in script, use shortcut names only as option
+
+       &update_intrinsic_custom_attributes (%options, "user|group|project|...")
+       sub update_intrinsic_custom_attributes macht folgendes:
+           --> sind/welche Attribute sollen gesetzt werden in %options
+	       add/remove.....
+	       je nach user|group|project| eine passende update sub aufrufen
+
+   EVTL: (Bedingung searchflag update reicht aus)
+     Datei mit serachflags, Entwickler (und evtl. anderen Dingen)
+       sophomorixFirstPassword:128       # immer verborgen
+       sophomorixComment:128|1           # kann vom admin umgestellt werden, default ist (erste option)
+     sophomorix-repair --schema
+       --> wenn nur 1 Wert da, sophomorixFirstPassword:
+           setzt zwangswerte für searchflag (wenn nur 1 Wert da, sophomorixFirstPassword)
+       --> wenn mehrere Werte:
+           prüft das searchflag: wenn einer der Vorgabewerte: OK, sonst Auf ersten(default-Wert setzen)
+       --> evtl. parameter in sophomorix.ini:
+            GLOBALADMIN_MANAGED_SEARCHFLAGS=sophomorixFirstpassword, ...
+	    --> überlässt dem Serveradmin das SEARCHFlag management für diese Attribute komplett
+
+
+
+   18.04
+     -> smbclient option -mNT1 notwendig ab samba 4.7, 
+        da dann unix extensions nicht mehr mit dem Server verhandelt werden.
+        -mNT1: switch toold protocol SMB1 bei stat option
+
+     -> schematest: Zeitattribute
+     -> script um school share anzulegen
+     -> zusatzattribute alle fertig (kein Schema update mehr)
+ 
+   BUG: sophomorix-admin --kill globaladmin liefer Fehler bei zu
+   löschendem home, oder so
+
+   1) OK: Alle Konfigurationsdateien aus etc raus
+   2) OK: Postinstallscript installs sophomorix.conf and school.conf
+      --> global and default school is added by postinst
+
+   TODO: exit, if a configured school has no share
+
+   3) TODO: reinkopieren bei Schulerstellung
+      sophomorix-school --create --school <schoolname>
+   4) TODO: recreate all schools im postinst script?
+
+
+   Wenn schule konfiguriert (sophomorix.conf) UND share da:
+   --> sophomorix rennt los, keine weiteren tests 
+   --> ansonsten: mißconfigured school
+
+   --> <name>.school.conf
+   Paket: school.conf, students.csv, .... anlegen (leer)
+
+   sophomorix-school --check -->
+      falls erfolgreich. schulconfig anlegbar, mit --schoolcraete anlegen
+      --> Beispieldateien unter /etc/...
+
+   1) Configs nicht mehr im Paket
+   2) script um bisherige schulen anzulegen für tests im developer-paket
+   --> tests sollten laufen
+   3) sophomorix-school doku schule anlegen:
+      - sophomorix needs a school to add users in this school
+
+
+   M.R. Minisk:
+   sophomorix-device --room : PC's in einem Raum
+   (schüler,Lehrer,Drucken)
+   ... weitere ...
+   
+
+Todo:
+sophomorix-quota: mit tatsächlichen Werte von smbcquota vergleichen abfragen und mit dem Wert in AD vergleichen. mit Zusatzswitch --smbcquotas
+. Lesen der 
+
+--> examnutzer ohne Vorname Nachname ist das OK
+
+sophomorix-session --session 2018-02-20_15-07-21 -i
+--> probleme
+
+quota-Abfrage
+so tuts:
+ /usr/bin/smbcquotas --debuglevel=0 -U administrator%'KYtT64QP9ERT3Y4Y' -u beckjo //linuxmuster.local/default-school
+so nicht:
+/usr/bin/smbcquotas --debuglevel=0 -U administrator%'KYtT64QP9ERT3Y4Y' -L //linuxmuster.local/default-school
+
+sophomorix query
+
+todo:
+sophomorix-user sollte nur user finden mit sophomorix-Rolle (keine workstations )
+sophomorix-user -i -u NEXTCLOUD6$
+
+AD_get_full_userdata
+AD_get_full_groupdata
+AD_get_full_computerdata
+--> suchfilter anpassen
+
+
+Bug:
+sophomorix-user -i -u beckj*
+  -> zeigt Nothing known about user: beckj* (ist noch OK)
+  -> findet dann mehrere user
+     Aber nicht deren Logfiles LOGFILES:  Entries
+
+# fix typo
+grep for objectclass -> replace with objectClass
+
+
+# unschöne ausgabe:
+
+----------------------------------------
+# sophomorix-device
+wenn ein Rechner entfernt wird, erscheint unötigerweise:
+
+#### Hardwareclass members to be killed:                                  ####
+KILL: NEXTCLOUD5 from nopxe
+#### Removing member from nopxe:                                          ####
+   * WARNING: User NEXTCLOUD5 nonexisting (0 results)
+
+Reihenfolge anpassen?
+#### Hardwareclass members to be killed:                                  ####
+KILL: NEXTCLOUD6 from nopxe
+
+VOR 
+
+#### Killing 1 computers                                                  ####
+#### Killing computer NEXTCLOUD6$ (1):                                    ####
+   * DN: CN=NEXTCLOUD6,OU=server,OU=Devices,OU=default-school,OU=SCHOOLS,DC=linuxmuster,DC=local
+
+also ganz an den Anfang???
+----------------------------------------
+ Bei wiederanlage eines devices:
+
+#### Creating dnsNode: nextcloud7                                         ####
+   * samba-tool dns add localhost linuxmuster.local nextcloud7 A 172.16.0.22 --password='KYtT64QP9ERT3Y4Y' -U administrator
+       -> Record added successfully
+   * Adding Comments to dnsNode nextcloud7
+   * dnsNode nextcloud7 exists (1 results)
+   * samba-tool dns add localhost 0.16.172.in-addr.arpa 22 PTR nextcloud7  --password='KYtT64QP9ERT3Y4Y' -U administrator
+ERROR(runtime): uncaught exception - (9711, 'WERR_DNS_ERROR_RECORD_ALREADY_EXISTS')
+  File "/usr/lib/python2.7/dist-packages/samba/netcmd/__init__.py", line 176, in _run
+    return self.run(*args, **kwargs)
+  File "/usr/lib/python2.7/dist-packages/samba/netcmd/dns.py", line 1098, in run
+    raise e
+       ->    * dnsNode nextcloud7 (reverse lookup DC=22,DC=0.16.172.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local)
+
+scheint so, als ob der reverse lookup nicht entfernt werden würde
+
+--> Test schreiben für wiederanlage
+
+------------------------------------------------------------
+
+
+
+
+
+
+-j 
+
+-jj bevorzugt STDOUT: NUR JSON OBJECT
+              STDERR: NUR Fehler
+              Alle ausgaben mit print silent machen, aber alles geht
+              nicht weg
+
+
+17.10 Tests:
+- OK: Migration
+  --> Todo: BUG devices.csv wird nicht erzeugt, wenn total neuer gesetupter server
+         (beim 2.mal aufrufen tuts dann) 
+         sophomorix-vampire --datadir ../sophomorix-dump --restore-config-files
+- quota und shares testen/anlegen
+
+17.10 update
+- compatibility zu 16.04 raus, 17.10 und 18.04 rein
+- SID anzeigen lassen
+
+Todo: neue sub
+
+sub run_smb_script
+parameter: script (config-Verweis zu [EXECUTABLES])
+           optionstring
+           user
+           password
+--> Daraus erzeugen: 
+    je nach command wird ein Befehl zusammengebaut
+    1) Command:     <Executable> <optionstring> <login aus user/password>
+    2) Printstring: <Executable> <optionstring> <login aus user/****** statt password>
+    dann ausgeben des printstrings und ausführen des Command
+    (printstring: password abhängig von neu anzulegender variable [DEBUG] SHOW_SMB_PASSWORDS=TRUE)
+
+
+
+Migration: see file ./migration
+
+integrate sophomorix.ui in sophomorix-add/sophomorix-update/sophomorix-admin
+-just call sophomorix-ui
+dito mit quota
+
+sophomorix-ui tests
+sophomorix-test-1
+sophomorix-test-5
+mit individuellen ui Einstellungen anpassen
+
+AD_get_AD scheint langsam
+wird aufgerufen in:
+  * sophomorix-repair
+
+------------------------------------------------------------
+- sophomorix-device: 
+    * _console_print_devices
+      OK: schulweites auflisten der devices, 
+      TODO: evtl getrennt nach Rollen
+      hardwareclasses sind global-> better display am Anfang
+
+  --info -d <device>  (allow lowecase/uppercase/$account to fing a device)
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+sophomorix-kill/add:
+Test if its ok to run with 0 users the scripts (before script was terminated early)
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+Performance:
+sophomorix-check 3s
+sophomorix-user -iv braucht 5s (könnte schneller gehen???)
+------------------------------------------------------------
+
+Login-creation
+raumnamen/gruppen vermeiden???
+keine Ziffer anhängen
+
+Bei hinzufügen eines users in ein gruppe, testen, ob die von richtigen typ ist
+Bespiel computer soll in die Gruppe 7a, sollte nicht gehen
+
+
+------------------------------------------------------------
+sophomorix user -i -u <login> ()
+sophomorix-user -u (ohne weitere option -i sollte den user anzeigen)
+--> und auch andere scripte 
+    sophomorix-group, ...
+Wie umsetzen?
+alles anderen optionen verarbeiten, als letztes --info ???
+
+BEISPIEL: sophomorix-class
+my %options=();
+my $testopt_new=GetOptions(\%options, 
+                           "help|h",
+                           ...
+                          ); 
+&check_options($testopt,\%sophomorix_result,$json,\%options);
+
+
+performance
+
+sophomorix-user -ij
+
+2) sophomorix-search
+
+
+--> auf Schule einschränken 
+    --school schule
+
+    schulselektor, 
+
+    --> Listen dazu
+
+    Wichtig dropdown
+
+
+    user in einer gruppe
+
+    -- alle klassen einer Schule
+       (einschränkung projecte)
+    -- computer
+
+    --school einschränkung
+    
+  
+
+1) sophomorix-check : Ergebnis anzeigen
+
+--> 
+
+
+code_cleanup
+%options --> %option?
+Optionen, die default --- haben sind etwas ungeschickt
+
+NEW BEGIN
+
+The object GROUP is provided by ONE OF the options class OR project
+(But ONLY ONE of them):
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class,project".
+
+The object GROUP can be assembled by ONE OR MORE of the options
+(But at least ONE of them):
+$options{'CONFIG'}{'SOME_OF'}{'GROUP'}="class,project".
+
+The object GROUP can be assembled by NONE,ONE OR MORE of the options
+$options{'CONFIG'}{'MAYBE'}{'GROUP'}="class,project".
+--> why is this checked?
+   class,project are only possible as modifiers of the OBJECT.
+   
+One option depends on others:
+(Option set needs options create AND new to work)
+   $options{'CONFIG'}{'DEPENDS'}{'set-gidnumber'}="create,new";
+
+ACTIONS that need the object GROUP:
+
+$options{'CONFIG'}{'ACTION'}{'GROUP'}="create";
+
+   
+   todo:
+   $options{'CONFIG'}{'ADDINFO'}="class,adminclass";
+   if no ACTION option is given, AND
+      one of these ADDINFO options is given
+   --> set info=1 
+
+   exit if options are not combined properly
+
+   
+NEW END
+
+# options that provide the object PASSWORD
+# These options provide a password, but you can use only one at a time
+$options{'OBJECT_SINGLE'}{'PASSWORD'}="password,randompassword"; 
+
+# options that provide the object USER
+# These options provide a user/userlist, you can use them together
+# class: take the users of a class
+$options{'OBJECT_MULTI'}{'USER'}="user,class";
+$options{'OBJECT_MULTI'}{'GROUP'}="project,extraclass,teacherclass";
+
+
+Vielleicht kann folgendes auch gescripted werden:
+unbenutzte optionen sollen undef sein
+Es bleibt immer gesetzte optionen
+
+INFO-MODE  
+  STANDALONE TRUE/FALSE  -> ohne weitere OPTIONEN
+  USER  -> 
+  CLASS
+
+ACTION-MODE
+
+... mehr?
+
+whitelisting:
+STANDALONE optionen definieren
+(alle anderen sind dependant und MÜSSEN erwähnt werden)
+
+
+siehe Beispiel in sohomorix-minitest
+Es folgnde typen von optionen
+
+sophomorix-scripte die Objekt modifizieren:
+EINTEILUNG in (JEDE Option muss irgendwo drin sein)
+** MODIFIER (können ALLE optionen modifizieren)
+   json="TRUE"
+   verbose="TRUE"
+   school="TRUE" (if not data object)
+** ACTION_STANDALONE (mussen alleine aufgerufen (außer Modifiers) werden, --help, --listteachers, ....)
+   {'help'}="TRUE"
+   {'listteachers'}="TRUE"
+
+** ACTION_OBJECTDEP (müssen mit einem OBJECT aufgerufen werden
+  (z.B. in --user <user> --comment <comm>) die option --coment <comm>)
+   {'comment'}=USER  (comment brauch USER Object)
+   
+** OBJECT (stellte ein Object bereit: --user <user>, --class <class>)
+   # Optionen, die user-OBJECTs bereitstellen
+   {user}{'USER'}
+   {group}{'USER'}
+   {all}{CLASSTYPE}
+   {adminclass}{CLASSTYPE}
+   USER,CLASS,...
+
+** CONFLICTING (schließen sich gegenseitig aus)
+  {'CONFLICTING'}{'PASSWORD'}{password}
+  {'CONFLICTING'}{'PASSWORD'}{randompassword}
+
+** ACTION_STANDALONE_PAIRS (do not)
+  {'oldlogon'}{'newlogin'}
+ACTION_OBJECT_PAIRS (need an object)
+  {'?'}{'?'}
+
+
+** DEFAULT_NONOPTION (was passiert wenn keine option angegeben ist)
+   --> help         (diese wird gesetzt: z.B. sophomorix-user)
+** DEFAULT_ONLYOPTION
+ (was passiert wenn NUR (Ausnahme MODIFIER)
+  EINE bestimmte option angegeben wird?
+   user --> info (zusätzlich)
+   (wenn außer MODOFIER )
+
+
+TESTEN:
+# nicht-MODIFIER ermitteln -> speichern, Zählen
+# keine Option außer MODIFIER -> DEFAULT_NONOPTION
+  --> return
+# zusatzoptionen außer MODIFIER: DEFAULT_ONLYOPTION
+  --> return
+# ACTION_STANDALONE ohne andere OPTIONEN (außer MODIFIER)
+  --> return
+# ACTION_STANDALONE_PAIRS ... (außer MODIFIER)
+  --> return
+
+# objecte:
+# welche Objekte werden bereitgestellt:
+  OBJECT durchgehen
+# sind die objecte für ACTION_OBJECTDEP da
+  --> weiter
+# conflicting: alle Namen durchgehen
+  Conflicte testen
+  --> return
+
+------------------------------------------------------------
+
+
+
+
+
+
+sophomorix-check:
+use a sub for cleanup the files in checkresult and other places
+when exiting with error: clean up also
+
+
+when 
+ 1) a user is in sophomorix.update
+ 2) and it is set to killable:  sophomorixx-user -K -u gal42
+ 3) sophomorix-check again
+ 4) then it cannot be killed, only updated
+    --> is this ok so?
+    --> should the user appear in both update and kill?
+
+
+--------------------
+Bugs:
+
+sophomorix-device:
+Listet auch nicht-sophomorix nodes --> verbessern
+wie werden die Einträge gemacht (devices.csv)
+--> ist bei default-school drin, sollte nach global?
+
+
+sophomorix-user:
+-> funktionen die suchen dann noch sophomorix -user -s "del R"?
+dito für Gruppen (auch comment displayname usw. )
+
+oder sophomorix-search?
+option objectclass
+option school
+
+Ergebnis: samaccountname objecttype sophomorixType/Role
+
+
+
+OK: extraclasses.csv
+
+Example Line:
+gast;gast;20;10.1.2000;Gaeste;pwd;26.11.2019
+
+
+FIELD1: groupname , will be updated
+FIELD2: basename for logincreation: Used on user creation, but not later!
+FIELD3: used to number the users: increasing later adds more user (keep basename so that they will fit)
+
+------------------------------------------------------------
+Was tun?
+
+A) change to ini format?
+
+Super wäre, wenn FIRSTNAME,LASTNAME konfogurierbar wären
+ (updatebar)
+user müssten dann aber per loginname zusammengführt werden, nicht per identifier (aufwand)
+
+[groupname]
+        ENDDATE=  (wird hier analysiert)
+        USER_NUMBER=24
+automatisch:
+        FIRSTPASSWORD=(nicht mehr änderbar, könnte auch Zufallspasswort sein)
+        CREATIONDATE= (könnte auch automatischgesetzt werden)
+        BASENAME (nicht mehr änderbar, oder doch? alte user löschen/neue anlegen)
+                 oder =groupname
+per sophomorix-class
+	COMMENT=...(Für <groupname>)
+
+
+ODER:
+
+[BASENAME]
+    GROUPNAME=(bei ändern wird neue gruppe erzeugt und die user verschoben, alte gruppe verwaist/glöscht)
+    GROUPCOMMENT=(Für die Gruppe <groupname>)
+    USERCOMMENT=(Für user)
+    ENDDATE=  (wird hier analisiert)
+    USER_NUMBER=24
+    FIRSTPASSWORD=(nicht mehr änderbar, könnte auch Zufallspasswort sein)
+    CREATIONDATE= (könnte auch automatischgesetzt werden)
+
+
+what should be changeable?
+- number of users (remove/add at once, no toleration)
+- klassename (verschieben)
+- comment
+- enddate
+
+
+B) durch sophomorix-extraclass ersetzen
+- klasse anlegen (geht schon), sophomorixToleration/Deactivation Date nutzen, 
+- useranzahl anlegen in der Klasse (STATUS W,waiting for termination)
+
+------------------------------------------------------------
+
+
+ACL:
+
+ordner share,program
+OK 1) parallel zu management,students,teachers in jeder Schule und global
+Todo   2) dann paket
+Todo   3) anschließend ntacl abernten
+
+* Tests für project acl
+* nichtlöschbar fehlt noch
+* examgroup fehlt noch, examuser, ...
+
+
+
+############################################################
+Todo END
+############################################################
+
+
+
+AK:
+Win 10, wie sichtbar, wer angemeldet ist.
+
+linbo WEBUI:
+- kernel-parameter als drop-down mit beschreibung wozu
+  (... fix for Motherboard xyz)
+
+kommentare in devices.csv erhalten
+
+Übungsfirmen als Schulen
+Lehrernetz schülernetz-Trennung
+
+
+Schulkonsole:
+Umgang mit Tauschlaufwerken:
+- Inhalt löschen| Inhalt ReadOnly noch x Tage zeigen, ...
+  (evtl. als Lehrer)
+- schülerhome nur ro als Lehrer
+- Button um Lehrer am schuljahresende aus allen Klassen zu entfernen
+
+
+------------------------------------------------------------
+2017 Essen-Tagung
+firewall: wie für einzelne user ssh nach außen zulassen
+Funktionsgruppe ssh allow?
+
+doku: Gruppenkonzept Hirarchie
+schüler -> klasse -> schulstudents -> SCHOOLS
+
+Klassenarbeiten mit Moodle
+gibts was umzusetzen??
+
+
+
+paket signieren, pgp-schlüssel
+
+rename samaccountname-> not supported
+- Evtl. in mehreren Schritten:
+  1) neuer Account anlegen
+  2) passwordcopy
+  3) alter expiren lassen
+  4) alter löschen
+
+
+   
+Loggen ab 17.10. 
+??? samba_sid mitloggen?
+
+############################################################
+BUGS:
+############################################################
+
+------------------------------------------------------------
+
+TODO: 
+
+quota: 
+
+setzen der admin quota auf werte aus sophomorix.ini
+school/globalbinduser: 0
+school/globaladmin: 1000 MB, 1000MB oder unbegrenzt?
+Es gilt das bei user gesetzte quota 
+--> siehe sophomorix-quota --developer-set-quota
+    --> setzt einzelquota
+sophomorix-admin -i -a globadm
+so umbauen, dass es auch Einzelquota für admins setzen kann
+
+----------
+performance???
+AD_get_quota evtl auf 1 user limitieren mit Option
+(nur 1 user lesen, Rest gleich)
+----------
+
+
+NEXT/Todo:
+
+Bug beim anlegen weitere extraclass user
+
+------------------------------------------------------------
+sophomorix-ui
+
+todo:
+
+bug: sophomorix-check
+
+# todo
+# sophomorix-user -u xxx --add-webui-permissions "WEBUI:upload:TRUE" test names
+
+
+
+in die Tests einbauen:
+- sophomorix-test-5
+sophomorix-test-1 --mod
+
+
+------------------------------------------------------------
+doku in wiki:
+
+
+
+Auswertung (=Berechnung des Attributes SophomorixWebuiPermissionsCalculated für jeden user)
+------------------------------------------------------------
+
+################   Kurzablauf: <webui> ist als variable zu sehen
+
+
+------------------------------------------------------------
+Performance:
+sophomorix-ui für 3500 user: 
+MIT  update: 72   sekunden
+OHNE update:  1,8 sekunden
+(bei 2 entries bleibts bei 1,8 sekunden)
+------------------------------------------------------------
+
+sophomorix-ui startet
+
+erläutern der wichtigsten optionen:
+  - usermods anzeigen
+  - abgekündigtes modul
+  - umgang mit Rollenwechsel
+------------------------------------------------------------
+
+
+Tests auf 17.10 linuxmuster.local/lan -> parameter testen 
+
+apt install emacs sshpass make nfs-common
+
+
+sophomorix-exam-mode -i:
+* user get_full userdata???
+
+sophomorix-devices -i
+* use hash group_v? if possible?
+
+sophomorix-room -i ?
+--> use group_v
+
+
+mailalias:
+make configurable in school.ini
+--> in role section ???
+   todo: sub alias_from_name  in sophomorixBase werted das aus
+
+------------------------------------------------------------
+Überlegen:
+
+Neue such subs sind:
+
+Alle Gruppen (aller Schulen):
+   AD_get_groups_v
+Gruppen im Detail:
+   AD_get_full_groupdata
+
+Alle User (aller Schulen):
+   AD_get_users_v
+User im Detail:
+   AD_get_full_userdata
+
+Alle Shares/Schulen Übersicht
+AD_get_shares_v
+
+
+
+Alle User/Gruppen
+Todo: Diese sollten mit der Option <school> aufgerufen werden
+wenn school eine Schule ist, dann 
+--> dann wird nur der Unterbaum durchsucht
+wenn es keine Schule ist
+--> abbruch
+wenn es "---" oder "ist", dann alle schulen
+
+--> Rückgabe in der gleichen Datenstruktur
+
+? Was tun wenn man eine Gruppenliste braucht
+? Was tun wenn man eine Userliste braucht:
+--> festlegen
+
+
+---> alte Funktionen evtl. weglassen/umscreiben auf eigentlichen Zweck:
+remove AD_group_list (at least display/print options)
+remove AD_project_fetch (at least display/print options)
+       -> print commented
+       -> replace with other function
+dito: AD_class_fetch
+
+Ausgabe von user/Klasseninfo:
+  * creationdate bei Anzeige umwandeln in lesbares Datum (Format Konfigurierbar)
+  * comments to listing of Values (... in MiB)
+  * SID:
+    gibts erst ab artful 17.10:
+    libnet-ldap-sid-perl
+
+option to add a description:
+sophomorix-group --description --group >name< tut das schon ????
+
+bei gruppen ausfüllen:
+   displayname?
+   sophomorixComment (nicht nötig, da es displayname,description gibt?)
+
+
+DOKU:
+sophomorix-user - abfrage
+see SophomorixBase.pm at json_dump
+for an Info Listing:
+ A) create a sub that creates a json object
+    give it a name with $jsoninfo
+ B) with &json==1, the json obect ist printed
+ C) without, a _console_print_... function is called that uses this json object
+
+multischool:
+sophomorix-userlock --global
+sophomorix-userlock --school <name>
+
+
+Adding a user/group/...:
+when AD adding was succesful, continue, else not
+
+session2group
+session2project
+--> sollte es sowas geben (z.B. Oberstufengruppen, einer klickt, andere können nutzen)
+
+
+
+
+
+tests aller quota (4 angaben bei allen gruppen)
+
+testen ob bei developersetquota auch comments gehen,
+wird der user auch upgedated?
+
+man sollte bei quotaangaben auch NUR Comment angeben können
+z.B.: kein userquota wegen ... mit --quota bsz:---:Kommentar
+
+wird Kommentar auch upgedated werden
+testen der werte die an --quota --mailquota übergeben werden
+Zahlen: 0-9
+Kommentare: a-9a-zA-Z 
+
+
+
+
+
+SMB-shares
+school shares anlegen scripten:
+1) lokal -> scripten
+2) share existiert
+   sophomorix-repair --school aufrufen
+(bisher: schule wird repariert bevor user angelegt werden)
+3) quotatest
+
+Bug:
+sophomorix-add -j soll auch json Return Objekt ausgeben, wenn nix anzulegen ist.
+dito -update, -add.....
+
+sophomorix-quota:
+
+sophomorix-project
+sophomorix-class
+bei Option -i, die Quota angaben (mit Comments, UNTER die Mitgliedersummierung),
+ganze Zeile verwenden
+
+sophomorix-project -i
+sophomorix-class -i 
+sophomorix-group -i 
+* --min-user <num> --max-user <num>
+
+
+sophomorix-quota 
+* tests schreiben
+
+
+* sophomorix-check -ij: check which schools have a working smb file server
+  * exit with error, when a user would be created
+* sophomorix-quota: test if quota can be set
+* sophomorix-school: test for school
+  test if quota are enable
+  ... -F OK smbshare responds
+  ob quota enabled sind: parsen des Outputs
+  
+
+
+toolbox script to query as ordinary user
+check if confidential attribute is hidden
+deploy confidential attribute further
+
+
+
+
+
+
+Info:
+
+Mail:
+-mailman extra dazu
+
+Docker:
+container unter /var/lib/docker/...
+daten unter /srv/docker/linuxmuster-mail
+c't-Artikel lesen
+
+Mailattribute
+OK: attribut mail  -> Füllen  loginname@linuxmuster.net ()
+TODO? Was ist zu tun? 
+proxyAdresses  - multivalue, noch leer
+mailAdresses
+
+
+paketserver:
+- weiterhin mit minidinstall
+  synchronisation nach
+  
+  deb http://schmitt.linuxmuster.org/lmn7/ /
+  deb http://fleischsalat.linuxmuster.org/lmn7/ /
+
+viertelstündlich
+
+nicenstein 
+
+
+-- mehrschullösung
+   1 Mailserver für alle schulen, gleiche maildomain (vorerst)
+
+
+
+sophomorix-school --check
+   - sophomorix schaut, ob diese Schule existiert
+   - Woran erkennbar?
+      - Achtung: nur smb:// Befehle benutzen, da das share remote liegen könnte
+      - es gibt ein smb-share mit dem Schulnamen
+        (ein paar Namen für Schulen sind deshalb verboten, welche?)
+      - in dem smb-share befindet sich toplevel eine Datei aquota.user
+        (Sieht man die Datei im smb-share)
+      - Tests:
+         - kann sophomorix eine Datei anlegen? smbclient
+         - kann sophomorix eine NTACL setzen?  smbcacls
+         - kann sophomorix quota setzen?       smbcquota
+   - Wenn share nutzbar --> Schüler werden angelegt
+     sonst Abbruch BEVOR was gemacht wird:
+     Zur Schule <school> gibt es kein smb-share 
+
+5. Feld angleichen (lehrer,schüler)
+   A) schueler.txt an lehrer.txt/extraschueler:
+      5. Feld wunschlogin, 6. Feld unid
+      Problem:
+         - Schüler-Export ändert sich zur 6.x
+	 - Schüler export braucht Leerfeld (sehr problematisch)
+	 - Migration
+   B) lehrer.txt/extraschueler an schueler.txt
+      5.Feld unid, 6. Feld wunschlogin
+      Problem:
+         - lehrer-export ändert sich zur 6.x (eher gangbar als A))
+	 - Lehrerexport braucht Leerfeld
+	 - Migration
+   Beides aufwendig und betrifft auch
+   - den workfow an den Schulen (Sekretariat Verwaltung, ...)
+     schwierig umzustellen
+   - Pakete, Fortbildungen, Beispieldateien, ...
+   - das ganze ohne jeglichen Mehrwert, Zusatzfeature
+   ---> Besser Finger weg.
+        SK solte sich den langjährigen Gegebenheiten anpassen.
+	Fallunterscheidung lehrer/extraschueler und schueler
+	(sophomorix-check -ij gibt die Infos)
+        
+
+------------------------------------------------------------
+Schulkonsolen-konfiguration
+(SK=Schulkonsole(eine von vielen), Webui=Ajenti, ...):
+
+TODO: kurzverfahren aufschreiben
+
+Umsetzung:
+
+
+------------------------------------------------------------
+WIDERSPRUCH:
+single-user einstellungen in school.ini oder AD?
+
+2 unterschiedliche Methoden sind angedacht, auf welche einigen?
+
+1) festplattenquota, mailquota, ...:
+   sophomorix-quota trägt die Werte ins AD ein.
+   (nicht in eine Textdatei)
+   Falls beim user der Quota-Wert nicht leer ist
+   wird er benutzt um defaultquota, klassenquota zu überschreiben
+  
+
+2) schulkonsolenmodule
+   default aus school.ini, sophomorix schreibt bei JEDEM user die Werte ins AD rein.
+   Individuelle module nicht vorgesehen, aber notwendig
+   (modul testen, modul verbieten, ...)
+   Individuelle Werte:
+   A) In school.ini z.B. mit
+      [users]
+	webui_show=user1=modulname1,modulname2,user2=modulname2,
+	webui_block=user1=modulname1,modulname2
+      --> problematsch:
+        - sehr school.ini/lange Zeilen,
+	  (quota sollte dann eigentlich auch in school.ini)
+        - school.ini aus der Produktion nicht mehr so einfach kopierbar,
+	  da sie individuelle Einstellungen enthält
+   B) ins AD
+      wie erkennbar, dass ein user individuelle module sieht?
+      --> Zusatzattribut in AD
+          Sophomorix-Webui-Custom=TRUE/FALSE
+	  (in Anlehnung an quota sollte es dieses Attribut auch für
+	   Klassen/Projekte geben)
+
+Generelle Idee:
+Einstellungen (quota,SK-module, ...) habe folgende hierachie
+
+serverweit
+    --> globalweit
+    --> schulweit
+          --> rollenweit (begrenzte Anzahl)
+	      --> Gruppenweit
+	          (Klassenweit/Projektweit unbegrenzte Anzahl)
+	         --> Individuell (user)
+Vorschlag:
+1) school.ini:
+      Vorgaben für die ganze Schule
+      Vorgaben für eine Rolle
+   AD:
+      Vorgaben für eine Gruppe
+      Vorgaben für einen user
+
+2) sophomorix-quota/mailquota/sk (module) berechnet für jeden user:
+   - entsprechend der Schule/Rolle/Gruppe einen Wert, der für den user gilt:
+   - die kann individuell überschrieben werden, wenn ein FlagAttribut beim
+     user gesetzt wird (sophomorixQuotaCustom=TRUE/FALSE)
+
+3) im entsprechenden USER-Attribut
+        SophomorixQuota
+        SophomorixMailquota
+        Sophomorix-(Webui)-User-Permissions
+     steht dann IMMER der finale Wert.
+
+siehe auch Managementgroups:
+wäre wohl besser deren defaultmembers im AD bei der Gruppe zu speichern
+
+------------------------------------------------------------
+
+
+
+Moodle Testzugriff Stefan
+Arbeitskreis
+- ACL, Windows-Clients, Linux-Clients???
+  Rainer, Buch kopiert mit sssd
+  Domänenbeitritt ja, Auswirkung auf linbo
+
+confidential: nicht schulweise
+sondern Mitgied in Gruppe
+
+sophomorix-device return json (import von Thomas auch)
+
+CUPS via Samba
+wer macht das?
+
+
+Setup mit Partition =Schule
+-> lvm, usw...
+   sollte in die Doku von Linuxmuster-base
+
+
+#####################################
+LVM einrichten
+
+pvcreate /dev/xvdb
+vgcreate srv /dev/xvdb
+
+lvcreate -L 10G -n default-school srv
+mkfs.ext4 /dev/srv/default-school
+mkdir -p /srv/samba/schools/default-school
+
+lvcreate -L 30G -n linbo srv
+mkfs.ext4 /dev/srv/linbo
+mkdir -p /srv/linbo
+
+lvcreate -l +100%FREE -n global srv
+mkfs.ext4 /dev/srv/global
+mkdir -p /srv/samba/global
+
+## /etc/fstab
+/dev/srv/default-school /srv/samba/schools/default-school  ext4  defaults       0       0
+/dev/srv/linbo /srv/linbo       ext4  defaults       0       0
+/dev/srv/global /srv/samba/global       ext4  defaults       0       0
+##############################################
+
+
+-> Wann geht sophomorix von einer funktionierende Schule aus?,
+   -> gemountete Partition?
+   -> aquota.user existiert?
+   --> soll ja schnell gehen, oder 
+
+ext4 und 1 smbshare=1 partition
+Ubuntu 17.10 Base
+-> key nicht aktuell
+-> vor entwicklertreffen testen
+
+############################################################
+Entwicklertreffen
+- Hardwareclasses
+  als attribut (-> ja, für scripte)
+  als Gruppe?
+- MAC-Adresse? wohin im AD, vorgesehenes attribut von MS?
+Info:
+unicodePwd: kann nicht direkt gesetzt werden
+ der Wert unicodePwd wird mit Net::LDAP dem samba4-server im
+ Klartext übergeben (firstpassword), der samba4 server speichert es gehasht ab
+sophomorix-mamagementgroup
+- brauchts die optionen --admins/--noadmins ?
+   -> alladmins oder <schulname>-admin?
+   wie macht man einen Lehrer zum admin, global-admin?
+   sophomorix-admin ??
+   muss der dann in alladmins und <schulname>-admins
+
+Ersetzungen:
+   ADMINLIST, woran erkennt man admins
+   Schulweite config oder Systemweite config:
+   URLSCHUKO 
+   URLMOODLE
+   URLMAIL
+
+Mail:
+ -> Eigene Mail, aber was (Anbindung an AD, Mailinglisten, Aliase)
+    - Docker mit postfix, dovecot: fürjeden user mailadresse
+    - Mailinglisten mit mailman (von AD userlisten holen)
+
+Firewall:Opensense
+
+OK: sophomorix-passwd -u ... --pass .... sollte tun
+???: interaktiv
+???: altes passwort gilt noch weiter
+???: passwort change tests in tests
+???: return correct error in JSON from samba when password ist too simple or too short
+???: dito when resetting password
+???: dito when testing firstpassword
+???: dito om --interactive (better output)
+
+------------------------------------------------------------
+
+
+
+
+Todo:
+
+smbcacls,smbcquotas usw. command
+
+sub execute_smbx_command($base_command,$part1,$part2,$smb_pass);
+  $smb_pass is fitted between $part1 and $part2
+-> centrally configurable sophomorix.ini
+   SHOW_SMBX_COMMAND=TRUE/FALSE
+   # command zeigen, ohne password bzw '******'
+   SHOW_SMBX_COMMAND_PASSWORDS=TRUE/FALSE
+   --> wichtig beim debuggen usw.
+
+testen mit: 
+&execute_smb_command("SMBCQUOTAS",$debug_level,$smb_admin_pass,""," -L //$root_dns/$share"
+sophomorix-quota --share all -F
+sophomorix-quota --share all -L
+
+
+
+Auf share setzen
+OK: "strict allocate = yes"
+Todo: --> document in source
+
+bei 
+sophomorix-quota --developer-setquota all:-4 -u maiersa42
+gute Fehlermeldung anzeigen
+
+
+Testen project-acls (Tests anpassen)
+
+Ersetzmechanismus von  @@PROJECT@@ in repdir.project anpassen
+@@GLOBALPROJECT@@ einführen
+
+--> wie legt man ein globales project an?
+ --> todo
+
+
+
+
+
+sollte man default quota setzen auf dem share für alle schüler?
+haben die dann beim anlegen den default?
+
+Quota doku zeichnen
+sophomorixQuota beim user: <share>:<user_hardlimit>:<user_calculated>:<smb-quota-actually-set>
+
+tools: fill up quota with mput (use kernel for example)
+
+
+Also bräuchte man für eine 
+
+
+smbcquotas -F //localhost/share
+
+--> Quotas Enabled On
+
+Flags:
+
+Enabled
+Deny Disk
+Log Soft Limit
+Log Hard Limit
+(--> wohin wird geloggt?)
+
+smbcquotas -L //localhost/share
+
+Add a limit:
+smbcquotas -S UQLIM:<user>:<num_hard_bytes>/num_soft_bytes //localhost/share
+
+--> wird nicht exakt umgesetzt (zum nächsten Block im FS umgesetzt)
+
+linux: repquota zeigt in 1k Blockgröße an (1024*kleiner als smbcquotas)
+
+smbcquotas -S UQLIM:<user>:-1/-1 //localhost/share
+--> No LIMIT
+------------------------------------------------------------
+
+############################################################
+
+------------------------------------------------------------
+sophomorix needs to run on the domain controller:
+  - next uid/gid files
+  - access to /var/lib/samba/private/sam.ldb (update unicodePwd)
+------------------------------------------------------------
+
+next developer meeting
+
+sophomorix-exam-mode --unset --participants <user1>,<user2>,..
+soll da noch der participant hinzu?
+- um das wegnehmen des users aus einer ka zu erschweren?
+------------------------------------------------------------
+
+sophomorix-print:
+können Daten, die mit --caller-copy kopiert wurden vom user gelesen werden?
+
+richtig testbar erst nach Migration
+
+List templates with help option?
+
+Ersetzungen???:
+   ADMINLIST
+   URLSCHUKO
+   URLMOODLE
+   URLMAIL
+
+?? Falls kein passendes paket-template in der richtigen sprache da ist, auf das Deutsche zurückgreifen?
+oder Fehler ??
+
+--project macht userliste (komplex da auch Gruppen mitglied sein können)
+
+??? 
+exam-mode nur bei bestimmten Status erlauben? Aktive user
+???
+
+sophomorix-session -i -s session:
+
+
+
+AD_user_kill
+   identifier unused in sub -> remove?
+   mitloggen der genutzten samaccount namen?
+
+sophomorix-passwd: password ändern mit option
+
+
+austeilen/einsammeln-Befehle
+------------------------------------------------------------
+von unix auf smbshare mit: mput, recurse
+
+optionen: sharename,unix-from-path
+
+/usr/local/bin/smbclient //servername/share  -c "cd remote_path_of share; lcd /var/schuko/dir; prompt; recurse; mput *; exit;"
+
+prompt: Nachfrage für jedes file an/aus (prompt=aus)
+exit: beendet connection
+
+exit evtl. vermeiden und mehrfach kopieren, spart Zeit?
+
+von smbshare zu smbshare
+
+  * server site copy nutzen:
+    https://wiki.samba.org/index.php/Server-Side_Copy
+  * gvfs
+    http://manpages.ubuntu.com/manpages/trusty/man1/gvfs-copy.1.html
+  * mount als smb share, use find usw, rsync
+  sudo mount -t cifs //192.168.2.73/BACKUPS /mnt -o username=luis,file_mode=0777,dir_mode=0777
+
+debuglevel von samba an smbclient, usw. durchreichen
+default=0
+
+
+password hash cloning cloning
+optional $ldap,root_dse
+wenn undef, dann selber bindm,unbind
+
+
+sernet-Pakete:
+- Wichtig Rahmenbedingungen:
+  - dauerhafte Lösung für linuxmuster.net ohne Nachforderungen
+  - unbekannte Anzahl von schulen
+  - eigenes Repo auf http://pkg.linuxmuster.net erforderlich, da Pakete zuerst getestet werden müssen,
+    bevor sie an die Schulen verteilt werden können
+- Kosten sind fürden  Verein möglich zu übernehmen, geringer Umfang
+- verzögerte Pakete OK für linuxmuster.net, aber nicht bei:
+   - sicherheitskritischen Dingen
+   - selbst bezahlten features (smbcacls rekursiv)
+
+
+------------------------------------------------------------
+PROGRESS (Rückgabe bei langlaufenden Scripten)
+
+--> STDERR
+comment_en
+step:
+final_step
+duration:
+duration_time   (noch )
+
+OK: sophomorix-add
+    ---> beispielhaft
+
+sophomorix-update
+sophomorix-kill
+sophomorix-device
+sophomorix-exam-mode mit progress JSON output
+    setting user ... in exam mode, unset
+-> Textstrings in sophomorix.ini
+
+
+
+------------------------------------------------------------
+sophomorix-repair --school auf resettetem system mit vielen Fehlern
+
+todo:
+0) testen ob hash bei demselben password gleich ist
+   -> password übertragbar?
+1) school share: statt guest ok -> valid users = @LINUXMUSTER\acb  @LINUXMUSTER\global-admins
+2) mv von homes
+3) migration:
+    * tausch syncen
+      wie macht man ein Verzichnis read only auf einem share nur für die Gruppe?
+    * migration_repair eines home
+      - acl für dir?
+      - acl für file?
+
+------------------------------------------------------------
+1. NTACL: vollständige Klärung, ob wir die Controlbits weglassen können
+   Control bits ergeben sich durch setzen der ACL's
+   Propagation der inheritance (muss propagiert werden)
+   Windows-GUI macht das rekursiv, smbcacls kann das (noch) nicht
+
+2. Die NTACLs unseres Schulservers durchgehen
+   bisheriges home (schüler darf nur lesen und durch):
+   work  -> Hier darf Schüler schreiben
+   _einsammeln -> hier nicht
+   _austeilen -> hier nicht
+NEU: --> transfer
+
+
+   --> wird noch recherchiert
+
+   school-share:
+      statt
+        guest ok = yes
+      Kommt
+        valid users = administrator@LINUXMUSTER.LOCAL, @LINUXMUSTER\acb,  @LINUXMUSTER\global-admins, ...  (acb=schulgruppe)
+                      oder acb@linuxmuster.lan
+        -> workgroup= kurzer domänenname (kurze Domänename bzw. netbiosname)
+	-> realm    = langer domänenname.lan  lange Domänename = dns-Zonen-name
+
+
+TODO:
+
+-> statt user administrator 
+    user administrator mitglied der gruppe global-admins
+    (statt valid users = administrator@LINUXMUSTER.LOCAL) 
+
+
+
+OK: umgesetzt mit acb@LINUXMUSTER.LAN
+
+   dfs
+   Freigabe der schule mit msdfs proxy = \fileserver-bsz\abc
+     -> msdfs proxy: EINZIGE OPTION die erfordelich ist (ohne msdfs root und andere)  
+     -> alle anderen optionen werden ungültig (trotzdem drin lassen?)
+     -> Optionen wie Comment usw. müssen auf Fileserver liegen, auf den msdfs proxy zeigt
+
+3. sync von homes
+   wie kommen migrierte Daten ins home
+  (alt: undefinierter Zustand)
+   1) migration:
+     HOMES:
+     1) irgendwie syncen ( z.B. rsync via ssh)
+     2) ACL drüberbügeln
+        - files und directories getrennt
+     TAUSCH:
+     - READ-Only in unterordner (Altes-Tauchverzeichnis-gelösch_ab_10_12_2017)
+       - getrennt nach
+          --sync-teachershare
+          --sync-classshare
+	  --sync-projectshare
+   2) versetzen von einer zur anderen schule
+      statt move via samba-shares
+     
+
+
+4. Zugriffe auf AD-Objekte Attribute regeln
+   (Teilbaum, Attribute ausblenden, ...)
+
+   geht
+   von konsole aus nicht simple, aber scriptbar
+
+   Lesezugriff auf Unterbaum
+   --> liefert nach
+   adsi editor
+
+   samba version 4.3.11
+   --> besser sernet-Version
+   --> Distributionspakete updatebar
+       ---> sernet repo eintragen, update, fertig
+       
+   ---> wird nachgeliefert:
+        - wie zusammengeklicktes mit adsi abernten
+        - kann sein, dass man aktuelleres samba braucht
+
+   schema-Erweiterungen schützen
+   Erstpasswörter:
+   Geburtstag:
+      nicht lesbar
+   ---> wird nachgeliefert
+
+
+5. Passwort Hash-Frage, Ob wir da richtig vorgehen (ungesaltete Passwörter)
+   - testen, ob kopiertes passwort bei anderem Passwort
+
+   - password history aktivieren (alte Passörter führen nicht zum sperren des Accounts)
+
+   --> Info zu salt in den Passwort hashes wird nachgeliefert
+
+------------------------------------------------------------
+SophomorixTest.pm:
+
+script starten mit parameterkombination, die zum abbruch führen soll
+  BSP: sophomorix-admin --create-* ohne password option
+  RESULT JSON anschauen und nach der passenden Fehlermeldung suchen
+
+  &run_command_verify_exit("sophomorix-admin --create-global-binduser global-binduser-666 --password",
+                           "ERROR: A password option is needed");
+  -> eigentlich sollte das run_command machen
+
+Weitere tests:
+
+start_user_test
+end_user_test
+(dito mit group, oder zusammen als start_object_test)
+-> mitloggen, welche user/gruppengetestet wurden
+--> user/group exists, but not tested
+------------------------------------------------------------
+
+Problem:
+sophomorix-repair erzeugt viele Fehler, wenn schulen konfiguriert,
+  aber die Schule noch nicht angelegt ist
+Mögliche Reaktion:
+--sophomorix-repair erzeugt die Schulen (evtl. nicht gewollt)
+
+
+sophomorix-check:
+Warnungen:
+ERROR:   Line seen multiple times: n
+WARNING: User seen in multiple classes
+
+Result hash:
+sollte beinhalten:
+x user mit fehlendem Geburtsdatum
+x user mit unrealistischem Jahr im ...
+x user mit unerlaubtem Zeichen im Nachnamen
+x ... Vornamen
+
+
+use lastname for Encoding detection
+
+school.conf -> file
+    CLASS_MAP=12=oberstufe12,13=oberstufe13
+
+
+------------------------------------------------------------
+scheduled freeze(z.B. Lehrer):
+   - datumsangabe/Haltbarkeit eines accounts
+   - ab dem Datum wird es disabled (samba 4 Funktion nutzen)
+   - entweder nur warnen
+     - problem: entfernen aus 
+- oder besser ein kalender?
+
+
+------------------------------------------------------------
+sophomorix-admin:
+
+Bindusers:
+
+Gruppen, die den ldap-Baum lesen (schreiben) können werden mit der Schule angelegt:
+   GROUP = @@SCHOOLPREFIX@@AD_RO_auth|roauth|OU=Management
+   GROUP = global-AD_RO_auth|globalroauth|OU=Management
+ODER
+   Es sind die schulgruppen <schulname> bzw. SCHOOLS
+
+sophomorix-admin legt dann user an, die in diesen Gruppen sind 
+
+
+Option für zufallspasswort Anzeigen:
+--randompasswd-display -> JSON (Objekt noch testen)
+
+
+------------------------------------------------------------
+
+
+optionen:
+
+--password NICHT OK
+--passwd   OK, bzw. beide möglich
+in Doku nur eins von beiden: --passwd (kürzer)
+
+------------------------------------------------------------
+
+
+Bugs nach AK:
+
+students.csv
+doppelte Zeilen, andere Klassen
+
+sophomorix-user:
+-> funktionen die suchen dann noch sophomorix -user -s "del R"?
+
+
+- apostroph testen in Namen O'Reilly und O`Reilly (backtick)
+  -> in UTF8 drin, nicht im Loginnamen
+     nicht in ascii? ist das richtig?
+
+
+sophomorix-check
+error_strg weiter
+Klassencheck fertig
+Datumscheck fertig
+Vorname WARNING bei / ..... usw -> siehe ascii-Tabelle
+nachname
+
+login-creation: wenn nicht nur a-z rauskommt, warnung/error
+
+
+Jahreszahl-Algorithmus Besser:
+gültige Jahreszahlen werden je File berechnet:
+min_age=6
+max_age=40
+geht von heutigen Jahr 6 Jahre zurück ... -6 ... -40
+und erlaubt 2007,07,7 im hash
+
+tests für students.csv.errors-*
+-> Anzahl Zeilen in sophomorix.error
+
+
+Handling doppelter Zeilen in students.csv
+
+
+Wenn kein Sonderzeichen gefunden wurde, ASCII annehmen
+
+
+bei using UTF usw. : surnames: 126, firstnames 4 (Anzahl der hits)
+
+
+Wenn von linuxmuster-import-devices sophomorix-device aufgerufen wird
+sollte irgendwann der Returnwert des json-Objekts verwendet werden
+sophomorix-user -s <string> sollte in vorname, vorname ascii .... suchen
+
+doppelte Zeilen liefern Fehler
+
+
+setup:
+
+unattended hat Probleme
+
+creating linbofs dauerte bei manchen sehr lange
+-> Hinweis auf die dauer wäre be einigen ungeduldigen nicht schlecht (This can take a few minutes)
+   oder bei zwischenschritten eine Ausgabe
+
+nach ablauf der (unsichtbaren) Passwordeingabe wird das Password doch noch geechoed, wenn das script läuft.
+
+Tippfehler bei Passwordeingabe: unvisible -> invisible
+
+bei manchen Installationen (eigentlich identisch) wurde der global-admin nicht angelegt 
+(hinterher anlegen, anlegen bei erneutem Setup war möglich)
+Fehlermeldung von sophomorix-admin .... war No connection to AD
+-> Laufzeitproblem? wird der admin zu früh angelegt?
+
+
+import devices:
+
+wir hatten server ip 10.0.0.1 255.255.0.0
+
+Trotzdem wurden Rechner mit IP 10.170.10.241 angelegt
+-> macht das Sinn?
+-> sollte man nicht prüfen, ob die IP's der Rechner im Netz liegen
+
+
+
+sophomorix-check -ij bricht ab bei syntaxfehler in bsz.school.conf
+(userfile.students.csv)
+aber sophomorix.add nicht (sollte auch abbrechen)
+
+
+
+sophomorix-nochange soll sophomorix.nochange auflisten
+sophomorix.nochange nicht mit admins???
+
+
+Exam modus:
+
+
+------------------------------------------------------------
+sophomorix-exam-mode -i:
+sinnvolles ordnen, evtl. session berücksich
+
+--> sophomorix-exam-mode mit einem Aufruf mehrere benutzer in exam-mode setzbar
+
+Exam: Jeder Schritt in sophomorix.ini konfigurierbar
+
+WEITER:
+smb_home bei den kill_funktionen in sub
+
+user aus anderen Schule in exammode
+andere examuser testen
+
+sophomorix-user -i soll examuser anzeigen
+
+homedir erstellen, ntacl
+
+homedir testen
+
+
+evtl. noch dazu:
+[exammode]
+	TESTLOCK=TRUE
+	TESTOTHEREXAM=TRUE
+	DISABLE_FIRST=TRUE
+	LOGINAME=postfix
+	CREATE_DISABLED=TRUE
+	PASSWORD=random
+	managementgroup = ......
+	REMOVELOCK=TRUE
+	DISABLE_LOGIN=TRUE
+	ENABLE_LOGIN_EXAM=TRUE
+
+
+KA-Modus in der Session starten
+   -> Abruch:
+      * einer der user ist schon im exam-mode
+      * einer der zu erzeugenden accounts gibts schon
+   (später-> session kopieren, neue benutzer definieren,
+    sodass KA-session Wochen vorher vorbereitet werden kann)
+Abfolge Zusatzaccount anlegen:
+  * update <login>-Account
+     * Nur wenn kein anderer schon exam mode nutzt
+       # nicht mehr: Nur wenn noch nicht gelockt (von anderem)
+       # nicht mehr: LOCK-supervisor-Date-Time in sophomorixExamMode bei <login>
+     * (nicht mehr <login> disablen, doppelanmeldungen verhindern)
+     * Zwangsabmeldung von <login>
+
+  * neuer Account erstellen
+    * Abbruch, wenn es nicht jeder user nicht im 
+    * neue sub mit option (<login>) (performant ohne schulcheck/klassencheck usw.)
+     * Loginname des Zusatzaccounts:
+        * <login>-exam (unsere Wahl)
+        - <login>-session-id
+        - <login>-short-session-id + ka vorbereitbar
+        - <rechnername>
+     * disabled anlegen
+     * Passwort:
+        * am besten wie <login> -> testen ob das geht
+        * ansonsten: Passwort setzen (muss komplex genug sein),
+	      --password "Muster!"
+     * AD-Ort: OU=Examuser(s) -> Anpassen
+     * keine Gruppenmitgliedschaft
+     * Home erstellen
+        * srv/samba/schools/<school>/examuser(session-ide)
+	* ohne Unterordner
+        * spezielle ACL drüber (ähnlich Schüler)
+        * kein Tausch
+     * managementgruppen-Mitgliedschaften setzen
+        * je nach Haken (zuerst alle leer?)
+     * LOCK-supervisor-Date-Time in sophomorixExamMode bei <login> ersetzen
+       mit finalem Inhalt
+     * final step
+       * disable <login>
+       * enable <login>-exam
+
+
+* Material teilen:
+
+
+Während KA:
+   * wer ist an welchem PC angemeldet
+   * hinzukommende user haben schon einen Account, wenn sie in der session sind
+     -> ansonsten nachmeldbar
+
+Material holen (innerhalb der Schule rename):
+
+   * srv/samba/schools/<school>/examuser(session-ide)
+     worunter alle homes liegen ins home des Lehrers moven
+     (owner erhalten oder ändern)
+
+   * von userlisten nach supervisor
+   * wie???
+
+Abfolge Zusatzaccount entfernen:
+   * Home löschen
+   * Account <login>-exam löschen (oder aufbewahren)
+   * Account <login> wieder enablen
+
+
+sophomorix-examMode bei <login>-exam
+------------------------------------------------------------
+option --waitstep n seconds: um bei Tests schrittweise verfolgen zu können was passiert.
+
+nach jedem Schritt n Sekunden warten
+
+
+
+
+Abfolge:
+  * Schuko Warnung, dass ausgeloggt wird, Anzeige wer eingeloggt
+  * Prüfling zwangsausloggen(testen ob ausgeloggt)
+  * Prüfling aus allen Gruppen austragen
+    (wie ist das, wenn sein Klasse mitglied in einem Projekt ist?)
+    --> konfigurierbar, welche das sind?
+    --> Internetzugansg sperren?
+
+--> AD-Eintrag, welcher Lehrer den user in exammode gesetzt hat (und Datum mit Uhrzeit?)
+
+--> Heimatverzeichnis wegschieben 
+    umbiegen nach .../KLASSE/USER-lock oder .../KLASSE/home/USER-lock ?
+    in Heimatverzeichnis abspeichern: 
+      - Gruppenzugehörigkeiten
+      - Password-hash der momentanen Avccounts
+
+--> neues, leeres Prüfungs-home anlegen (heißt wie altes, repdir.student_home benutzen)
+
+Nach dem exam:
+--> Examhome/einsammeln sichern zum lehrer, der exammodus *gestartet* hat
+--> Examhome löschen
+--> altes Heimatverzeichnis rück umbenennen
+--> Gruppenzugehörigkeiten aus Datei herstellen (Datei dann löschen)
+--> Password wiederherstellen (hashdatei löschen)
+
+option: alle user aus exam-mode raus (cronjob bei Nacht)
+
+
+sophomorix-session: managementgroup mit userliste (viele auf einmal setzen)
+- soll auch als alle 2 sekunden cronjob laufen können, config nicht einlesen???
+
+-- sophomorix-managementgroup modul --> ohne loggen, mehrfach paralles
+
+-- exam-mode:
+   * zuerst alle user locken string lock-<supervisor>-Datum ins sophomorixExamMode attribut
+   * dann einen nach dem anderen in exam-mode eintragen 
+
+
+
+
+Problem: zuerst Gruppen erzeugen, erst dann können NTACL's erzeugt werden:
+
+in AD_school_create
+&AD_create_school groups(SCHOOLS|$DevelConf::AD_global_ou)
+wird 2x aufgerufen
+-> besser: erstesmal ohne repdir
+           zweitesmal mit repdir (noch besser nur repdir)
+
+------------------------------------------------------------
+NTACL umgesetzt
+
+OK in repdir.school
+/srv/samba/schools/default-school
+/srv/samba/schools/default-school/students
+/srv/samba/schools/default-school/management
+/srv/samba/schools/default-school/projects
+
+OK in repdir.teacherclass
+/srv/samba/schools/default-school/teachers/
+/srv/samba/schools/default-school/teachers/homes
+/srv/samba/schools/default-school/teachers/share/
+
+OK in repdir.teacher_home
+/srv/samba/schools/default-school/teachers/homes/cv/
+
+OK in repdir.adminclass
+/srv/samba/schools/default-school/students/5a
+/srv/samba/schools/default-school/students/5a/share
+/srv/samba/schools/default-school/students/5a/homes
+
+OK in repdir.student_home
+/srv/samba/schools/default-school/students/5a/homes/adamskke/
+
+OK in repdir.global
+    /srv/samba/global/management
+    /srv/samba/global/projects
+    /srv/samba/global/teachers
+    /srv/samba/global/students
+
+OK in globaladministrator_home.ntacl.template
+    /srv/samba/global/management/<global-admin>
+OK in 
+/srv/samba/schools/default-school/students/5a/homes/adamskke/_einsammeln
+    /srv/samba/schools/default-school/management/<school-admin>
+
+OK
+/srv/samba/global
+-> vorbereitet in global.ntacl.template
+
+OK
+/srv/samba/global/projects/<p_name>
+-> in projects.share.ntacl.template
+
+
+
+Noch Testen:
+
+/srv/samba/schools/default-school/examusers
+    examusers.ntacl  noch ersetzen
+--> wie normale students klassen homes
+sollte OK sein?
+
+/srv/samba/schools/default-school/examusers/?exam?/<examuser>
+   repdir.examuser_home 
+   OK: @@ADMINCLASS@@ -> @@SUBDIR@@
+       examuser_home.ntacl sollte OK sein
+
+
+
+
+
+
+Und unloeschbar:
+/srv/samba/schools/default-school/students/5a/homes/adamskke/transfer
+--> Unterschiedlich dazu
+/srv/samba/schools/default-school/teachers/homes/cv/transfer
+--> Unterschiedlich dazu
+/srv/samba/schools/default-school/examusers/?exam?/transfer
+
+Und evtl. dito für exam-user
+------------------------------------------------------------
+
+
+Testen:
+smbcals -M OWNER:name
+   Example: -M OWNER:'LINUXMUSTER\Domain Users' setzt den OWNER
+smbcals -M GROUP:name
+--> Wird aber auch schon mit der ACL-Datei gesetzt
+
+
+CONTROL-Zeile im output von smbcacls wird noch nicht verarbeitet:
+
+z.B, 
+teacher_home.ntacl.template:    CONTROL:SR|DP
+students.ntacl.template:        CONTROL:SR|PD|SI|DI|DP
+
+Woher der Unterschied?
+Wie wird das gestzt? Mit smbcacls?
+
+-I remove   -> PD erscheint
+-I allow|copy    -> PD verschwindet
+see man smbcacls
+
+how to set:
+SI
+DI
+...
+
+man smbcacls sagt unter anderem:
+
+    --query-security-info FLAGS
+           The security-info flags for queries.
+
+       --set-security-info FLAGS
+           The security-info flags for queries.
+
+
+
+Die Control-Bits sind in source3/lib/util_sd.c erklärt:
+
+ {SEC_DESC_OWNER_DEFAULTED,       "OD", "Owner Defaulted"},
+ {SEC_DESC_GROUP_DEFAULTED,       "GD", "Group Defaulted"},
+ {SEC_DESC_DACL_PRESENT,          "DP", "DACL Present"},
+ {SEC_DESC_DACL_DEFAULTED,        "DD", "DACL Defaulted"},
+ {SEC_DESC_SACL_PRESENT,          "SP", "SACL Present"},
+ {SEC_DESC_SACL_DEFAULTED,        "SD", "SACL Defaulted"},
+ {SEC_DESC_DACL_TRUSTED,          "DT", "DACL Trusted"},
+ {SEC_DESC_SERVER_SECURITY,       "SS", "Server Security"},
+ {SEC_DESC_DACL_AUTO_INHERIT_REQ, "DR", "DACL Inheritance Required"},
+ {SEC_DESC_SACL_AUTO_INHERIT_REQ, "SR", "SACL Inheritance Required"},
+
+ {SEC_DESC_DACL_AUTO_INHERITED,   "DI", "DACL Auto Inherited"},
+ {SEC_DESC_SACL_AUTO_INHERITED,   "SI", "SACL Auto Inherited"},
+
+ {SEC_DESC_DACL_PROTECTED,        "PD", "DACL Protected"},
+ {SEC_DESC_SACL_PROTECTED,        "PS", "SACL Protected"},
+ {SEC_DESC_RM_CONTROL_VALID,      "RM", "RM Control Valid"},
+ {SEC_DESC_SELF_RELATIVE ,        "SR", "Self Relative"},
+
+############################################################
+sernet Problembeschreibung:
+
+1) Auf dem Server sieht die Schule 'bsz' wie folgt aus:
+# find /srv/samba/schools/bsz/
+
+/srv/samba/schools/bsz/
+/srv/samba/schools/bsz/teachers
+/srv/samba/schools/bsz/teachers/share
+/srv/samba/schools/bsz/teachers/homes
+/srv/samba/schools/bsz/teachers/homes/oe42
+/srv/samba/schools/bsz/teachers/homes/oe42/_einsammeln
+/srv/samba/schools/bsz/teachers/homes/oe42/_austeilen
+/srv/samba/schools/bsz/teachers/homes/wu42
+/srv/samba/schools/bsz/teachers/homes/wu42/_einsammeln
+/srv/samba/schools/bsz/teachers/homes/wu42/_austeilen
+/srv/samba/schools/bsz/management
+/srv/samba/schools/bsz/students
+/srv/samba/schools/bsz/students/share
+/srv/samba/schools/bsz/students/homes
+/srv/samba/schools/bsz/students/m7ab
+/srv/samba/schools/bsz/students/m7ab/share
+/srv/samba/schools/bsz/students/m7ab/homes
+/srv/samba/schools/bsz/students/m7ab/homes/maiersa42
+/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_einsammeln
+/srv/samba/schools/bsz/students/m7ab/homes/maiersa42/_austeilen
+/srv/samba/schools/bsz/students/m7ab/homes/muellegr42
+/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_einsammeln
+/srv/samba/schools/bsz/students/m7ab/homes/muellegr42/_austeilen
+/srv/samba/schools/bsz/students/m8cd
+/srv/samba/schools/bsz/students/m8cd/share
+/srv/samba/schools/bsz/students/m8cd/homes
+/srv/samba/schools/bsz/students/m8cd/homes/samardze42
+/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_einsammeln
+/srv/samba/schools/bsz/students/m8cd/homes/samardze42/_austeilen
+/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42
+/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_einsammeln
+/srv/samba/schools/bsz/students/m8cd/homes/jonsonad42/_austeilen
+/srv/samba/schools/bsz/projects
+
+(m7ab,m8cd sind Schulklassen)
+
+2) Jede Schule hat ihre eigene Freigabe, z.B. 'bsz'
+# net conf list
+[bsz]
+	path = /srv/samba/schools/bsz
+	comment = Share for school bsz
+	guest ok = yes
+	read only = no
+	msdfs root = yes
+	hide unreadable = yes
+
+3) Wir haben uns per Windows-client/Explorer ACL's zusammengeklickt, Haken bei Vererbung,
+   ... die nun per script umgesetzt werden sollen.
+
+Die Verzeichnisse werden per script via SMB-Protokoll (smbclient) angelegt und mit smbcacls mit ACL's versehen
+
+4) z.B. /srv/samba/schools/bsz/teachers SOLL so aussehen.
+
+REVISION:1
+CONTROL:SR|PD|SI|DI|DP
+OWNER:BUILTIN\Administrators
+GROUP:LINUXMUSTER\Domain Users
+ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ
+ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL
+
+5) Gesetzt werden die ACL's im script so:
+
+smbcacls -U administrator%'Muster!' //linuxmuster.local/bsz teachers --set 
+  "REVISION:1,OWNER:BUILTIN\Administrators,GROUP:LINUXMUSTER\Domain Users,ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ,ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/FULL"
+
+6) Leider scheint smbcacls die CONTROL-Zeile nicht setzen zu können.
+
+man smbcacls zeigt unter anderem:
+
+    --query-security-info FLAGS
+           The security-info flags for queries.
+
+       --set-security-info FLAGS
+           The security-info flags for queries.
+
+Aber es wird nirgends erwähnt was als 'FLAGS' angegeben werden muss um SR|PD|SI|DI|DP zu setzen.
+############################################################
+
+
+
+sophomorix-repair für die 2 admintypen anpassen
+
+------------------------------------------------------------
+sophomorix-check:
+  bei sophomorix.adds schon loginnamen erstellen (die es noch nicht gibt)
+  -> besser möglich einzelne user anzulegen mit loginnamen als parameter
+  -> sophomorix-add prüft nochmal ob loginname möglich, wenn nicht garnix machen
+
+------------------------------------------------------------
+
+json output konfigurierbar auf stderr oder stdout
+-> checken auf server
+
+
+
+sernet-Anfrage 1
+
+smbstatus -b zeigt, wer eingeloggt ist
+Wir bräuchten:
+A) Test, ob ein bestimmter User eingeloggt ist.
+ -> wie kann man das einfach ermitteln? ohne smbstatus -b zu parsen
+B) wir kann man einen user per script zwangsweise ausloggen
+   (Klassenarbeit -> homeverzeichnis tauschen gegen leeres Klassenarbeitshome)
+
+sernet-Anfrage 2
+
+Daten von einem share zum anderen verschieben
+- recursiv
+- acls sollen erhalten bleiben
+idealerweise mit rsync via smb-protocol, scheint es nicht zu geben
+oder kann man beides smb-mounten und dann rsync incl. ntacls-syncen 
+
+sernet-Anfrage 3
+
+user einschränken auf teil-AD-baum (school-admin)
+binduser einschranken auf loginattribute (teil AD-Baum)
+
+
+
+------------------------------------------------------------
+
+Test von Gruppe SCHOOLS und Schulen in test 2-5
+
+sophomorix-repair (fix admins)
+
+sophomorix-device ???:
+use settings from [devicefile.devices.csv]
+--> nur noch aus Develconf::
+$dns_node_prefix_string="SophomorixdnsNode";
+--> später nach sophomorix.ini umziehen:
+
+
+sophomorix-test-2:
+WARNING: j1008p02 exists with 10.170.208.2, but should be 10.170.208.4
+
+
+sophomorix.ini ?????:
+definitions in [OU] should be moved to other sections
+i.e. AD_project_ou
+should be moved to upcoming? section [type.project]->[SUB_OU]
+
+principle: for each role/type and userfile/devicefile there is a section with defaults 
+
+
+samba-tools Gruppen vermeiden:
+1) eine Klasse soll angelegt werden
+2a) check ob sie schon existiert
+2b) check ob es eine sophomorix Klasse ist
+3)
+-> nichtexistent -> anlegen
+-> existent und sophomorix Klasse -> OK, nix zu tun
+-> existent aber keine sophomorix-klasse:
+   A) klasse nicht anlegen, user nicht anlegen -> warnung
+      Klasse wurde von Hand angelegt
+      Lösung 1
+      -> von Hand löschen, check, add
+      Lösung 2
+      -> Group map Eintrag
+       (Umsetzung todo)
+
+
+
+
+nextcloud:
+
+mailattribut  -> einzel, mehrfach
+
+Homeverzeichnis -> zum mounten
+-> per smb:// ?
+
+
+Kontakte in thunderbird: add-on Cardbook (ohne sogo connector)
+
+App "External storage support"
+
+mit vpn und darin smb
+
+Standort: DMZ, Pinhole um smb:// homes zu erreichen
+
+Nextcloud
+Alle user das Home-share verbinden
+server: 10.16.1.1
+$user
+Anmeldedaten in Sitzung speichern
+
+
+
+
+Parameter in students.csv:
+login_prefix=R17-         macht logins mit R17-nachnamevor[123]
+login_classprefix=yes     macht Logins mit klasse-nachnamevor[123]
+
+
+------------------------------------------------------------
+Bug:
+neuer parameter LOGINPREFIX in school.master.ini und überschreiben in
+bsz.school.conf mit anderem Wert ändert diesen Wert nicht nur in bst.students.conf sondern auch an anderer Stelle
+------------------------------------------------------------
+
+Bug: wenn adminclass entfernt wird, bleibt die übergeordnete ou erhalten
+
+
+
+
+
+attribut mail beim anlegen eines users füllen (single Value)
+-> unveränderbar, da Datenschutzprobleme bei Minderjährigen, wenn sie ihre private Mail eingeben
+-> evtl. als weiterleitung
+
+weitere Attribute über eigenes attribut (multivalue)??
+
+
+
+
+
+todo wie erkennt man remote shares?:
+tauchen die in net config list auf?
+    - wenn ja: OK
+    - evtl. remote shares in sophomorix_config zu schreiben
+
+weiter:
+
+creating test-1 for migration users
+see 
+  sophomorix.add-1
+  sophomorix-test-1
+
+
+
+
+
+--------------------------------------------------
+??? DomainDNS:
+DC=LINUXMUSTER,DC=LOCAL
+oder
+DC=linuxmuster,DC=local
+oder ist das egal???
+--------------------------------------------------
+
+--------------------------------------------------
+CN=SCHOOLS,OU=SCHOOLS, ...
+besser nach ????
+OU=Groups,OU=GLOBAL, ...
+zu globalen Projekten
+
+Sollen auch global-students, global-teachers und global-admins in SCHOOLS?
+---> wieder die Frage des Ortes, siehe 4 Zeilen höher
+   
+--------------------------------------------------
+
+
+--------------------------------------------------
+Übergang:
+----------
+sophomorix.ini ZUSÄTZLICH lesen
+
+Einige Parameter aus sophomorix-devel.conf
+in die sophomorix.ini umlagern
+
+- laden der sophomorix.ini in sophomorix_config->DEVELCONF
+
+-> sophomorix-devel.conf abschaffen? teilweise ja, aber hashes dort behalten?
+
+lesen der School. ini:
+
+trailing whitespace abschneiden
+
+
+sophomorix.ini für Pfade:
+
+[PATH]
+	CONF_SOPHOMORIX=/etc/linuxmuster/sophomorix
+	CONF_TMP=/var/lib/sophomorix/tmp
+
+[NAME]
+	DEFAULT_SCHOOL=default-school
+
+[ENCODING]
+	FIRSTNAMES=firstnames.UTF8.txt,firstnames.ISO_8859-1.txt
+	FIRSTNAME_ERRORS=firstname_errors.UTF8.txt,firstname_errors.ISO_8859-1.txt
+...
+
+
+
+----------
+Final
+sophomorix-devel.conf
+UND
+sophomorix-Roletype.conf
+in einer datei
+sophomorix.ini
+--------------------------------------------------
+
+
+--------------------------------------------------
+Create result hash VOR sophomorix_config
+OK use JSON
+OK option -j+
+OK %sophomorix_result=&result_sophomorix_init("scriptname", ...);
+   ... initialisiert einen result hash
+
+OK &result_sophomorix_add(\%sophomorix_result,"ERROR|WARNING",$err_num,$string);
+   ... schreibt ERROR|WARNING in den result hash
+
+OK &result_sophomorix_add_summary({
+                     NAME=>"NOCHANGE", 
+                     RESULT=>$lc_nochange, 
+                     RESULT_TYPE => "integer",
+                     DESCRIPTION_POST => "users are not to be changed in ".basename($nochange_file), 
+                     DESCRIPTION_PRE => "users in ".basename($nochange_file), 
+                     FORMAT_TYPE => 1,
+                     sophomorix_result=>\%sophomorix_result,
+			       });
+   ... schreibt ein Resultat mit beliebigem Namen
+
+OK &result_sophomorix_add_log(\%sophomorix_result,$string);
+   ... loggt etwas in den result hash
+
+OK &result_sophomorix_check_exit(\%sophomorix_result);
+   ... checks if WARN/ERR were so severe (misconfigured) that the script should exit, and exits
+   ... called before something ist changed
+   ... display EXIT Error  
+
+OK &result_sophomorix_print(\%sophomorix_result,$json);
+   ... called at the end of the script
+   ... prints JSON with option --JSON
+   ... prints on Terminal iithout --JSON
+
+--------------------------------------------------
+desccription field
+  - of a user ist chageable by the admin
+  - of a group ist chageable by the admin
+--> it is not updated
+??? check if this is true ???
+
+
+??? add logging to tests ??? 
+so we ca see in commnd log, which commands were execuded by wich test
+
+Configs:
+
+replacing all {PARAMETER} with {'PARAMETER'} ???
+make all parameters lowercase
+
+count number of hits ???
+when checking config against master:
+if hits are below 10%, exit with error: seems strange
+read master returns count of parameters
+
+Was tun wenn die samba server passwortlänge sich mit den 
+Einstellungen der USER_FILES beißt 
+
+
+
+encoding und encoding force
+Nochmal überlegen, welche Fälle auftreten können
+
+ENCODING=auto: sophomorix ermitelt
+
+ENCODIG = UTF8
+FORCE=no
+--> UTF8 annehmen, evtl. ändern? oder warnen?
+ENCODIG = UTF8
+FORCE=yes
+--> Umcodierung nach UTF8 forcen, egal was kommt
+
+
+
+
+what to do if configuration is bad: warn or exit?
+
+
+test-1:
+
+add configs? or remove them from git
+
+
+weiter:
+
+sophomorix-check:
+
+# ???? what to do here
+  todo: login creation in sophomorix-add
+        login in 5th field teachers.csv OK
+        testing random password creation
+JETZT:
+students: Feld 5 wird als unid gesehen:
+   - upload bei exact matches (ALLES außer unid gleich, auch Klasse,Schule)
+
+unid double problem:
+   what if unid is double in different files?
+   this cant be avoided
+   ---> upload filename.unid to AD attribute unid?
+        ohne unid --- nach sophomorixUnid
+   ---> bei schulwechsel eines schülers: neue unid (wäre ohne filename auch so)
+                                    ---> neuer Account
+        ist das OK so?
+   ---> zusammenführen der accounts per script???
+
+Options to be added ????:
+--dummy-bithdate (also konfigurable), use 01.01.1970 as birthdate
+  for all users
+--skip unids 
+  (ignore the unids in files, do not upload)
+--upload unids (upload unids for exacr matches, this might be default)
+
+
+sophomorix-test-workflow
+ - add more projects
+   - make projects member of project
+
+test: sophomorix-test-workflow
+   test wenn user leicht verändert wieder kommt 
+
+Testing: test with users that would create the same loginname
+         (differ only in birthdate and class)
+
+
+test script: suche nach user fragmenten|gruppen fragmenten im AD
+   - wo ist der user xyz42 noch in einem attribut
+
+
+neues attribut: sophomorixLockingDateEnd
+sophomorix-check/update ativiert den user wieder zu status A
+   sophomorix-user -u user -L --days <day-num>
+neues Attribut????:
+        sophomorixFullAdminClass
+        --> bsz-m3kk3t
+        (sophomorixAdminClass --> m3kk3t)
+
+
+sophomorix-user -i
+   --> Übersicht zeigen, wie bisher
+-i -K
+   --> alle killable zeigen (einer pro Zeile)
+
+-i -K -v
+   --> alle zeigen, wichtige Attribute
+
+-i -K -vv 
+   --> alle zeigen, dump der Net::LDAP abfrage
+
+ebenso mit -u user
+           -s searchstring
+
+Status wechseln 
+  R und K??? wie wars
+  E und a tauschen hat Vorteil:
+   automatismus: deacrivated and activated
+   von hand: enabled
+--> statuskorrektur bei migration erforderlich???
+    ??? Option repair status bei sophomori-check ???
+
+
+script sophomorix-nochange to show sophomorix.nochange ???
+
+sophomorix-workflow: .nochange
+  - die user die T und D sind und sich der status nicht ändert auch nach nochange?
+
+######
+überlegen: funktionen 
+&get_all roles  (all user roles)
+&get_all_types  (all group types)
+
+return as search filters, commaseparated, ....
+######
+
+Dateisystem:
+/home/  -> /srv/samba
+/srv/samba/schools/bsz
+/srv/samba/global
+
+ext4 nehmen wegen quota
+vor Umsetzung nochmals nachhaken
+
+
+
+
+Next:
+
+- sophomorix-device
+  -  comment zur zone hinzufügen                                     OK
+    -> testen ob zone und comment da                                 OK
+  - nur die Zonen löschen die den comment haben                      todo
+  - keine Zonen Doppelt anlegen  (unique list sub nutzen)
+  - -i name:                                                         todo
+  Alle Info zum device:
+  - $Account
+  - dnsnode
+  - dnszone
+  - mehr? linbo?
+
+- test2:
+  - nslookup reverse test                                             OK.
+  - AD entry test für reverse lookup                                  OK.
+  - Am Ende (devices entfernt)
+    - alle dnsNode incl. reverse weg?                                 OK. 
+    - alle dnsZone weg?                                               OK.
+
+
+test1: test all options and flows of user account status changes      OK: 
+
+
+############################################################
+Konfigurationsdateien, ini smb
+school.conf default Datei erstellen
+  - festlegen der zulässigen Parameter
+  - festlegen der default-werte
+  - festlegen der erlaubten Werte
+  --> z.B. yes|no   yes=default, no auch möglich
+  --> z.B. 6|5|4|7|8|9|10|11|12|13
+      bei der Länge der loginnamen
+  --> Linuxmuster-Schule|String="A-Za-z0-9-_<space>"
+  Ziel
+  --> webui zeigt (evtl translated):
+      --drop-down menü yes/no oder 5 bis 13
+      --bzw. Infobox mit erlaubten Zeichen:
+        A-Z
+        a-z
+        0-9
+        - (Bindestrich)
+        _ (underscore)
+        <space> bzw. <Leerzeichen>
+
+Ablauf beim lesen der Konfiguration:
+- für jede Schule:
+  - default-lesen (option: no-check)
+    und in %sophomorix_config rein 
+  - config der Schule lesen (option: check)
+    - parameter einzeln durchgehen
+      - wenn es den Parameternamen schon gibt (von default)
+        dann überschreiben
+      - wenn es den Namen nicht gibt, 
+        Fehler, unzulässiger Parameter
+  - evtl. checken, welche Parameter NICHT in school.conf sind:
+    ausgeben, als unused features ausgeben
+
+Neue Parameter definieren:
+  1) Eintragen in default.conf
+  2) Dann ist der Parameter möglich 
+
+Frage: beim setup(Later): Entwicklertreffen
+ - A) vereinfachte config kopieren? (Grundschule, Gymnasium, ... zu Wahl)?
+ - B) volle config kopieren? für 
+Default-config durch schulkonsole wählbar?
+
+############################################################
+
+
+
+
+sophomorix-check, .add , .kill workflow
+DNS reverse lookups
+
+Zone anlegen: samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password='Muster!' -U administrator
+samba-tool dns zonedelete <Your-AD-DNS-Server-IP-or-hostname> 0.99.10.in-addr.arpa --password='Muster!' -U administrator
+
+
+Host anlegen: samba-tool dns add localhost 100.16.10.in-addr.arpa 1 PTR r100-pc01.linuxmuster.local --password='Muster!' -U administrator
+dns delete <Your-AD-DNS-Server-IP-or-hostname> samdom.example.com demo A 10.99.0.55
+
+
+samba-tool dns zonedelete linuxmuster.local 210.171.10.in-addr.arpa --password='Muster!' -U sophomorix-admin
+
+samba-tool dns zonedelete localhost 2.170.10.in-addr.arpa --password='Muster!' -U administrator
+
+
+dnsnodes wollen immer angelegt werden
+
+
+
+ntacl_test
+
+Later:
+############################################################
+* console printout made nicely
+  _console_print_sessions
+  ...
+* sophomorix-school -i (show important data: admins?admin-mail?)
+* schoolname: a-z and 0-9 only, maximum length (regex configurable?)
+* man pages
+* AD_get_AD 
+  Wird nur noch aufgerufen in 
+  * sophomorix-repair
+* UTC time
+  - nicht erzeugt in config_sophomorix_read (nur lokale Zeit)
+  - falls  Zeit neu eingelesen wird, wie im auskommentierten Teil von config_sophomorix_read,
+    dann kann es sein, dass UTC und LOCAL nicht exakt 3600,7200s auseinanderliegen
+    a) man braucht UTC garnicht -> nix tun
+    b) man bracht UTC NICHT entsprechend LOCAL -> einkommentieren, neu einlesen
+    c) man bracht UTC genau entsprechend LOCAL -> von der localtime ableiten
+* sophomorixAdminClass 
+  - used by rooms, classes, ... better name: 
+      sophomorixGroup            the group name
+      sophomorixExitGroup        the group name before moved to attic
+      sophomorixGroupBasename    the name in students.csv, ... no schooltoken
+* Festplattenquota
+* ACL_set_file in SophomorixBase.pm
+  get LINUXMUSTER workgroup and others from smb.conf 
+* sophomorix-managemengroup -i
+  display all managemengroups nicely
+* when creating an object (project, user, admin) always check beforehand if it already exists
+  if it exist: exit without doing anything
+  (see example code in sophomorix-admin --create <name is checked>)
+* Klassen per cronjob entfernen, in denen
+  A) kein user drin ist
+  B) 450 Tage keine Änderung war
+  Umsetzung: getested mit global-internet
+    sobald ein user in eine Gruppe kommt wird im 
+    attribut 'whenChanged' die Zeit aktualisiert
+       -> Anzeigbar machen (Projekt zuletzt aktualisiert,
+           ....)
+       -> bei nichtbenutzten adminclasses sollte also 
+          'whenChanged' gleich bleiben
+* possible Feature:
+  - Händisches vorabanlegen/selbstanlegen der user (Schulkonsole), mit spezial-Kommentar in 
+    sophomorixAdminFile (Vorname,Nachname,Gebdat,schule)
+  - Falls derselbe user dann in einer Schuldatei auftaucht wird integriert/zusammengefpührt
+    (sophomorixAdminFile, ...)
+* Referenzen statt Kopien großer hashes:
+  --> checken ob das so ist
+* sophomorix-user
+  in allen optionen kommasepatierte userlisten zulassen
+  user_count und max_user_count nutzen im PROGRESS Objekt
+* code cleanup: 
+   surname mit lastname ersetzen
+   $date_now --> $time_stamp_AD
+* user logging (user-add.log/user-update.log/user-kill.log):
+  --> janitor/cronjob macht
+      a) anonymisiert den Eintrag nach x Tagen (nur uid->login bleibt erhalten)
+         - entfernt user auch aus add,update, ...
+      b) entfernt den Eintrag nach x Tagen (x=730), y tagen bei teacher, z tage bei anderen Rollen
+* more tests for forced loginnames
+  min_length, max_length more characters?
+
+############################################################
+
+
+
+
+Überlegen:
+############################################################
+sophomorixAdminClass: 
+  - bisher Klassenname MIT Prefix. 
+  - Besser ohne prefix? Was äbdert sich dann?
+  - oder neues Attribut sophomorixAdminClassBasename? Exit.... auch?
+############################################################
+
+
+
+
+todo:
+############################################################
+sophomorix-sessions  comments:                         OK 16.1.2017
+manpage sophomorix-session:                            OK 16.1.2017
+add the groups 
+  webfilter
+  intranet
+  printing                                             OK 16.1.2017
+Update tests for new memberships                       OK 17.1.2017
+
+display membership status with sophomorix-session -ij  OK 17.1.2017
+
+sophomorix-managemengroup to add/remove users simply   OK 17.1.17
+
+tests for sophomorix-managemengroup
+all options, add, remove single user multiple user     OK 18.1.17
+add and remove in one line combined                    OK 18.1.17
+
+DN: OU=global,OU=SCHOOLS,DC=linuxmuster,DC=local
+ entsteht bei tests irtümlicherweise
+-->nonexisting test, Bugfixed                          OK 18.1.2017
+
+Bei Listen 1er Session mit:
+sophomorix-session -ij --session 2017-01-22_18-03-16
+- wird beim supervisor dessen collect angezeigt        OK 22.1.17
+- wird beim supervisor dessen share angezeigt          OK 22.1.17
+(dummy listen)
+
+Quota listen                                           OK 24.1.17
+- wir nur bei participants angezeigt
+
+Workflow                                               OK 2.2.17
+
+sophomorix-admin
+--create <adminname> --school global
+Und beim setup:
+sophomorix-admin --create global-admin --school global --password 'fdrTfdtt!i'
+(kommt in Gruppe global-admins)
+(Gruppe global-admins kommt in  "Domain Admins")
+
+Andere Schule
+sophomorix-admin --create <admin-name> --school bsz --password 'fdrTfdtt!i'
+(kommt in Gruppe bsz-admins)
+(Gruppe global-admins kommt in  "Domain Admins")
+                                                      OK 3.2.17
+
+----------------------------------------------------------------
+
+Fileserver:
+
+* Angeraten: Domain Controller und Fileserver auf verschiedenen Maschinen
+  * Fileserver des DC_ für group policies, netlogon, sysvol
+  * DC braucht signing/Fileserver nicht-> Performance unterschied
+  * update notwendigkeit verschieden
+  * sophomorix würde auf dem Domain Controller laufen
+* ALLES über smb erledigen (kein NFS, ... auf dieselben Daten)
+  * Linux: aktuelle cifs-clients sehr gut
+* Backup MIT acl's: z.B. rsync MIT extended Atributes
+* Dateisystem
+  * ext4 (konservativ)
+  * xfs (neuste funktionen nur in aktuelleren Kerneln, nicht in LTS 16.04)
+  * btrfs (lvm nicht mehr notwndig, Samba VSS Modul vorhanden, CopyOnWrite uvw., in LTS 16.04 enthalten)
+* ACL's
+  * win ACL's und posix ACL's sind was verschiedenes
+  * defaultmäßig setzt smbcacls BEIDES
+  * setzen von posix ACL's ist abschaltbar pro share
+    * vfs objects = acl_xattr
+        stored in the Extended Attribute security.NTACL
+    * zeigen: 
+       getfattr -d filename (reicht nicht)
+       getfattr -n security.NTACL filename
+* DFS: spricht nichts dagegen
+  * 3 Typen:
+    * Filesystem/Links pro Ordner (besser getestet)
+    * Filesystem/Links in AD (nicht so getestet)
+    * DFS Proxy (pro share) 
+
+* user "Administrator" 
+  * ist nur in AD
+    * wbinfo -u   zeigt: 
+         LINUXMUSTER\sophomorix-admin
+         LINUXMUSTER\administrator
+    * wbinfo -i administrator / wbinfo -i Administrator
+    LINUXMUSTER\administrator:*:0:100::/home/LINUXMUSTER/administrator:/bin/false
+    LINUXMUSTER\sophomorix-admin:*:3000017:100::/home/LINUXMUSTER/sophomorix-admin:/bin/false
+* Tools:
+  * smbcacls
+  * smbcquotas
+  * smbclient
+  * kann man mkdir, chmod, .... auf dem samba share abschalten???
+* Setup:
+  1) DC einrichten
+  2) Fileserver einrichten
+  3) net ads join (Benutzer und Kennwort des DC)
+  4) Freigaben auf dem Fileserver + DFS Eintrag auf dem DC
+
+* Fragen:
+  
+Welcher user nutzt smbclient und smbcals?
+Bisher: Admministrator (sonst tuts nicht) da id=0
+AD_bind sollte derselbe user sein also 
+entweder sophomorix-admin oder Administrator
+Hier noch anpassen:
+   -->  SophomorixBase.pm: my $smbcacls_base_command="
+
+
+
+sophomorix-repair 
+------------------------------------------------------------
+sophomorix-repair und directoty tree:
+dependencies
+
+- make sure every school can be reached by a UNC path with  share
+  (this should be done by school)
+Administrator kann nur die verzeichnise anlegen?
+
+smbcacls mit --kerberos nutzen
+(Performance Vorteile mit kernberos ticket?)
+
+
+
+
+Löschen von Verzeichnissen/Daten (rekursiv)
+--------------------------------------------------------------------------------
+- User: Home löschen beim entfernen des Accounts:            OK 
+- Klassen NICHT löschen, wenn letzter User gelöscht wird     OK
+  - Klassen können vorübergehend leer sein: nicht löschen    OK
+- sophomorix-class -kill: tausch löschen                     OK
+- projekt löschen: tauschverzeichnis löschen                 OK 
+
+Feature or not?
+sophomorix-user
+Händisches vorabanlegen der user (Schulkonsole), mit spezial-Kommentar in sophomorixAdminFile
+(Vorname,Nachname,Gebdat,schule)
+Falls derselbe user dann in einer Schuldatei auftaucht wird integriert/zusammengefpührt
+(sophomorixAdminFile, ...)
+
+
+<bug>
+tests für adminclasses: mittesten von 
+sophomorixMembers
+sophomorixAdmins
+projects:
+zusätzlich bei Projekten:
+sophomorixMembergroups
+sophomorixAdmingroups
+Bug: werden nicht geleert beim löschen der user
+--> löschen nicht mit samba-tool
+</bug>
+
+??? warum kann sophomorix-minitest get_homedirectory aufgerufen erdenwenn es in SophomorixBase nicht exportiert wird?
+mit get_sharedirectory geht das nicht
+
+
+<bug>
+inconsistent:
+sophomorix-class --create --class 7a
+sophomorix-class --kill --class 7a
+sophomorix-class --kill --class 7a
+
+Einheitlich
+
+</bug>
+
+###??????????????????????????????????????????????????###
+
+------------------------------------------------------------
+sophomorix-exam: setzt user in KA-modus/oder nicht
+   entsprechend wie managementgroups
+      on user1,user2,...
+Klassenarbeitsmodus setzen raus aus session, rein in sophomorix-exam???
+
+------------------------------------------------------------
+Nach provisioning durch linusmuster-base:
+sophomorix-devel.conf:
+  - user mit dem sophomorix arbeiten soll definieren
+    -> sophomorix-admin
+  - file angeben in dem das Passwort des users steht
+    /etc/linuxmuster/.secret/sophomorix-admin
+
+
+
+Managementgroups
+------------------------------------------------------------
+Beliebige managemengruppen erlauben/nachliefern können, z.B. nextcloud 
+1) In Schule managementgruppe bereitstellen
+  - bei AD_school_create hinzu
+    sophomorix-school --create school <school>  (oder --update)
+    sophomorix-school --create-all-schools     (todo, bei Paketinstallation)
+2) Managementgruppen auf default zurücksetzen:
+   Konfiguration in school.conf 
+   (ini format, subsections mit '.' getrennt, konfigurierbar)
+
+   Oder besser im AD konfigurierbar machen?
+   (neue Attribute erforderlich)
+
+   school.conf: Konfiguriere den Default der memberships
+   [group.wifi] # jede Managementgruppe (evtl. später projekte)
+     allow_group=12a,12b,teachers # students
+     allow_users=maierle,muellerle
+     except_users=lucifer   # lucifer ist in 12a
+     except_group=5a  # falls group=students
+     revert_allow_users=maierle,muellerle
+     revert_allow_group=12a,12b,teachers # students
+     revert_except_users=lucifer   # lucifer ist in 12a
+     revert_except_group=5a  # falls group=students
+     revert_cron=...  # Zeile für cronjob
+     # allow:  nur diese user können vom Lehrer hinzugenommen werden
+     # revert: rückstellen auf diesen default
+   -> wifiaccess hat eigentlich 3 Stati:
+      - vom admin erlaubt oder verboten
+      - vom lehrer freischaltbar
+      - default on/off (anlegen, nach KAs, ...)
+
+  sophomorix-managementgroup --revert         -> zurück auf default
+  sophomorix-managementgroup --revert-allow   -> alle möglichen
+
+
+Rollen/Typen:
+
+soll unterschieden werden???:
+
+type=project          project einer Schule
+type=globalproject    schulübergreigendes Project
+
+
+
+
+
+common filter:
+------------------------------------------------------------
+weiter:
+comment_line(column_nr,string)  kommentiert aus
+drop_line(column_nr,string)  entfernt
+bei string auch regex?
+
+Diesen Filter in school.conf konfigurierbar machen:
+DROP_LINE=6,String
+(nach ini-Umstellung)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+session beenden: 
+was passiert dann mit den session einstellungen
+(option reset?)
+
+
+
+Fertig
+
+
+Sollen user in global vorgesehen werden?
+(außer global admins?)
+
+
+Filesys-SmbClient
+------------------------------------------------------------
+perl smbmodul nimmt als workgroup WORKGROUP an.
+workgroup ist aber LINUXMUSTER, bzw. das beim provisionieren angegebene
+-> Probleme?
+
+
+BUGS:
+----------------------------------------------------------------------
+<bug>
+
+sophomorix-test-5:
+
+sophomorix-admin --create admin-66 --school default-school --password 'Muster!'
+
+legt an:
+
+/home/schools/default-school/teachers
+/home/schools/default-school/teachers/share
+/home/schools/default-school/teachers/homes
+
+sollte aber nicht
+
+</bug>
+
+Name "Conf::reverse_loginname_creation" used only once: possible typo at /usr/sbin/sophomorix-add line 367.
+
+
+
+------------------------------------------------------------
+sophomorix-device:
+
+AD: je Drucker eine Gruppe
+Wenn Drucker, dann Gruppe erstellen
+    (Jeder nur-IP-Gerät(0 in Feld 11) bekommt eine Gruppe, 
+     später konfigurierbar in devices.csv)
+   User in Druckergruppe:  kann drucken
+   Nicht in Druckergruppe: kann nicht drucken
+   pyquota: Frank testet early ob AD attribute gebraucht werden
+
+type of a room/roomws: wenn room wegfällt, wegen examaccounts, 
+                       kann room für die workstations genommen werden (statt sophomorixType=roomws)
+
+
+
+
+
+------------------------------------------------------------
+AD_group_addmember_management
+
+-> allow only adding in:
+   -> a management group (no other type of group)
+      
+   -> of the same school as the user (as found out by sophomorixSchool)
+      (choose the correct group) groupname in option: internet leads to group bsz-internet (if user is )
+      options:
+        --internet  <user1,user2>   --nointernet  <user1,user2>
+        --wifi      <user1,user2>   --nowifi  <user1,user2>
+        --intranet  <user1,user2>   --nointranet  <user1,user2> 
+        --webfilter <user1,user2>   --nowebfilter <user1,user2> 
+        --printing  <user1,user2>   --noprinting  <user1,user2>
+        --admin     <user1,user2>   --noadmin <user1,user2>
+
+ 
+   -> and beeing allowed to be added
+
+
+
+
+sophomorix-session -i:
+
+liefert dann noch folgende Infos:
+     group_internetaccess_allowed  TRUE/FALSE
+     group_internetaccess_default  TRUE/FALSE
+     .... um in der Schulkonsole
+       -- auf default zurückgehen zu können
+       -- um einschalten ausgrauen zu können
+
+
+------------------------------------------------------------
+tests für status
+
+
+------------------------------------------------------------
+SophomorixSamba_AD:  suche nach: future groups in students.csv
+dort sollten die zukünftigen Gruppen ermittelt werden, um vergave von loginnamen zu 
+beschränken
+
+------------------------------------------------------------
+ouclass umbenennen in studentsclass oder students
+-> muss in SophomorixSamba ersetzt werden
+-> muss in sophomorix.ini ersetzt werden
+-> und in Tests
+
+
+???????????????????????
+AD_get_container ersetzen mit config einstellungen
+
+gibt 3x in SophomorixSamba:
+   bei AD_computer_create: Role, room_basename
+
+   bei AD_user_create:     Role, group_basename
+       AD_group_create:    Type, group_basename
+
+
+
+???????????????????????
+
+
+
+xls input:
+------------------------------------------------------------
+viele Schulen bekommen xls Dateien aus der Schulverwaltung
+für diese filter bereitstellen
+
+Filter evtl. automatisch ermitteln lassen:
+
+alle integrierten Filter durchgehen:
+danach entstandene datei checken:
+
+Erfolgreicher Filter führt zu einer folgenden Datei:
+
+Klassenfeld: klassen, die sich wiederholen
+Vorname: Namen aus Liste
+Nachnamen: Namen aus Liste
+Geburtsdatum: syntax, Ziffern
+unid: muss eindeutig sein
+
+-> Zusatzfelder werden an der selben Stelle im csv angehängt
+-> ermittelter Filter sich merken
+   -> nächstesmal als erstes checken 
+
+------------------------------------------------------------
+school (ehemals school_token,ou) usw
+- Config hash,directories:
+  school is used für this name
+  if a name,dir,.. is needed for the default-school ist is 
+  the contents of $DevelConf::name_default_school
+
+In the AD the school token of the default school is ---
+
+
+
+sophomorix-repair
+------------------------------------------------------------
+
+acl_test in sophomorix-developer
+   -> dasselbe für ntacl_test
+
+find test: 
+1) testen obs ntacls gibt, abs-pfade sich meken
+2) ntacl_test
+3) testen ob alle ntacls getestet wurden
+
+-> jede Zeile wird einzeln mit Test verglichen, um zu sehen WAS nicht passt
+-> vorhandene Zeile und getestete Zeilen werden gezählt 
+   test für gleiche Anzahl
+-> getesteter Pfad wir in hash %acl_test_paths gespeichert, falls er mit /home beginnt
+
+Zusatzbefehl:
+&acl_are_all_tested();
+  - macht ein find über /home/schools und /home/global (nur dirs?) und schaut:
+    -> gibts nicht getestete dirs unter /home ? -> angangs evtl. ignorieren
+       ---> schauen, ob Müll entstanden ist
+  - für jedes gefundene dir in /home einen test:
+    ->wurde es getestet
+       -> ja, ok. Nein not ok       
+
+
+
+User auflisten lassen,
+dann  mit $root_dns,$school,$group_basename,$user,$role 
+bzw. in unixHomeDirectory schauen
+-> dann role-basiert die entsprechende ACL aufrufen
+
+
+
+
+
+Weiter DNS: 
+
+Datei mit anzulegenden zonen
+  -> diese datei wird von linuxmuster-base erzeugt??
+  -> Nur 1 Zone?
+nicht mehrgenutzte Zonen löschen (geht das, wenn noch einträge da sind??)
+Dann die DNS Nodes für reverse lookup zur passenden Zone hinzunehmen
+
+------------------------------------------------------------
+Hardwareclasses (hwk, hardwareklasse)
+- in anzulegendes attribut sophomorixHardwareClass speichern, bei computer 
+  (dnsnodes (ohne computzeraccount ) werden nicht gespeichert)
+- UND: wird von sophomorix-device als Gruppenmitgliedschaft des Computeraccounts
+  gespeichert
+Umsetzung:
+sophomorix-device
+   - liest alle erforderlicen hwk aus files (und deren members)
+   - liest vorhandene hwk aus AD (gruppen mit sophomorixTxpe hardwareclass)
+   - abgleich
+     nichtexistente hwk anlegen
+     welche Computer in welcher hwk dazu
+     welche computer aus welcher hwk raus
+     nicht mehr benötigte hwk entfernen
+---> nicht so dringend, beliebig nachlieferbar
+------------------------------------------------------------
+
+muss mac-adresse ins AD, wohin?
+Kommentar ins AD, wohin?
+--> weitere?
+
+
+avoid deleting a computer twice remember killed, added, ... computers, dnsrecord
+funktion, um Liste von doppelten einträgen zu befreien, dann sortieren
+
+rename: workstation -> computer
+
+save dnsZone by each dnsNode when reading into %AD hash : ist that so?
+
+2,3, mehrere nic für einen computer, geht das?
+
+
+check Dateinamen in *.school.conf:
+USER:FILE: nur aus sophomorix.ini
+CLASS_FILE: alle Namen zulässig
+DEVICE_FILE: alle Namen zulässig
+
+Klassenarbeit (exam)
+- (neues Feld im ldap: DONE)
+  -sophomorixExamMode: Inhalt loginame der lehrers, der ihn in KA versetzt hat
+  oder --- Done
+- zu tun wenn KA gestartet wird:
+  sophomorix-teacher --examuser user1,user2,... --teacher bz
+   macht: 
+   A) sophomorixExamMode=bz
+   B) PWDhash wegsichern (JSON-Objekt)
+   C) Gruppen, in denen user direkt drin ist: sichern (gleiches JSON Objekt)
+      (class, projekt1,projekt2) entfernen
+      Damit wird auch Internet gesperrt
+      (da user aus Internetgruppe herausfällt)
+   D) JSON Objekt wegsichern ins tatsächliches home  
+   E) home wegmoven  bz --> <bz-exam-backup>
+      neues leeres home erzeugen: mkdir bz
+   F) evtl. user nachträglich wieder in die 
+      Gruppe internet für den Internet-Zugang
+
+   G) nach der Anmeldung passwort auf Zufallspasswort setzen
+   ????? wie findet man heraus welcher user an welchem PC angemeldet ist
+   --> LDAP auslesen ? geht das? smbstatus -B
+
+
+
+Bugs sophomorix-device
+
+- variablen umbenennen
+  workstation: begriff vermeiden
+
+- unused rooms löschen
+- unused zones löschen
+- adminDescription und sophomorixAdminFile nutzen bei workstations, computeraccounts$
+ 
+
+
+
+Geräteverwaltung:
+Wie kommen Ducker in Cups
+- wie bisher: web-gui von cups verwenden, einzeln anlegen
+Rechner, Drucker, Access Points:
+- lehrernetz/schuelernetz 
+- ist eine Role erforderlich?
+- wo im ldap? dns-admin-description
+
+
+
+Liste zulässiger Dateinamen/Optionen abprüfen beim einlesen der Konfigurationsdateien
+
+
+Wenn eine Gruppe gekillt wird, dann auch deren leeren OU container killen:
+AD_group_kill
+
+Anzahl dns zonen:
+
+nur sophomorix? mit default zone? -> checken
+
+
+
+sophomorix-dump-paket:
+wenn virusscan nicht installiert, dann nicht dumpen
+
+parameter in migration.conf may bzw. must auswerten
+-> may: kein Fehler, bzw nur warnung
+
+
+
+AD_get_name_tokened wird ersetzt durch sophomorix_config hash abfrage
+
+
+
+remove_whitespace überall einsetzten
+
+Passwoort falsch in sophomorix-samba.secret
+--> Abbruch mit aussagekräftiger Fehlermeldung.
+
+
+Passwortänderung erzwingen, wie geht das?
+sollte auf gruppen , ... anwendbar sein.
+
+Option --password (sophomorix-device , samba-tool) im printout entfernen
+
+Projekte:
+ldap-Feld: keep members on move (TRUE/FALSE)
+Benutzer im Projekt lassen beim versetzen oder nicht
+R. Schajor
+
+ldap-Feld Bild für den user vorsehen?
+
+SophomorixComment auch für Gruppen?
+script sophomorix-comment im alle abweichenden Kommentare zu sehen?
+
+sophomorix.add, ...
+testen was ist wenn die Dateien nicht konfiguriert sind,
+aber user auftreten: einfach zeile ignorieren
+
+
+Neues Attribut im ldap:
+OK: sophomorixAdminFile students.csv, abc.students.csv, ...
+    ? updaten, wenn user in anderem File auftaucht? -> Ja
+
+Kommentarfeld zu einem User:
+
+sophomorix tests: SophomorixAdminFile checken
+
+OK: sophomorixComment
+OK: default: "created by sophomorix"
+--> Wieviel Platz hat man in so einem Feld?
+--> sophomorix user --show comments:
+    Zeigt alle (non default) Kommentare
+
+Bugs after moving to xenial
+- membeships of the default groups are not correct
+   --> add tests
+
+- migration:
+first test if 
+remove group teachers first in classes.sh if existing
+then recreate it with uid=10000
+or: add gobal and  
+
+what about /etc/linuxmuster/sophomorix/device/classrooms
+--> classrooms.csv (more configuration stuff)
+wegfallen lassen -> Daten in ldap?
+   statt room ist group type classroom?
+
+
+
+
+
+
+gibts leere Gruppen? werden die richtig migriert?
+
+
+wbinfo:
+wbinfo -u    (listet alle user)
+wbinfo -g    (listet alle groups)
+
+'Zeile' aus passwd
+   wbinfo -i USER
+   wbinfo --user-info=USERNAME
+'Zeile' aus group
+wbinfo --group-info=GROUPNAME
+
+Alle gidnumbers of user
+wbinfo -r USER
+wbinfo --user-groups=USER
+
+wbinfo --pam-logon=sch42%'LinuxMuster!' (test pam login)
+wbinfo --krb5auth=sch42%'LinuxMuster!'  (authenticat using kerberos)
+
+wbinfo --all-domains
+   BUILTIN
+   LINUXMUSTER
+
+
+
+
+Questions:
+show/hidden bei klassen ist Attribut
+(es gibt keine hiddenclass mehr)
+
+Gibts irgendwas, was man quotieren müsste?
+  Printerdaten? Seiten? pykota
+  Schulkonsole Liste  
+-> neu attribute im ldap erforderlich, welche
+
+-> Überlegen
+
+flag für adminclass: teacher
+oder type=teacher (statt adminclass)
+wenn eine gruppe für einen user mit der rolle teacher anlegt wird, dann ists eine solche
+
+samba4 Fragen:
+Gibts Useranzahlbeschränkung?
+User und Gruppennamen gleich? Geht das?
+
+Schulkonsole: 
+Wo soll aufgeschrieben werden, wie user usw. abgefragt werden müssen, ...
+-> --porcelain output
+
+Idee:
+
+machine parsable output für Listen, ...
+--------------------------------------------------
+Vorbild: git ... --porcelain
+-> im human readable output auch FARBEN verwendbar für output
+
+sub &message("error|warning|info",porcelain=1|0,$value);
+
+Bei Liste Titelzeile, was an welcher Stelle was steht 
+(z.B. ldapAttributname)
+
+Ansprechpartner für Format: Kai W.
+--------------------------------------------------
+
+
+ext4 als Standard 
+
+
+drucker in devices.txt mit anderer nummer
+
+
+/etc/linuxmuster/printers in ldap nehmen?
+
+
+index definieren im schema
+
+
+id_mapping zeigen
+
+# ldbsearch -H /var/lib/samba/private/idmap.ldb
+
+Edit idmap.ldb: (https://wiki.samba.org/index.php/User_and_Group_management)
+
+UID-Mapping:
+1) Find sid with
+   # wbinfo --name-to-sid <user>
+   # wbinfo -n <user>
+   ---> sid
+2) # wbinfo --sid-to-uid <sid from 1)>
+   # wbinfo -S <sid from 1)>
+   ---> uidnumber
+3) ldbedit -e emacs -H /var/lib/samba/private/idmap.ldb objectsid=<sid from 1)>
+
+
+GID-Mapping
+4) # wbinfo --user-sids=<usersid from 1)>
+   The first is the user sid
+   Then group sids follow
+
+
+
+NT_STATUS_INVALID_SID
+siehe https://lists.samba.org/archive/samba-technical/2011-November/080319.html
+
+
+
+libnns winbind tut nicht
+
+uidnumbers:
+
+Todo: im ldap abspeichern/abrufen (momentan in /etc/linuxmuster/sophomorix/user/...)
+
+- bei migration die alle setzen (uidNumber und gidNumer)
+- beim neu anzulegenden user, ein eigenen Zähler hochzählen
+  limit.
+  (Defaultmäsig beginnen uidNumber/gidNumer bei etwa 3.000.000)
+   Bei jedem ausgeführten id-Befehl wird die uidnumber um 2 erhöht.
+   (scheinbar wird sie dynamisch erzeugt) 
+  gruppe/user:
+     gidnumer/uidnumer: gidNumber
+     msSFU30NisDomain: linuxmuster ( bei LINUXMUSER.LOCAL)
+
+Tests nach migration:
+
+- OK: Bei welchen/wievielen Usern kann man sich mit dem firstpassword einloggen
+  sophomorix-passwd --test-firstpassword
+
+- uidNumber und gidNumber testen mit:
+  id user (output parsen) und mit den Daten vor der Migration vergleichen
+  -> Fehler melden: 
+
+- Dürfen unix gid und uid dieselben vorkommen? 
+
+
+
+
+
+funktion create userlist neu schreiben:
+
+parameter:
+
+loginnamenliste
+klassenliste (auch lehrer)
+alle role students
+alle role teacher
+default: eingeschränkt alle ou's
+
+
+
+Idee:
+
+viele befehle brauchen eine ou als option
+
+sinnvoll wäre:
+
+wenn mehrschulsystem konfiguriert ist, 
+dann wird in den Befehlen die option --ou gefordert
+ODER: 1) es wird IMMER ou gefordert
+      2) wenn man nur eine hat, kann eine defeult OU in der config gesetzt werden 
+
+
+
+############################################################
+Schema
+############################################################
+
+Questions:
+
+lDAPDisplayName  (wird zum befüllen benutzt)
+adminDisplayName (tut nicht)
+
+
+Changes:
+1) ----------------------------------------
+creationdate
+tolerationdate
+deactivationdate
+
+OK:
+oMSyntax 24 (Zeit) --> oMSyntax 64 (utf8 string)
+attributeSyntax: 2.5.5.11 --> attributeSyntax: 2.5.5.12
+
+See: https://technet.microsoft.com/en-us/library/cc961740.aspx
+
+Benamung/Unterscheidung:
+
+mailquota bei user mailquota
+(Oder kann dasselbe attribut nochmals verwendet werden?)
+
+mailalias bei user? oder kann diese Mailadresse schon eingetragen werden
+
+############################################################
+sophomorix-mail
+############################################################
+dovecot statt cyrus
+dovecot 
+
+was macht sophomorix-mail bisher:
+- mailbox anlegen/löschen 
+- info anzeigen:
+  - wieviel speicher genutzt
+  - forwards anzeigen
+- Erstellen von /etc/aliases 
+  aliases
+  maillists
+
+was ist zu tun?
+
+
+
+
+############################################################
+Set password age
+############################################################
+
+soll man das machen:
+
+samba-tool domain passwordsettings set --max-pwd-age 0
+
+
+############################################################
+Set password of administrator
+############################################################
+
+samba-tool user setpassword Administrator
+
+############################################################
+DNS
+############################################################
+
+abhängigkeiten für DNS query testen
+
+
+* Alle bisherigen abfragen??:
+  samba-tool dns query localhost linuxmuster.local @ ALL -U administrator --password='Muster!'
+  sophomorix-device --dns-show (nur sophomorix nodes und zones)
+
+* DNS-Einträge anlegen:
+  # samba-tool dns add localhost linuxmuster.local j1010p01 A 10.16.100.1 --password='Muster!' -U Administrator
+
+  This adds: DN: DC=j1010-p01,DC=linuxmuster.local,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
+  ObjectClass: dnsNode
+  The IP 10.16.1.100 is in Attribute dnsRecord, Binary last 4 Bytes
+  -> Zusatzattribute zu dnsNode können z.B. die Attribute cn, adminDescription, 
+
+  # samba-tool dns zonecreate localhost 100.16.10.in-addr.arpa --password='Muster!' -U Administrator
+         100.16.10  -> Erste 3 Oktetts in umgekehrter Reihenfolge
+                    10 bleibt
+                    0,16,32,48,...  
+                       -> Momentan: 2. oktett der server IP (IP aus Datei)
+                       -> Final: aus den setup-Daten /var/linuxmuster, ... legt thomas eine zonendatei an.
+                    100 kommt von der Rechner IP
+  ?????????????? Zeilenweise bei lesen nach %devices{'file'} zu jedem node eine Zone festlegen
+  This adds: 
+  DN: DC=210.170.10.in-addr.arpa,CN=MicrosoftDNS,DC=DomainDnsZones,DC=linuxmuster,DC=local
+  ObjectClass: dnsZone
+  -> Zusatzattribute zu dnsZone können z.B. die Attribute cn, adminDescription, 
+
+
+  Deleting DNSNode with samba tool:
+  # samba-tool dns delete localhost linuxmuster.local bsz-j1010p20 A 10.171.210.20 --password="Muster!" -U Administrator
+
+
+#INFO# samba-tool dns serverinfo localhost
+samba-tool dns zoneinfo localhost 100.16.10.in-addr.arpa --password='Muster!' -U Administrator
+
+
+Tests:
+apt-get install dns-utils
+
+dig j1010-p01
+
+
+nslookup
+# nslookup name.linuxmuster.local
+Return 0: not found, Retutn 0: found: kacke
+
+
+lehrer.txt : eindeutige id nutzen
+
+
+############################################################
+Tree
+############################################################
+
+
+
+
+
+Forbidden OU's: SCHOOL, GLOBAL
+Forbidden tokens: global, ---
+
+############################################################
+Migration:
+############################################################
+
+
+Three steps:
+1) DUMP: run sophomorix-dump on old server
+    (dumps to /root/sophomorix-dump)
+2) copy the dir /root/sophomorix-dump recursively to new server/stick
+3) SUCK IT IN: sophomorix-vampire --datadir /path/to/dumped/dir
+
+to do: add option --restore-config-files (update wiki)
+   use config file instead of list in script
+test sophomorix-dump on school server
+sophomorix dump: warn when target dir exists
+
+role hiddenclass?
+bz is in forbidden login hash -> /etc/group
+   -> sophomorix-add shows show with option -i name clashes from fixed uidnames
+log when a user cannot be created (summary in the end of script)
+use project dump to create projects (is all info there)
+
+add encrypted passwords to sophomorix.add
+old: 
+   userpassword          {SSHA}oTOa69my8cTkVa97XVDVeiJr3Ctmd0JHeS9RMC5SUkV4cElzQmlDa2k5QWtBdjFPek1Dbw== 
+                         {CRYPT}QByepZzk6naTo
+   sambalmpassword
+      FFCA9D16DCB26848AAD3B435B51404EE
+   sambantpassword
+      CA7D70A5587A194B83A4C4D325ED1C44
+new: 
+   unicodePwd
+  
+Migration:
+
+die mit AD_ou_add angelegten gruppen müssen eine gid bekommen
+teachers: 10000 bei migration
+
+
+add ldif file that updates
+unicodePwd AND sophomorixFirstPassword
+add option to sophomorix-vampire
+
+Tasks to do after migration:
+projects: add displayname
+
+Bugs after Migration tests: 
+------------------------------
+sophomoriy-user cannot show  
+
+sophomorix-project -i -p mkk_abt3
+WARNING: sce seen twice! Remove one of them!
+
+agoruom ist a workstation
+
+sophomorix-class -i -c klasse:
+- zeigt das user als member raus müssen.
+
+nach sophomorix.add muss 
+
+#-> und die admins aus 
+#   sophomorix-dump/data/root/sophomorix-dump-viewdumps/memberdata_view.sql
+#   nach sophomorixAdmins
+#   (mit dem sophomorix-Befehl)
+#-> alle mit adminclass teacher sind admins in der gid
+#   wenn user, die nicht in adminclass teachers sind in anderen gruppen admins sind,
+#   ---> script erzeugen um diese nachzutragen
+
+############################################################
+Scripts
+############################################################
+
+Allgemein:
+
+Man kann wohl nicht eine unicode string mit "" (empty) füllen
+-> Attribute entfernen? wenn --comment ""
+-> oder was sonst reinschreiben?
+
+
+
+
+AD_group_addmember
+ add user to group only if they are not member already
+ add group to group only if they are not member already
+
+
+sophomorix-project
+
+add groups with role 'project'
+  - p_name (no school).
+  - projects can contain students of all schools
+  - project name length
+  - p_longname: description field used
+  - Zeitanzeige lesbarer machen (-i -p <name>)
+
+Oberstufenkurse, wahlweise mit der ID
+http://www.linuxmuster.net/wiki/anwenderwiki:sophomorix:sophomorix-project
+  - zusammen mit dem Schlerdatenexport  auch oberstufenexport exportieren
+  - sync betrachten
+
+
+
+sub AD_user_move {
+add created schools to list
+
+
+Tests:
+
+if user is admin and should be member -> degrade user
+if user is member and should be admin -> upgrade user
+           member AND admin -> throw error
+dito for groups
+
+--members/admins  nonexisting user -> dont add user 
+
+
+option sync memberships: go throuh all projects and sync memberships
+
+
+sophomorix-user
+ OK: options to change status
+     Todo: update dates
+ option to list new teachers
+how to handle users that are organised in wrong school
+  i.e. sophomorisSchoolname is BSZLEO an they are in OU=SCHOOL 
+
+sophomorix-class
+(migrate similar to projects)
+- add option to create class (like*-project) --create
+  --hide (sets type adminclass to hiddenclass)
+  --quota
+  --mailquota
+  --mailalia
+  --maillist
+  --description ?  "migrated on $date"  
+  --admins
+  --admingroups
+  (members are managed automatically)
+create tests for that (sophomorix-test-4)
+
+count current members (CM) and show then with -i option before MM
+or one column: CM/MM -> 32/0
+
+display type (T=teacher3,S=students)
+display hidden
+
+--info to display that (show classes like projects now)
+sophomorix-vampire creates missung groups:
+  --> hiddenclasses
+  --> classes without students
+  ---> and updates them (i.e. groups created by sophmorix-add)
+Think about: create classes first, then the users automatically (avoids name clash)
+
+add --info --class <class>
+
+
+-> sophomorix-device
+
+-> hardwareklassen gruppen bauen
+
+-> leere rooms löschen
+
+macadress in den ldap: https://msdn.microsoft.com/en-us/library/windows/desktop/ms676850%28v=vs.85%29.aspx
+
+
+add/move/kill
+-> logfiles adding, deletion, killing
+-> Option -i: 
+     - add a table per OU/token 
+     - kill user markes with K
+
+sophomorix-kill:
+  list of groups that will never be killed
+  - attic
+  - teachers
+  - students
+  - Windows administrators groups
+
+sophomorix-project
+  -> create all groups with role=project
+ 
+Attributes for a group
+
+
+
+
+
+
+sophomorix-useradd
+  - replace default password 'linux' with 'LinuxMuster!'
+  --> sophomorix.ini
+
+sophomorix-add:   
+call sophomorix-print correctly 
+--user --comment "" does not work ()
+--user --webui-dashboard "" does not work
+
+
+format of sophomorix.add, .move, .kill
+   - use utf8 in these files 
+   - allow user to be added with special quota
+
+sophomorix-schools.conf
+     use unid in 5th field (yes no)
+       --> sinnvole Warnung in office.report: unid expected 
+     from_age, to-age (instead of from_year to year)
+     expect_login_name (bei teacher.csv: YES, NO: generiere)
+       --> sinnvole Warnung in office.report: login expected 
+
+############################################################
+sophomorix-passwd
+
+auflisten von Passwörtern, die ablaufen?
+
+tun unicode passworter? evtl. in _unipwd_from_plainpwd von latin1 nach utf8 umstellen
+
+Password-length:
+sophomorix-add, sollte mit 
+    samba-tool domain passwordsettings show  (dauer 0,3 sekunden)
+die passwortlänge abfragen (evtl. mehr???) und kürzer Konfigurierte Passwort-Längen 
+ausschließen
+-> Funktion config_sophomorix_read mit option (get_passwordsettings)
+   liest zusätzlich pwd_settings ein (auf performanzgründen nicht immer)
+
+config_sophomorix_read auf hashs als parameter umstellen
+
+
+
+Wenn alte, kurze Passwörter als firstpasswords eingespielt werden (complexity and length abgemildert)
+Dann tut das zurücksetzen of das erstpasswort nicht mehr (wenn abmilderung wieder aufgehoben)
+
+https://www.ostechnix.com/check-password-complexity-linux/
+   # sudo apt-get install libcrack2
+   # echo "Welcome1" | cracklib-check
+
+Lösungen?
+
+1) bei jedem Firstpasswort LmN! davorsetzen, aber den alten hash einmal einpflegen.
+--> altes pwd tut
+--> wenn zurückgesetzt, dann geht das auch, weil passwort komplex genug
+--> Nachteil: alte ausgedruckte Kärtchen zun nicht
+
+2) BESSER: neue firstpasswords , den complexity rules entsprechend wählen
+--> altes password tut, falls user das noch kennt
+--> falls passwort zurückgesetzt wird, dann auf das neue komplexe
+
+############################################################
+sophomorix-newfile
+
+encoding als attribut reinspeichern?
+
+ansonsten: siehe neuer workflow
+
+
+############################################################
+sophomorix-check
+
+doku: Erlaubte Zeichen Vorname/Nachname/Klasse/Geburtsjahr:
+siehe check_class
+      check_first
+      check_last
+      check_birthdate
+in sophomorix-check
+
+--injectline "Klasse;Nachname;Vorname;Gebdat" --school
+  fügt die Zeile (Unicode) 
+     NACH den Plausibilitätstest und utf8 codierung ein
+     --> testen des Anlegens von usern auf der Kommandozeile
+         (Dateien unter /etc bleiben unverändert beim test)
+     --> auch zum selbstanlegen von usern in der Schulkonsole geeignet
+
+
+???? statt teach-in:
+--ask-me
+  --> jedes Ähnlichkeitsmatch mit ja/nein beantworten
+      approx-match Level angeben
+
+
+
+my %AD= %$ref_AD;  muss das so sein? kopiert das den hash unötigerweise?
+(auch in anderen scripten soverwendet)
+
+wenn user nicht die Rolle student,teacher hat, ist er nicht im AD_hash drin.
+--kaputte Rolle> sophomrixRole="teach" -> nicht im AD 
+
+ERROR usw. bei read_config
+
+
+--tests:
+
+--filter
+  mitgelieferte Filter sollten auf alle files anwendbar sein.
+  jetzt ist absoluter input und output path hardcordiert
+  
+
+
+-- kann man Felderreihenfolge selbst bestimmen?
+   -> auto im Filter-Feld erstellen
+   -> Zeilentrenner bestimmen (in jeder Zeile gleich oft, 4-6 mal)
+      -> Vornamen aus Vornamenlise, Nachnamen aus Nachnamenliste
+      - Geburtstag mit Ziffern
+      - Eindeutiges Feld: unid
+
+   -> Trenner ermitteln
+
+--analyze-file /path/to/file --use-filter /path/to filter
+
+--extrastudents.csv erzeugt Dateien in ../tmp wie nach Filter
+
+--list-filter (and exit) 
+
+Einlesen der Daten
+
+1) Filter oder Copy anwenden
+   extraclasses -> user generieren
+
+(Ende von sophomorix-check --filter-only)
+
+2) Lauf durch Dateien: 
+
+   A) Einlesen in 
+      %users_file
+
+      (oder file -> Line -> als EINDEUTIGE stelle?)
+
+
+      identifier -> <identifier>    OK: FIRSTNAME
+                                    OK: SURNAME
+                                    OK: BIRTH
+                                    OK: UNID
+                                    OK: FILE
+                                    OK ZEILE_OLD
+                                    ... passwort length, ... auch? was in .update, .move, .add kommen würde?
+                                    COUNT -> wie oft wurde dieser identifier gesehen
+                                    STATUS -> ok, Vorname unerlaubtes Zeichen, ..... 
+
+     lookup oder Full?      
+     unid  -> <unid> IDENTIFIER ->
+     dateiname -> Zeilennummer -> LINE_ORIG -> unmodifiziert
+                               -> LINE_FIXED -> mod, utf8
+                               -> identifier
+                               -> unid
+                               und später
+                               -> LINE_ADD
+                               -> LINE_UPDATE
+                               -> LINE_MOVE
+                               -> LINE_KILL (gibts nicht)
+     Klassenweise user
+
+?????????????? Weiter: .... ermitteln. alles für .add, move, ... update
+
+handling of filter script checken
+cp checken (mkdir)
+danach gefiltertes einlesen
+Atlantis- filter incorperieren ind git
+
+do that really?
+remember may lines in hash,
+go through all lines
+write them to file if correct
+writing file .../tmp/*.filter.utf8
+
+
+Zeile alt, Zeile neu
+
+     Identische Zeilen -> log, Warning, ...
+
+
+
+   B) Vornamen (+Nachnamen) auf encoding testen
+
+
+3) Lauf durch den hash, jeder entry
+   mit dem gefundenen encoding
+   FIRSTNAME_UTF8 usw. dazu
+   sowie LINE_FIXED (gibts doppelungen?)
+
+
+4) korrigierte Zeilen ausgeben: *.csv.filter.utf8
+
+(Ende von sophomorix-check --analyze)
+Option (zum debuggen: --show-line students.csv:20
+
+5) Lesen der systemdaten 
+   vorhandene Loginnamenliste erzeugen
+
+6) vergleichen (Reihenfolge)
+   Linien Durchgehen 1-x
+
+   im hash .add .move .kill .update erstellen
+
+   .kill: sofort entfernbar
+   .move: andere Klasse, andere Schule (AD Umbau, Klassen und Gruppenzugehörigkeiten)
+   .update (Account internes update: Namen, Status, Duldung)
+   .add neu hinzu
+
+7) Linien in datei schreiben (wieso nicht gleich?)
+   Deswegen: debuggen
+   Option: --follow students.csv:20
+   Zeigt:
+   students.csv OLD:   ....
+   students.csv NEW
+   sophomorix.add: ... Zeile oder Titel=Rest
+   sophomorix.update:
+   sophomorix.move:
+   sophomorix.kill:
+   System: dump of Values
+
+todotodotodo:???????????????????????????????????????
+sophomorix-check:
+
+auch teacher ermitteln
+und andere Rollen (rollenliste bei der ldapsuche aus sophomorix.ini)
+speichern nach rollen,
+identifier
+unid
+
+andere suchen (computer) so umstellen, dass es keine zwischenvariablen gibt
+(spart füllen einer variablen, Beispiel siehe user)
+
+
+Idee: Zeile für Zeile durchgehen und ermitteln was zu tun ist:
+
+1) exakt passende matches
+- alle Zeilen durchgehen
+- unid match ODER id match 
+  -> testen auf move (sub)
+  -> testen auf update (sub)
+     (TESTEN BEI MIGRATION mit und ohne unid(unid weglöschen))
+-> ohne match: 
+   neu anzulegen im hash: proposed_add
+
+
+2) ermitteln der zu löschenden user
+   neu anzulegen im hash: proposed_delete
+
+3) approx-match der id
+  proposed_add und proposed_delete
+  -> automatisch matchen
+     &automatch_line();
+     -> alle delete durchgehen
+        -> approx-match
+           evtl. ermittel wie approx beide sind 
+  -> testen auf move (sub)
+  -> testen auf update (sub)
+
+- gar kein match zu vorhandenen:
+  -> add
+- übrigbleibende:
+  -> toleration
+  -> deactivation
+  -> kill
+
+
+Resultat für Encoding:
+
+A) keine Sonderzeichen -> ASCII
+B) wiederspruch -> UNDETECTABLE
+C) sicher Festgestellt -> UTF(, ...   
+
+Benutzersynchronisation, Reihenfolge:
+
+1) Matches suchen: .update .move
+
+A) unid aus Datei gibts im system 
+     a) alle Daten gleich -> nix tun
+        (evtl aus dem hash löschen, nächste schleife performanter)
+     b) ein paar Daten unterschiedlich 
+          Klasse gleich: *.update
+          Klasse verschieden: *.update und move
+     c) Daten sehr unterschiedlich -> warnung, ohne update
+
+B) unid aus Datei gibts nicht im system, aber in  Dateien
+     a) identifier gleich -> *.update zum unid hochladen 
+        (umstellung auf unid, evtl. option unid hochladen)
+
+     b) ohne unid, identifier gleich, klasse gleich 
+        -> nix tun
+
+     c) identifier ahnlich -> update
+ 
+2) Neue suchen         (mit unid -> .add)
+3) zu Löschende suchen (mit unid -> kill)
+
+4) ohne unid: 
+   Dateien für sophomorix-teach-in erstellen
+   .add, -> .update (tolerate,deactivation date) or .kill
+5) Do it, oder sophomorix-teach-in 
+
+sophomorix-quota
+- option --show-non-default-quota
+         --show-non-default-mail-quota
+  zeigt alle vom default abweichende quota von
+  --user
+  --adminclasses
+  --projects
+  evtl. auch einzeln
+
+sophomorix-quota workflow:
+
+1) Für alle user:
+   @userlist erzeugen (am ende sort)
+   Alter Wert sophomorixQuota aus AD holen, zerlegen in einen hash:
+   %old_quota
+      -> samAccount
+      -> school 
+        -> sophomorixQuota           (Attribut)
+        -> target_user -> 8000|---   (Sollwert der users)
+        -> target_calc -> 8000       (alter berechneter Wert)
+        -> quota -> failed|2997|...  (Realer Wert)
+
+     sophomorixQuota Attribut
+     -> 'empty' 
+     -> 'school:target_user:target_calc:failed'   i.e.: bsz:---|3000:failed
+     -> 'school:target_user:target_calc:quota'    i.e.: bsz:7000:7000:6997
+   @sort @userlist
+
+
+2) neue Quota für alle user berechnen:
+   * school-default
+   * adminclass
+   * project additions
+
+   --> ergibt für jeden user/schule ein Wert in MB (Sollwert, target_value)
+       (struktur wie bei %old_quota, jedoch %new_quota)
+
+   %new_quota -> samAccount -> school -> target_calc -> 3000
+                                      -> target_calc_info -> SD|CD|SDP|CDP
+                                      -> school -> 1000
+                                      -> adminclass -> 2000
+                                      -> project_add -> project1 -> 2000
+                                                     -> project2 -> 800
+                                      -> user   
+
+3) Entscheiden ob update erforderlich:
+
+   A) old quota target value exists
+      AND old quota target_value = new quota_target value
+      AND quota not failed
+      AND quota within x% of target_value
+      -> do nothing 
+   B) else
+      --> setzen, prüfen, updaten
+      1) smbcquota mit target_value absetzen
+      2) return auswerten, if OK, weiter else failed
+      3) gesetztes quota mit smbcquota abfragen
+      4) if gesetztes quota innerhalb x%, weiter else failed
+      5) sophomorixQuota updaten 
+
+sophomorix-quota --info 
+                 --school <school> (nur user 1er schule)
+                 --updates-only (failed and calc ne target)
+                 --use-smbcquota (use smbcquota to query quota) 
+                   display full info of smbcquota 
+
+-> alle user durchgehen
+-> sophomorixQuota abfragen
+
+Auflisten:
+userlogin | OK | global | calc | target_value | quota
+userlogin | !! |school1 | calc | target_value | failed 
+userlogin | OK |school2 | calc | target_value | quota 
+
+calculated: SD=3000
+            CD=5000
+            SDP=8000
+            CDP=9000
+wobei SD=school-default, CD=Class-default, +P=project modifiedsop	
+
+Umsetzung:
+OK: sophomorixQuota setzen für gruppen (sophomorix-project, sophomorix-class)
+OK: sophomorixQuota setzen für user (sophomorix-user)
+
+1. sophomorix-quota
+   projects-quota-memberhash
+   project -> sambasamaccount (membergroups auflösen, loop vermeiden) 
+   Quotaberechnung neu
+   --info gibt die Berechnung aus(-ij als json):
+   Schulweise (option --school) reduziert
+   Default: Schule
+   Classquota (nur abweichende)
+   Projectquota (nur abweichende)
+   Einzelquota (nur abweichende)
+2. quota setzen und updaten
+
+
+Todo:
+- tut sophomorix-user --quota auch für admins -> fixen von sophomorix-admin
+- quota user test in allen tests ergänzen
+- zeigen wenn quota auf andere schulen zeigen
+- zeigen wenn quota auf nichtexistierende smb shares zeigen
+
+
+
+sophomorix-print:
+
+     - Full utf8 support
+       (Firstnames, Surnames will be utf8 encoded)
+     - add support for templates
+       see pull requests for sophomorix2
+
+sophomorix-howcanihelp
+- unbekannte Vornamen, Nachnamen melden5. quotaberechnung alt
+- ... 
+
+sophomorix-belwue:
+
+Konten erstellen nur zum Mailversand per belwue: scanner@xyz.de (löschen eingehender mails, daily/weekly)
+NUR-Mailversand Konten, z.B. Sekretärinnen
+  * Konto bei belwue
+  * kein Konto im pädagogischen Netz 
+
+sophomorix-class
+ - mit useranzahl listen
+ - bereich angeben um einzuschränken (z.B. über x user)
+
+
+############################################################
+all scripts
+############################################################
+
+testen:
+wenn falsche codierung geforced wird, sollte enweder
+- problematische accounts nicht angelegt werden
+- problematische abccounts korrect angelegt werden (fehlerhafte zeichen in utf8 Felder)   
+  Bei richtiger codierung werden fehler behoben
+  
+wenn man mit * sucht: 
+sophomorix-class -i -c class1*
+sophomorix-project -i -c pro*
+soll das auch gehen
+
+
+when die (file missing), tell what file is missing 
+
+show ldap search filer on -v (loglevel =>2)
+
+/usr/sbin/sophomorix-class started ... usw: in loglevel -v verschieben
+
+############################################################
+Janitor scripts
+############################################################
+
+check if user is in more groups of type class
+
+############################################################
+AD Browser
+Apache Directory Studio
+Paket machen incl. java?
+############################################################
+
+package install: braucht man den Aufruf von mandb?
+A) englische manpages erstellen, da sie als fallback dienen
+B) Hinweis -> Englisch, please translate
+
