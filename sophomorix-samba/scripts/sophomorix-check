@@ -764,8 +764,8 @@ if ($dump_login_avoid==1){
 # and populated from AD by subs (AD identifiers): 
 # $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
 
-#print Dumper (\%Match);
-#print Dumper (\%Match2);
+print Dumper (\%Match);
+print Dumper (\%Match2);
 
 # no migration
 #&populate_ad_dynamic_identifiers_utf8();
@@ -776,7 +776,8 @@ if ($dump_login_avoid==1){
 # find exact matches
 &print_title("Finding exact user matches ...");
 &find_migration_unid_matches();
-&find_migration_ascii_matches();
+#&find_migration_ascii_matches();
+&find_migration_ascii_matches2();
 
 # find approx matches
 # create loop that stopps itself???
@@ -1610,7 +1611,7 @@ sub show_dynamic_identifiers_ascii {
     if ($file_count==0 or $ad_count==0){
 	return 0;
     } else {
-        if($Conf::log_level>=2){
+#        if($Conf::log_level>=2){
 	    @file_ids= sort @file_ids;
             print "file_dynamic_identifiers_ascii:\n";
             foreach my $id (@file_ids){
@@ -1623,7 +1624,7 @@ sub show_dynamic_identifiers_ascii {
                 print "   * $id ($ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$id} in AD,",
                       " status $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$id})\n";
             }    
-        }
+#        }
         return 1;
     }
 }
@@ -1737,6 +1738,58 @@ sub find_migration_ascii_matches {
         }
     }
     &print_title("ascii--to-utf8-Matching $line_count lines: $matched_count matched, $not_matched_count unmatched");
+}
+
+
+
+sub find_migration_ascii_matches2 {
+    print "\n";
+    foreach my $user_file (@filelist){
+        my $filename=basename($user_file);
+        &print_title("Migration exact matching in $filename ascii-to-utf8");
+        &show_dynamic_identifiers_ascii();
+        my $line_count_file=0;
+        my $matched_count=0;
+        my $not_matched_count=0;
+        foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
+            $line_count_file++;
+            if ( exists $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
+                # MATCH
+                my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii};
+#                if($Conf::log_level>=2){
+                    print "    MATCH: $identifier_ascii to $sam in $filename\n";
+#                }
+
+                # save to write later
+                my $sub=(caller(0))[3];
+                $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+                my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
+                $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
+                $Match{'ACTION'}{$line_new}{'status'}=
+                    $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                # reverse action_BY_sAMAccountName
+                $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
+
+                # remove from ad_to_be_matched
+                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
+                delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+                $matched_count++;
+            } else {
+                # NO MATCH
+                print " $filename:",
+                      "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                      "$identifier_ascii\n";
+                print "   --> No exact match for $identifier_ascii\n";
+                $Match{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
+                $not_matched_count++;
+            }
+        }
+        &print_title("ascii--to-utf8-Matching $line_count_file lines in $filename: $matched_count matched, $not_matched_count unmatched");
+        print "\n";
+    }
+
 }
 
 
