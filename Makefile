@@ -298,6 +298,7 @@ install-developer:
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-supertest $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-*[0-9] $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-workflow $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-workflow-schoolisolation $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-errorfiles $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-infoscripts $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-exammode $(DESTDIR)/usr/sbin
@@ -383,6 +384,10 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/classrooms-5 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.devices.csv-5 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.classrooms-5 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
+
+
 	@install -d $(TESTDATA)/transfer-testdata
 	@install -d $(TESTDATA)/transfer-testdata/subdir1-level1
 	@install -d $(TESTDATA)/transfer-testdata/subdir2-level1
