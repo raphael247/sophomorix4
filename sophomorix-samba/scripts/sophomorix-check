@@ -212,6 +212,7 @@ my $info=0;
 my $level=0;
 my $json=0;
 my %Match=();
+my %Match2=();
 
 my $dump_matches=0;
 my $dump_files=0;
@@ -738,11 +739,18 @@ if ($dump_login_avoid==1){
 # Find Matches: Walk thhrough all files and identifiers in %users_file
 # ============================================================
 
+# AD data is in: $ref_AD_check
+# file data is in %users_file
+
 # dynamic matching data ist contained in %Match
 # reading user files populate these subhashes (file identifiers):
-# $Match{'file_dynamic_identifiers_ascii'} or $users_file{'file_dynamic_identifiers_utf8'}
+#    $Match{'file_dynamic_identifiers_ascii'} 
+#    $users_file{'file_dynamic_identifiers_utf8'}
 # and populated from AD by subs (AD identifiers): 
 # $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
+
+print Dumper (\%Match);
+print Dumper (\%Match2);
 
 # no migration
 #&populate_ad_dynamic_identifiers_utf8();
@@ -1495,36 +1503,36 @@ sub write_add_file {
     }
 
     my $status;
-    if ($Match{'ACTION'}{$filename}{$line_add}{'inject'} eq "yes"){
+    if ($Match2{'ACTION'}{$filename}{$line_add}{'inject'} eq "yes"){
         $status="S"; # injected users have status S=selfactivated
     } else {
         $status="U";
     }
-    my $login=&create_test_login($Match{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}, # user data
-                                 $Match{'ACTION'}{$filename}{$line_add}{'filename'}, # filename for password length
-                                 $Match{'ACTION'}{$filename}{$line_add}{'login'}, # proposed login (will be tested)
+    my $login=&create_test_login($Match2{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}, # user data
+                                 $Match2{'ACTION'}{$filename}{$line_add}{'filename'}, # filename for password length
+                                 $Match2{'ACTION'}{$filename}{$line_add}{'login'}, # proposed login (will be tested)
                                  $ref_AD_check, # forbidden logins
                                  $ref_login_avoid, # logins to avoid
-                                 $Match{'ACTION'}{$filename}{$line_add}{'line_count'},
+                                 $Match2{'ACTION'}{$filename}{$line_add}{'line_count'},
                                  \%users_file,
                                  \%sophomorix_config);
 
     my $mail=$login."@".
-        $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$filename}{$line_add}{'school'}}{$Match{'ACTION'}{$filename}{$line_add}{'role'}}{'MAILDOMAIN'};
+        $sophomorix_config{'ROLES'}{$Match2{'ACTION'}{$filename}{$line_add}{'school'}}{$Match2{'ACTION'}{$filename}{$line_add}{'role'}}{'MAILDOMAIN'};
     my $webui_permissions_string=join(",",
-        @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$filename}{$line_add}{'school'}}{$Match{'ACTION'}{$filename}{$line_add}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
-    my $add_line=$Match{'ACTION'}{$filename}{$line_add}{'filename'}."::".
-                 $Match{'ACTION'}{$filename}{$line_add}{'class'}."::".
-                 $Match{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}."::".
+        @{ $sophomorix_config{'ROLES'}{$Match2{'ACTION'}{$filename}{$line_add}{'school'}}{$Match2{'ACTION'}{$filename}{$line_add}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
+    my $add_line=$Match2{'ACTION'}{$filename}{$line_add}{'filename'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'class'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}."::".
                  $login."::".
                  "---::". # firstpassword
                  "---::". # uid
                  "---::". # gid
-                 $Match{'ACTION'}{$filename}{$line_add}{'unid'}."::".
-                 $Match{'ACTION'}{$filename}{$line_add}{'school'}."::".
-                 $Match{'ACTION'}{$filename}{$line_add}{'role'}."::".
-                 $Match{'ACTION'}{$filename}{$line_add}{'surname_utf8'}."::".
-                 $Match{'ACTION'}{$filename}{$line_add}{'firstname_utf8'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'unid'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'school'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'role'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'surname_utf8'}."::".
+                 $Match2{'ACTION'}{$filename}{$line_add}{'firstname_utf8'}."::".
                  $status."::".   # status
                  "---::". # creationdate
                  "---::". # tolerationdate
@@ -1539,14 +1547,14 @@ sub write_add_file {
         print ADD $add_line;
         # create result
         push @{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} }, $login;
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminFile'}=$Match{'ACTION'}{$filename}{$line_add}{'filename'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminClass'}=$Match{'ACTION'}{$filename}{$line_add}{'class'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sn'}=$Match{'ACTION'}{$filename}{$line_add}{'surname_utf8'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'givenName'}=$Match{'ACTION'}{$filename}{$line_add}{'firstname_utf8'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixUnid'}=$Match{'ACTION'}{$filename}{$line_add}{'unid'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixSchoolname'}=$Match{'ACTION'}{$filename}{$line_add}{'school'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixRole'}=$Match{'ACTION'}{$filename}{$line_add}{'role'};
-        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'identifier_ascii'}=$Match{'ACTION'}{$filename}{$line_add}{'identifier_ascii'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminFile'}=$Match2{'ACTION'}{$filename}{$line_add}{'filename'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixAdminClass'}=$Match2{'ACTION'}{$filename}{$line_add}{'class'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sn'}=$Match2{'ACTION'}{$filename}{$line_add}{'surname_utf8'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'givenName'}=$Match2{'ACTION'}{$filename}{$line_add}{'firstname_utf8'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixUnid'}=$Match2{'ACTION'}{$filename}{$line_add}{'unid'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixSchoolname'}=$Match2{'ACTION'}{$filename}{$line_add}{'school'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'sophomorixRole'}=$Match2{'ACTION'}{$filename}{$line_add}{'role'};
+        $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'identifier_ascii'}=$Match2{'ACTION'}{$filename}{$line_add}{'identifier_ascii'};
         $counters{'ADD'}++;
     } else {
         print "\n   ERROR: Login for $line_add could no be created\n\n";
@@ -2038,8 +2046,8 @@ sub analyze_user_line {
         $Match{'file_dynamic_identifiers_utf8'}{$identifier_utf8}="files, not matched";
 
         # identifier hash new
-        $Match{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii}="files, not matched";
-        $Match{'file_dynamic_identifiers_utf8'}{$filename}{$identifier_utf8}="files, not matched";
+        $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii}="files, not matched";
+        $Match2{'file_dynamic_identifiers_utf8'}{$filename}{$identifier_utf8}="files, not matched";
 
         # file -> line
         #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
@@ -2064,25 +2072,28 @@ sub analyze_user_line {
 	$Match{'ACTION'}{$line_new}{'inject'}=$injected;
 
         # save for action new 
-        $Match{'ACTION'}{$filename}{$line_new}{'identifier_ascii'}=$identifier_ascii;
-        $Match{'ACTION'}{$filename}{$line_new}{'school'}=
+        $Match2{'ACTION'}{$filename}{$line_new}{'identifier_ascii'}=$identifier_ascii;
+        $Match2{'ACTION'}{$filename}{$line_new}{'school'}=
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
-	$Match{'ACTION'}{$filename}{$line_new}{'birthdate'}=$birthdate;
-	$Match{'ACTION'}{$filename}{$line_new}{'class'}=$class;
-	$Match{'ACTION'}{$filename}{$line_new}{'filename'}=$filename;
-	$Match{'ACTION'}{$filename}{$line_new}{'firstname_ascii'}=$first_ascii;
-	$Match{'ACTION'}{$filename}{$line_new}{'surname_ascii'}=$last_ascii;
-	$Match{'ACTION'}{$filename}{$line_new}{'firstname_utf8'}=$first_utf8;
-	$Match{'ACTION'}{$filename}{$line_new}{'surname_utf8'}=$last_utf8;
-	$Match{'ACTION'}{$filename}{$line_new}{'line_count'}=$count;
-        $Match{'ACTION'}{$filename}{$line_new}{'role'}=
+	$Match2{'ACTION'}{$filename}{$line_new}{'birthdate'}=$birthdate;
+	$Match2{'ACTION'}{$filename}{$line_new}{'class'}=$class;
+	$Match2{'ACTION'}{$filename}{$line_new}{'filename'}=$filename;
+	$Match2{'ACTION'}{$filename}{$line_new}{'firstname_ascii'}=$first_ascii;
+	$Match2{'ACTION'}{$filename}{$line_new}{'surname_ascii'}=$last_ascii;
+	$Match2{'ACTION'}{$filename}{$line_new}{'firstname_utf8'}=$first_utf8;
+	$Match2{'ACTION'}{$filename}{$line_new}{'surname_utf8'}=$last_utf8;
+	$Match2{'ACTION'}{$filename}{$line_new}{'line_count'}=$count;
+        $Match2{'ACTION'}{$filename}{$line_new}{'role'}=
             $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
-	$Match{'ACTION'}{$filename}{$line_new}{'unid'}=$unid;
-	$Match{'ACTION'}{$filename}{$line_new}{'login'}=$login;
-	$Match{'ACTION'}{$filename}{$line_new}{'inject'}=$injected;
+	$Match2{'ACTION'}{$filename}{$line_new}{'unid'}=$unid;
+	$Match2{'ACTION'}{$filename}{$line_new}{'login'}=$login;
+	$Match2{'ACTION'}{$filename}{$line_new}{'inject'}=$injected;
 
         # list of lines
+        # old
         push @{ $Match{'lines_with_filename'} }, $filename."::".$line_new;
+        # new
+        push @{ $Match2{'lines_with_filename'} }, $filename."::".$line_new;
     }
 }
 

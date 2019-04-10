@@ -61,16 +61,14 @@ Idee beim Zeilendurchgehen:
 Behebung: komplex:-(
 1. Schritt in users file erden daten aus files doppelt gespeichert:
    users_file{id}  (alt, buggy, gleiche id in verschiedenen files wird überschrieben
-   users_file{filename}{id} (neu, da zusatzlicher key, kein überschreiben)
+   users_file2{filename}{id} (zusatzliche hash mit subkey file key, kein überschreiben)
 2. filelist mit filename vor identifier
 3. Schritt zusätzlich neu
    $Match{'ACTION'}{$line_new} old
-   $Match{'ACTION'}{filename}{$line_new}
+   $Match2{'ACTION'}{filename}{$line_new}
    umgesetzt in: 
      analyze_user_line zusätzlich befüllt, old immer noch
    write_add_file umgestellt (final fertig)
-
-
 
 
 testen, update eines users der in 2 Schulen vorkommt
