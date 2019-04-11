@@ -815,7 +815,9 @@ if ($dump_matches==1){
 # ADD users that could not be matched to AD users
 ############################################################
 foreach my $line_new ( @{ $Match{'lines_with_filename'} } ){
-    if (not defined $Match{'ACTION'}{$line_new}{'sAMAccountName'}){
+    my ($file,$line)=split(/::/,$line_new);
+    # if (not defined $Match{'ACTION'}{$line_new}{'sAMAccountName'}){
+    if (not defined $Match2{'ACTION'}{$file}{$line}{'sAMAccountName'}){
         &write_add_file($line_new);
     }
 }
@@ -1305,13 +1307,18 @@ sub test_user_update {
         $old_webui_string_ref,
         $new_webui_string_ref,
        )=@_;
+    my $old_filename=$ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
     my $line_new=$Match{'action_BY_sAMAccountName'}{$sam};
+    #print "HERE: old filename of $sam: $old_filename $line_new $Match2{'ACTION'}{$old_filename}{$line_new}{'surname_ascii'}\n";
+
+    #print Dumper (\%Match2);
+
    
     # count changes to attributes, 
     # update unid only when ALL other values are the same
     my $identifier_class_changes=0;
 
-    # new_surname_ascii
+    # new_surname_ascii old
     if ( ($Match{'ACTION'}{$line_new}{'surname_ascii'} eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'})){
         # no update
         ${$new_surname_ascii_ref}="---";
@@ -1321,6 +1328,20 @@ sub test_user_update {
         ${$new_surname_ascii_ref}=$Match{'ACTION'}{$line_new}{'surname_ascii'};
         $identifier_class_changes++;
     }
+
+    # new_surname_ascii new
+#    if ( ($Match2{'ACTION'}{$old_filename}{$line_new}{'surname_ascii'} eq 
+#          $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'})){
+#        # no update
+#        ${$new_surname_ascii_ref}="---";
+#    } else {
+#	print "HERE update $sam in $old_filename to ${$new_surname_ascii_ref}\n";
+#       # update
+#       ${$update_ref}++;
+#       ${$new_surname_ascii_ref}=$Match2{'ACTION'}{$old_filename}{$line_new}{'surname_ascii'};
+#       $identifier_class_changes++;
+#   }
+  
 
     # new_firstname_ascii
     if ( ($Match{'ACTION'}{$line_new}{'firstname_ascii'} eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'} )){
@@ -1635,6 +1656,12 @@ sub populate_ad_dynamic_identifiers_ascii {
     foreach my $identifier_ascii (keys %{$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}} ) { 
         $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii}="ad, not matched";
     } 
+    foreach my $user_file (@filelist){
+        my $filename=basename($user_file);
+        foreach my $identifier_ascii (keys %{$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}} ) { 
+            $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii}="ad, not matched";
+        } 
+    }
 }
 
 
@@ -1757,15 +1784,12 @@ sub find_migration_ascii_matches2 {
                 # MATCH
                 my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii};
 #                if($Conf::log_level>=2){
-                    print "    MATCH: $identifier_ascii to $sam in $filename\n";
+                    print "    MATCH: $filename $identifier_ascii to $sam\n";
 #                }
 
-
-                # todo save in Match2 ?????
-
-
-                # save to write later
                 my $sub=(caller(0))[3];
+
+                # save to write later old
                 $Match{'file'}{$filename}{$identifier_ascii}=$sam;
                 my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
                 $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
@@ -1775,9 +1799,24 @@ sub find_migration_ascii_matches2 {
                 # reverse action_BY_sAMAccountName
                 $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
 
-                # remove from ad_to_be_matched
+                # save to write later new
+                $Match2{'file'}{$filename}{$identifier_ascii}=$sam;
+                my $line_new2=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                $Match2{'ACTION'}{$filename}{$line_new2}{'sAMAccountName'}=$sam;
+                $Match2{'ACTION'}{$filename}{$line_new2}{'MATCH_SUB'}="$sub";
+                $Match2{'ACTION'}{$filename}{$line_new2}{'status'}=
+                    $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                # reverse action_BY_sAMAccountName
+                $Match2{'action_BY_sAMAccountName'}{$sam}=$line_new2;
+
+
+                # remove from ad_to_be_matched old
                 delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
                 delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+
+                # remove from ad_to_be_matched new
+                delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+                delete $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
                 $matched_count++;
             } else {
                 # NO MATCH
@@ -1787,6 +1826,7 @@ sub find_migration_ascii_matches2 {
                       "$identifier_ascii\n";
                 print "   --> No exact match for $identifier_ascii\n";
                 $Match{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
+                $Match2{'find_migration_ascii_matches'}{$filename}{$identifier_ascii}="no exact identifier match possible";
                 $not_matched_count++;
             }
         }
