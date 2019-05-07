@@ -826,6 +826,9 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     my $old_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
     my $new_school="---";
 
+    my $old_homedirectory=$ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'};;
+    my $new_homedirectory="---";
+    
     my $old_mail=$ref_AD_check->{'sAMAccountName'}{$sam}{'mail'};
     my $new_mail="---";
     # dirty fix to have class without
@@ -848,6 +851,7 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
         # check identifier update for matched users in AD
         &test_user_update($sam,
+			  \%sophomorix_config,
                           \$update,
                           \$new_unid,
                           \$new_surname_ascii,
@@ -865,6 +869,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                           \$new_mail,
                           \$old_webui_string,
                           \$new_webui_string,
+#                          \$old_homedirectory,
+                          \$new_homedirectory,
                          );
     }
 
@@ -901,6 +907,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                         $new_mail."::".
                         $old_webui_string."::".
                         $new_webui_string."::".
+                        $old_homedirectory."::".
+                        $new_homedirectory."::".
                         "\n";
         print UPDATE $update_line;
         # create result
@@ -1257,6 +1265,7 @@ sub test_RK_kill{
 ################################################################################
 sub test_user_update {
     my ($sam,
+	$ref_sophomorix_config,
         $update_ref,
         $new_unid_ref,
         $new_surname_ascii_ref,
@@ -1274,6 +1283,8 @@ sub test_user_update {
         $new_mail_ref,
         $old_webui_string_ref,
         $new_webui_string_ref,
+#        $old_homedirectory_ref,
+        $new_homedirectory_ref,
        )=@_;
     my $line_new=$Match{'action_BY_sAMAccountName'}{$sam};
    
@@ -1408,6 +1419,25 @@ sub test_user_update {
         $identifier_class_changes++;
     }
 
+    # homedirectory could not be calculated for %Match, calculating here
+    my ($homedirectory_new,$unix_home,$unc,$smb_rel_path)=
+    &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
+                                                   $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{'SCHOOL'},
+                                                   $Match{'ACTION'}{$line_new}{'class'}, # groupname is the subdir
+                                                   $sam,
+                                                   $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{sophomorixRole},
+                                                   $ref_sophomorix_config);
+    
+    if ( $homedirectory_new eq $ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'} ){
+        # no update
+        ${$new_homedirectory_ref}="---";
+    } else {
+        # update
+        # homeDirectory
+        ${$update_ref}++;
+        ${$new_homedirectory_ref}=$homedirectory_new;
+    }
+    
     # unid
     if ( ($Match{'ACTION'}{$line_new}{'unid'} eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'}) or
          ($Match{'ACTION'}{$line_new}{'unid'} eq "" and $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'} eq "---") ){
@@ -2008,7 +2038,7 @@ sub analyze_user_line {
         # save for action 
         $Match{'ACTION'}{$line_new}{'identifier_ascii'}=$identifier_ascii;
         $Match{'ACTION'}{$line_new}{'school'}=
-            $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
+            $sophomorix_config{'FILES'}{$type}{$filename}{'SCHOOL'};
 	$Match{'ACTION'}{$line_new}{'birthdate'}=$birthdate;
 	$Match{'ACTION'}{$line_new}{'class'}=$class;
 	$Match{'ACTION'}{$line_new}{'filename'}=$filename;
@@ -2022,9 +2052,10 @@ sub analyze_user_line {
 	$Match{'ACTION'}{$line_new}{'unid'}=$unid;
 	$Match{'ACTION'}{$line_new}{'login'}=$login;
 	$Match{'ACTION'}{$line_new}{'inject'}=$injected;
+	$Match{'ACTION'}{$line_new}{'class_type'}=$type;
 
-         # list of lines
-         push @{ $Match{'lines'} }, $line_new;
+        # list of lines
+        push @{ $Match{'lines'} }, $line_new;
     }
 }
 

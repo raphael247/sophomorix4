@@ -2504,6 +2504,7 @@ sub AD_user_update {
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
+    my $homedirectory = $arg_ref->{homedirectory};
     # custom attributes
     my $custom_1 = $arg_ref->{custom_1};
     my $custom_2 = $arg_ref->{custom_2};
@@ -2766,6 +2767,13 @@ sub AD_user_update {
         $replace{'sophomorixCloudQuotaCalculated'}=$cloudquota_calc;
         print "   sophomorixCloudQuotaCalculated:       $cloudquota_calc\n";
     }
+
+    # homedirectory
+    if (defined $homedirectory){
+        $replace{'homeDirectory'}=$homedirectory;
+        print "   homeDirectory:       $homedirectory\n";
+    }
+
     
     # status
     if (defined $status and $status ne "---"){
@@ -4539,6 +4547,7 @@ sub AD_get_AD_for_check {
                                 'givenName',
                                 'displayName',
                                 'mail',
+				'homeDirectory',
                                 'sophomorixSurnameInitial',
                                 'sophomorixFirstnameInitial',
                                 'sophomorixAdminFile',
@@ -4585,6 +4594,7 @@ sub AD_get_AD_for_check {
                    $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
                    $AD{'sAMAccountName'}{$sam}{'displayName'}=$entry->get_value('displayName');
                    $AD{'sAMAccountName'}{$sam}{'mail'}=$entry->get_value('mail');
+                   $AD{'sAMAccountName'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');

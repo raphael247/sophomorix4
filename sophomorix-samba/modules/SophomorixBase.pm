@@ -1061,6 +1061,11 @@ sub _console_print_updatefile {
                                                               " --> ".
                                                               $ref_updatefile->{'USER'}{$sam}{'MAIL_NEW'}; 
             }
+            if ($ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW'} ne "---"){
+                printf " %27s: %-53s\n","homeDirectory",$ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_OLD'}.
+                                                              " --> ".
+                                                              $ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW'}; 
+            }
             if ($ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_NEW'} ne "---"){
                 printf "  %-82s\n","sophomorixWebuiPermissionsCalculated:";
                 printf "    %-80s\n",$ref_updatefile->{'USER'}{$sam}{'WEBUI_STRING_OLD'};
@@ -3083,6 +3088,8 @@ sub read_sophomorix_update {
             $mail_new,
             $webui_string_old,
             $webui_string_new,
+            $homedirectory_old,
+            $homedirectory_new,
            )=split(/::/,$line);
 
         my $name_ascii_new=$surname_ascii_new.", ".$firstname_ascii_new;
@@ -3131,6 +3138,8 @@ sub read_sophomorix_update {
         $update{'USER'}{$sam}{'MAIL_NEW'}=$mail_new;
         $update{'USER'}{$sam}{'WEBUI_STRING_OLD'}=$webui_string_old;
         $update{'USER'}{$sam}{'WEBUI_STRING_NEW'}=$webui_string_new;
+        $update{'USER'}{$sam}{'HOMEDIRECTORY_OLD'}=$homedirectory_old;
+        $update{'USER'}{$sam}{'HOMEDIRECTORY_NEW'}=$homedirectory_new;
     }
 
     # counters

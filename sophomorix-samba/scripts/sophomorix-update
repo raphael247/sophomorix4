@@ -155,6 +155,7 @@ if ($lock==1) {
 # --info
 if ($info==1) {
     my $ref_update=&read_sophomorix_update({sophomorix_config=>\%sophomorix_config});
+    print Dumper($ref_update);
     &json_dump({json => $json,
                 jsoninfo => "UPDATEFILE",
                 jsoncomment => "sophomorix.update",
@@ -283,7 +284,10 @@ while(<USERUPDATE>){
            $mail_old,
            $mail_new,
            $webui_string_old,
-           $webui_string_new,          )=split(/::/);
+           $webui_string_new,          
+           $homedirectory_old,
+           $homedirectory_new,          
+          )=split(/::/);
 
 
     # deselecting users
@@ -348,7 +352,8 @@ while(<USERUPDATE>){
         $filename_new ne "---" or
         $status_new ne "---" or
         $mail_new ne "---" or
-        $webui_string_new ne "---" 
+        $webui_string_new ne "---" or 
+        $homedirectory_new ne "---" 
        ){
         # do NOT update move stuff: class,role,school 
         # leave it to AD_user_move
@@ -374,6 +379,7 @@ while(<USERUPDATE>){
                          mail=>$mail_new,
                          webui_permissions_calculated=>\@webui_calclist,
                          unid=>$unid_new,
+                         homedirectory=>$homedirectory_new,
                          user_count=>$user_count,
                          max_user_count=>$max_user_count,
                          json=>$json,
