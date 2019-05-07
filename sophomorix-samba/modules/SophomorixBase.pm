@@ -5665,50 +5665,52 @@ sub get_homedirectory {
     }
     my $unc="//".$root_dns."/".$school_smbshare;
 
+    my $dns=$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'HOMEDIRECTORY_HOST'}};
+    
     if ($role eq "student"){
         $smb_rel_path="students/".$group_basename."/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\students\\".$group_basename."\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\students\\".$group_basename."\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/students/".$group_basename."/".$user;
     } elsif ($role eq "teacher"){
         $smb_rel_path="teachers/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\teachers\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\teachers\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/teachers/".$user;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_ROLE'}){
         # examuser
         if ($group_basename eq ""){
             # no subdir
             $smb_rel_path=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$user;
-            $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\".
+            $homedirectory="\\\\".$dns."\\".$school_smbshare."\\".
                 $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."\\".$user;
             $unix_home=$DevelConf::homedir_all_schools."/".$school."/".
                 $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$user;
         } else {
             # with subdir
             $smb_rel_path=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$group_basename."/".$user;
-            $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\".
+            $homedirectory="\\\\".$dns."\\".$school_smbshare."\\".
                 $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."\\".$group_basename."\\".$user;
             $unix_home=$DevelConf::homedir_all_schools."/".$school."/".
                 $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'USER_SUB_DIR'}."/".$group_basename."/".$user;
         }
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.global'}{'USER_ROLE'}){
         $smb_rel_path="management/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'administrator.school'}{'USER_ROLE'}){
         $smb_rel_path="management/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
         $smb_rel_path="management/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
     } elsif ($role eq $ref_sophomorix_config->{'INI'}{'binduser.school'}{'USER_ROLE'}){
         $smb_rel_path="management/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\management\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\management\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/management/".$user;
     } else {
         $smb_rel_path="unknown/".$group_basename."/".$user;
-        $homedirectory="\\\\".$root_dns."\\".$school_smbshare."\\unknown\\".$group_basename."\\".$user;
+        $homedirectory="\\\\".$dns."\\".$school_smbshare."\\unknown\\".$group_basename."\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/unknown/".$group_basename."/".$user;
     }
     return ($homedirectory,$unix_home,$unc,$smb_rel_path);
