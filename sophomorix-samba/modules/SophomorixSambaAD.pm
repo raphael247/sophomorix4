@@ -2768,13 +2768,6 @@ sub AD_user_update {
         print "   sophomorixCloudQuotaCalculated:       $cloudquota_calc\n";
     }
 
-    # homedirectory
-    if (defined $homedirectory){
-        $replace{'homeDirectory'}=$homedirectory;
-        print "   homeDirectory:       $homedirectory\n";
-    }
-
-    
     # status
     if (defined $status and $status ne "---"){
         $replace{'sophomorixStatus'}=$status;
@@ -2873,6 +2866,12 @@ sub AD_user_update {
             $replace{'sophomorixComment'}=$comment;
         }
         print "   sophomorixComment:          $comment\n";
+    }
+
+    # homedirectory
+    if (defined $homedirectory and $homedirectory ne "---"){
+        $replace{'homeDirectory'}=$homedirectory;
+        print "   homeDirectory:       $homedirectory\n";
     }
 
     # custom attributes

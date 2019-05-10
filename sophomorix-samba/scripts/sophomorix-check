@@ -506,7 +506,7 @@ foreach my  $user_file (@filelist){
                                                          \%sophomorix_config,
                                                         );
 }
-print Dumper ($ref_encoding_check_results);
+#print Dumper ($ref_encoding_check_results);
 
 
 # ============================================================
@@ -1427,7 +1427,6 @@ sub test_user_update {
                                                    $sam,
                                                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{sophomorixRole},
                                                    $ref_sophomorix_config);
-    
     if ( $homedirectory_new eq $ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'} ){
         # no update
         ${$new_homedirectory_ref}="---";
