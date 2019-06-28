@@ -29,18 +29,55 @@ Host fleischsalat
 ############################################################
 Todo:
 ############################################################
+
+------------------------------------------------------------
+perl modul kommt mit dfs nicht klar
+file listing geht nicht
+smbclient würde tun (ziel ist der domanicontroller, msdfs verweist
+   dann auf fileserver
+
+1) nochmals checken: wieso wird msdfs root nicht erkannt:
+Testserver:
+
+sophomorix-session -i --sess 2019-05-16_14-26-31
+fetching filelist of user bd  (smb://server/kbrs/teachers/bd/transfer)
+--> msdfs wird nicht erkannt
+
+2) SophomorixBase.pm  --> sub dir_listing_user
+   umstellen auf smbclient
+
+
+------------------------------------------------------------
+
 DRINGEND GPO: an schule anlegen anbauen
 DRINGEND: Drucker und GPO
 sophomorix-device --sync xml file erzeugen und /var/lib/sophomorix/gpo:
    für jeden Drucker(role printer) ein Eintrag in 
     Printers.xml erzeugen (template mit @@PRINTSERVER@@ usw. )
+      sophomorix-samba/config-devel/gpo/printers.xml.template
     M. tested die Datei, wenn OK wird sie eingespielt
-Datun aktualisieren??
+Datum aktualisieren??
 printserver je schule konfigurierbar, falls unkonfiguriert, server nehmen
 
 Später (abwarten, ob aktuelleres samba genutzt wird)
 1) --> in Schule anlegen einbauen:alte entfernen und mit neuer überschreiben
 2) --> dump einer beliebigen GPO, bzw. mit Namen /uuid ansprechen
+
+--------------------------------------------------
+sophomorix-project legt projekt ein zweites mal an.
+
+
+------------------------------------------------------------
+force project names, ... to lowercase
+------------------------------------------------------------
+Bug?
+beim endgültigen kill eines users wird dieser nicht im json Objekt des
+   sophomorix-check angezeigt (add und update tut)
+
+
+
+
+
 
 
 BUG?
