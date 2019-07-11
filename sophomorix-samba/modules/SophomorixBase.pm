@@ -4797,17 +4797,13 @@ sub dir_listing_user {
     my ($root_dns,$sam,$smb_dir,$school,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
 
     # smbclient dir listing
-    print "smbclient dir listing start\n";
     # empty for a start
-    $ref_sessions->{'TRANSFER2_DIRS'}{$sam}{'TRANSFER'}=();
-    $ref_sessions->{'TRANSFER2_DIRS'}{$sam}{'TRANSFER_LIST'}=();
-
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}=();
+    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'}=();
 
     # extract subdir in schoolshare
     my $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$school";
     my ($tmp,$sub_path)=split(/$school\//,$smb_dir);
-    #print "$server $sub_path\n";
-    #print "$smb_dir\n";
 
     # scan the contents
     my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -4817,59 +4813,92 @@ sub dir_listing_user {
         $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
         " -c 'cd $sub_path; ls'";
     my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-    print "DONE\n";
+
     foreach my $status (@out_lines){
-        print "$status\n";
+        my $smb_name="";
+
+        # simple and works, but fails with  " D ", ... in filename
+        #my (@list_tmp)=split(/( D | N | A )/,$status); # split with 1 chars of space before/after
+
+        # best effort is to split at: whitespace D|N|A whitespace 0|0-9 whitespace
+        my (@list_tmp)=split(/(\s+D\s+0\s+|\s+N\s+[0-9]+\s+|\s+A\s+[0-9]+\s+)/,$status); # split with 1 chars of space before/after
+
+
+        foreach my $item (@list_tmp){
+            my $smb_type="";
+            if ($item=~m/\s+D\s+0\s+/){
+                # directory
+                $smb_type="DIR";
+                $smb_name=&Sophomorix::SophomorixBase::remove_embracing_whitespace($smb_name);
+                if ($smb_name eq "." or 
+                    $smb_name eq ".."
+                   ){
+                    last;
+                }
+
+                $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$smb_name}{'TYPE'}="d";
+                push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $smb_name; 
+                last;
+            } elsif ($item=~m/\s+N\s+[0-9]+\s+/ or $item=~m/\s+A\s+[0-9]+\s+/){
+                # node/files
+                $smb_type="FILE";
+                $smb_name=&Sophomorix::SophomorixBase::remove_embracing_whitespace($smb_name);
+		$ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$smb_name}{'TYPE'}="f";
+                push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $smb_name; 
+
+                last;
+            } else {
+                $smb_name=$smb_name.$item;
+            }      
+        }
+
+        if ($smb_name eq "" or 
+            ($smb_name=~m/blocks of size/ and $smb_name=~m/available/)){
+            next;
+        }
     }
 
-
-    
-    print "smbclient dir listing end\n";
-
-    # this will be removed #######################################################################################
-    # rewrite smb_dir with msdfs root
-    $smb_dir=&rewrite_smb_path($smb_dir,$ref_sophomorix_config);
-
-    print "      * fetching filelist of user $sam  ($smb_dir)\n";
-    my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
-                                     password  => $smb_admin_pass,
-                                     debug     => 0);
-    # empty for a start
-    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}=();
-    $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'}=();
-    my $fd = $smb->opendir($smb_dir);
-    while (my $file = $smb->readdir_struct($fd)) {
-        if ($file->[1] eq "."){next};
-        if ($file->[1] eq ".."){next};
-        if ($file->[0] == 7) {
-        #print "Directory ",$file->[1],"\n";
-        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$file->[1]}{'TYPE'}="d";
-        push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $file->[1]; 
-    } elsif ($file->[0] == 8) {
-        #print "File ",$file->[1],"\n";
-        $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$file->[1]}{'TYPE'}="f";
-        push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $file->[1]; 
-    } else {
-
-    }
-  }
-  # sort
-  if ($#{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }>0 ){
-      @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} } = 
+    # sort
+    if ($#{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }>0 ){
+        @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} } = 
         sort @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} };
-  }
-  #close($fd); # ?????????????? gives error
-    
-  # this will be removed #######################################################################################
+}
 
-    print "============================================================\n";
-    print "2 2 2 \n";
-    #print Dumper ($ref_sessions);
-    print Dumper ($ref_sessions->{'TRANSFER2_DIRS'}{$sam});
-    print "1 1 1 \n";
-    print Dumper ($ref_sessions->{'TRANSFER_DIRS'}{$sam});
-    print "============================================================\n";
 
+  #   # this will be removed #######################################################################################
+  #   # rewrite smb_dir with msdfs root
+  #   $smb_dir=&rewrite_smb_path($smb_dir,$ref_sophomorix_config);
+
+  #   print "      * fetching filelist of user $sam  ($smb_dir)\n";
+  #   my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
+  #                                    password  => $smb_admin_pass,
+  #                                    debug     => 0);
+  #   # empty for a start
+  #   $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER'}=();
+  #   $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER_LIST'}=();
+  #   my $fd = $smb->opendir($smb_dir);
+  #   while (my $file = $smb->readdir_struct($fd)) {
+  #       if ($file->[1] eq "."){next};
+  #       if ($file->[1] eq ".."){next};
+  #       if ($file->[0] == 7) {
+  #       #print "Directory ",$file->[1],"\n";
+  #       $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER'}{$file->[1]}{'TYPE'}="d";
+  #       push @{ $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER_LIST'} }, $file->[1]; 
+  #   } elsif ($file->[0] == 8) {
+  #       #print "File ",$file->[1],"\n";
+  #       $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER'}{$file->[1]}{'TYPE'}="f";
+  #       push @{ $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER_LIST'} }, $file->[1]; 
+  #   } else {
+
+  #   }
+  # }
+  # # sort
+  # if ($#{ $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER_LIST'} }>0 ){
+  #     @{ $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER_LIST'} } = 
+  #       sort @{ $ref_sessions->{'TRANSFER_DIRS3'}{$sam}{'TRANSFER_LIST'} };
+  # }
+  # #close($fd); # ?????????????? gives error
+  #   # this will be removed #######################################################################################
 }
 
 
