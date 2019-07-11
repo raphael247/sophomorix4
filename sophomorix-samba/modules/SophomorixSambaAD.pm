@@ -4358,11 +4358,14 @@ sub AD_get_sessions {
                                   user=>$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
                                 });
 
-                    &Sophomorix::SophomorixBase::dir_listing_user($sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
+                    &Sophomorix::SophomorixBase::dir_listing_user($root_dns,
+                                                                  $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
                                                                   $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'SMBhomeDirectory'},
+                                                                  $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sophomorixSchoolname'},
                                                                   $smb_admin_pass,
                                                                   \%sessions,
-                                                                  $ref_sophomorix_config
+                                                                  $ref_sophomorix_config,
+                                                                  $school_AD,
                                                                  );
 
                     # participants
@@ -4377,11 +4380,13 @@ sub AD_get_sessions {
 
                         # transfer directory of participants 
                         &Sophomorix::SophomorixBase::dir_listing_user(
+                                       $root_dns,
                                        $participant,
                                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'},
+                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'},
                                        $smb_admin_pass,
                                        \%sessions,
-                                       $ref_sophomorix_config
+                                       $ref_sophomorix_config,
                                        );
                         # quota
                         &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,

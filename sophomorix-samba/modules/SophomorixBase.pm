@@ -4794,8 +4794,39 @@ sub rewrite_smb_path {
 
 sub dir_listing_user {
     # directory listing for supervisor of session only
-    my ($sam,$smb_dir,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
+    my ($root_dns,$sam,$smb_dir,$school,$smb_admin_pass,$ref_sessions,$ref_sophomorix_config)=@_;
 
+    # smbclient dir listing
+    print "smbclient dir listing start\n";
+    # empty for a start
+    $ref_sessions->{'TRANSFER2_DIRS'}{$sam}{'TRANSFER'}=();
+    $ref_sessions->{'TRANSFER2_DIRS'}{$sam}{'TRANSFER_LIST'}=();
+
+
+    # extract subdir in schoolshare
+    my $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$school";
+    my ($tmp,$sub_path)=split(/$school\//,$smb_dir);
+    #print "$server $sub_path\n";
+    #print "$smb_dir\n";
+
+    # scan the contents
+    my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+        " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin.
+        "%'******'".
+        " $server"." ".
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+        " -c 'cd $sub_path; ls'";
+    my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    print "DONE\n";
+    foreach my $status (@out_lines){
+        print "$status\n";
+    }
+
+
+    
+    print "smbclient dir listing end\n";
+
+    # this will be removed #######################################################################################
     # rewrite smb_dir with msdfs root
     $smb_dir=&rewrite_smb_path($smb_dir,$ref_sophomorix_config);
 
@@ -4828,6 +4859,17 @@ sub dir_listing_user {
         sort @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} };
   }
   #close($fd); # ?????????????? gives error
+    
+  # this will be removed #######################################################################################
+
+    print "============================================================\n";
+    print "2 2 2 \n";
+    #print Dumper ($ref_sessions);
+    print Dumper ($ref_sessions->{'TRANSFER2_DIRS'}{$sam});
+    print "1 1 1 \n";
+    print Dumper ($ref_sessions->{'TRANSFER_DIRS'}{$sam});
+    print "============================================================\n";
+
 }
 
 
