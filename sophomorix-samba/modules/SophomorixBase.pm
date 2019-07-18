@@ -4828,7 +4828,6 @@ sub smbclient_dirlist {
 	$share_subdir=$share_subdir."".$home_subdir;
     }
 
-    $tree{'SMB_PATH'}="smb:".$server.$share_subdir;
     
     #print "share: $share\n";
     #print "server: $server\n";
@@ -4837,7 +4836,9 @@ sub smbclient_dirlist {
     #print "home_subdir: $home_subdir\n";
     #print "user: $sam\n";
 
-    my $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$share";
+    $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$share";
+    $tree{'SMB_PATH'}="smb:".$server.$share_subdir;
+
     # scan the contents
     my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
         " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin.
