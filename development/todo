@@ -47,6 +47,29 @@ fetching filelist of user bd  (smb://server/kbrs/teachers/bd/transfer)
    umstellen auf smbclient
 
 
+
+TODO:
+------------------------------------------------------------
+smbclient_dirlist listet ab jetzt den Inhalt von Verzeichnissen.
+verschiedene Parameter sind möglich
+z.B. userabrage vorab, dann mit share,homedirectory,subdirectory auflisten
+ALLE listing befehle darauf zurückführen:
+    dir_listing_user -> ersetzen TODO
+
+
+
+Fundstellen des perl moduls:
+
+clean_home_without_transfer 
+   -> Aufruf durch:
+      sophomorix-transfer --clean-home-dir
+      tut das auf msdfs???
+/usr/bin/smbclient -U administrator%`cat /etc/linuxmuster/.secret/administrator` //linuxmuster.lan/default-school -c 'cd "students"; ls'
+
+weiter:
+...
+
+
 ------------------------------------------------------------
 
 DRINGEND GPO: an schule anlegen anbauen
