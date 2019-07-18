@@ -58,6 +58,7 @@ $Data::Dumper::Terse = 1;
             result_sophomorix_check_exit
             result_sophomorix_print
             filelist_fetch
+            smbclient_dirlist
             dir_listing_user
             dns_query_ip
             remove_whitespace
@@ -4788,6 +4789,128 @@ sub rewrite_smb_path {
         }
     }
     return $smb_dir_new;
+}
+
+
+
+sub smbclient_dirlist {
+    my ($arg_ref) = @_;
+    my $share = $arg_ref->{sharename};
+    my $share_subdir = $arg_ref->{share_subdir};
+    my $home_dir = $arg_ref->{home_dir};
+    my $home_subdir = $arg_ref->{home_subdir};
+    my $smb_admin_pass = $arg_ref->{smb_admin_pass};
+    my $sam = $arg_ref->{user};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    # we need for smbclient:
+    #     sharename (mandatory)
+    #     share_subdir for the cd part
+    #        calculated by:
+    #           home_dir
+
+    my %tree=();
+    my $ref_tree=\%tree;
+    my $server;
+    my $tmp;
+    my $count_dirs=0;
+    my $count_files=0;
+
+    
+    if (defined $home_dir and not defined $share_subdir){
+        # extract share_subdir from complete dir
+        $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$share";
+        ($tmp,$share_subdir)=split(/$share/,$home_dir);
+    }
+
+    if (defined $home_dir and defined $home_subdir){
+        # append subdir
+	$share_subdir=$share_subdir."".$home_subdir;
+    }
+
+    $tree{'SMB_PATH'}="smb:".$server.$share_subdir;
+    
+    #print "share: $share\n";
+    #print "server: $server\n";
+    #print "share_subdir: $share_subdir\n";
+    #print "home_dir: $home_dir\n";
+    #print "home_subdir: $home_subdir\n";
+    #print "user: $sam\n";
+
+    my $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$share";
+    # scan the contents
+    my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+        " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin.
+        "%'******'".
+        " $server"." ".
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
+        " -c 'cd $share_subdir; ls'";
+
+    my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+    
+    if (not $return_value==0){
+        # command failed
+    }
+    
+    foreach my $status (@out_lines){
+        my $smb_name="";
+	#print "$status\n";
+        # simple and works, but fails with  " D ", ... in filename
+        #my (@list_tmp)=split(/( D | N | A )/,$status); # split with 1 chars of space before/after
+
+        # best effort is to split at: whitespace D|N|A whitespace 0|0-9 whitespace
+        my (@list_tmp)=split(/(\s+D\s+0\s+|\s+N\s+[0-9]+\s+|\s+A\s+[0-9]+\s+)/,$status); # split with 1 chars of space before/after
+
+
+        foreach my $item (@list_tmp){
+            my $smb_type="";
+            if ($item=~m/\s+D\s+0\s+/){
+                # directory
+                $smb_type="DIR";
+                $smb_name=&Sophomorix::SophomorixBase::remove_embracing_whitespace($smb_name);
+                if ($smb_name eq "." or 
+                    $smb_name eq ".."
+                   ){
+                    last;
+                }
+
+		# old
+                #$ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$smb_name}{'TYPE'}="d";
+                push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $smb_name;
+                # new
+		$count_dirs++;
+                $tree{'TREE'}{$smb_name}{'TYPE'}="d";
+                push @{ $tree{'LIST'} }, $smb_name;
+                 
+                last;
+            } elsif ($item=~m/\s+N\s+[0-9]+\s+/ or $item=~m/\s+A\s+[0-9]+\s+/){
+                # node/files
+                $smb_type="FILE";
+                $smb_name=&Sophomorix::SophomorixBase::remove_embracing_whitespace($smb_name);
+		#$ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER'}{$smb_name}{'TYPE'}="f";
+                #push @{ $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'} }, $smb_name; 
+
+                $count_files++;
+                $tree{'TREE'}{$smb_name}{'TYPE'}="f";
+                push @{ $tree{'LIST'} }, $smb_name;
+		
+                last;
+            } else {
+                $smb_name=$smb_name.$item;
+            }      
+        }
+    }
+
+    # save counters
+    $tree{'COUNT'}{'directories'}=$count_dirs;
+    $tree{'COUNT'}{'files'}=$count_files;
+    # sort
+    if ($#{ $tree{'LIST'} }>0 ){
+        @{ $tree{'LIST'} } = sort @{ $tree{'LIST'} };
+    }
+    #print Dumper (\%tree);
+    #print Dumper ($ref_tree);
+    return $ref_tree;
 }
 
 
