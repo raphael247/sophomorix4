@@ -592,6 +592,14 @@ foreach my $device_file (@filelist){
         @{ $devices_file{'room'}{$room}{'HOSTLIST'} } = sort @{ $devices_file{'room'}{$room}{'HOSTLIST'} };
         @{ $devices_file{'room'}{$room}{'MACLIST'} } = sort @{ $devices_file{'room'}{$room}{'MACLIST'} };
         @{ $devices_file{'room'}{$room}{'IPv4LIST'} } = sort @{ $devices_file{'room'}{$room}{'IPv4LIST'} };
+
+    }
+    # sort device_by_school lists
+    foreach my $school (@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }){
+        if ($#{ $devices_file{'LISTS'}{'devices_by_school'}{$school} } > 0){
+            @{ $devices_file{'LISTS'}{'devices_by_school'}{$school} } = 
+                sort @{ $devices_file{'LISTS'}{'devices_by_school'}{$school} };
+        }
     }
     close(DEVICES);
 }
@@ -1562,6 +1570,9 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                               });   
     }
 
+
+    &update_printer_gpos(\%devices_file,\%sophomorix_config,$json);
+
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } else {
@@ -1713,6 +1724,9 @@ sub analyze_device_line {
         push @{ $devices_file{'room'}{$room_token}{'HOSTLIST'} }, $dnsnode_name;
         push @{ $devices_file{'room'}{$room_token}{'MACLIST'} }, $mac;
         push @{ $devices_file{'room'}{$room_token}{'IPv4LIST'} }, $ip;
+
+        # lists by school
+        push @{ $devices_file{'LISTS'}{'devices_by_school'}{$school} }, $dnsnode_name;
 
         if ($account_flag eq "TRUE"){
             $devices_file{'computer'}{$ws_token_account}{'SCHOOL'}=$school;
@@ -2072,6 +2086,7 @@ sub push_kill_dnszone {
 }
 
 
+
 sub push_add_devicegroup {
     my ($add) = @_;
     push @adding_devicegroups, $add;
@@ -2079,10 +2094,55 @@ sub push_add_devicegroup {
 }
 
 
+
 sub push_kill_devicegroup {
     my ($kill) = @_;
     push @killing_devicegroups, $kill;
     $killing_devicegroups{$kill}="kill";
+}
+
+
+
+sub update_printer_gpos {
+    my ($ref_devices_file,$ref_sophomorix_config,$json)=@_;
+    print "\n";
+    &print_title("Creating Printers.xml for GPO in $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TARGET_DIR'}");
+    foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+        my $template=$ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE'};
+        my $target_dir=$ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TARGET_DIR'}."/".$school;
+        my $target=$target_dir."/Printers.xml";
+        # create output dir
+        system("rm -rf $target_dir");
+        system("mkdir -p $target_dir");
+        # write prefix
+        system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_PRE'} >> $target");
+        foreach my $device (@{ $ref_devices_file->{'LISTS'}{'devices_by_school'}{$school} }){
+            if ($ref_devices_file->{'device'}{$device}{'sophomorixRole'} eq "printer"){
+                # only work on printers
+                my $workgroup=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'};
+                my $printer_uppercase=$ref_devices_file->{'device'}{$device}{'COMPUTER'};
+                my $printer_lowercase=$ref_devices_file->{'device'}{$device}{'sophomorixDnsNodename'};
+
+                # printserver can be overridden in school.conf
+                my $printserver=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PRINTSERVER'};
+                if ($printserver eq ""){
+                    $printserver=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'netbios name'};
+                }
+                my $replace = "-e \"s/\@\@LINUXMUSTER\@\@/$workgroup/g\" ".
+                              "-e \"s/\@\@PRINTSERVER\@\@/$printserver/g\" ".
+                              "-e \"s/\@\@PRINTER_LOWERCASE\@\@/$printer_lowercase/g\" ".
+                              "-e \"s/\@\@PRINTER\@\@/$printer_uppercase/g\" ";
+                my $sed_command="cat ".$template." | sed ".$replace." >> ".$target;
+                if($Conf::log_level>=3){
+                    print "$sed_command\n";
+	        }
+                system($sed_command);
+	    }
+        }
+        # write postfix
+        system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_POST'} >> $target");
+    }
+    print "\n";
 }
 
 

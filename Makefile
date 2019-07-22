@@ -200,6 +200,9 @@ install-sophomorix-samba:
 # gpo stuff
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/gpo
 	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school.ldif.template $(DEVELCONF)/devel/gpo
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/Printers.xml.template $(DEVELCONF)/devel/gpo
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/Printers.xml.template.pre $(DEVELCONF)/devel/gpo
+	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/Printers.xml.template.post $(DEVELCONF)/devel/gpo
 	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/GPT.INI $(DEVELCONF)/devel/gpo/school/GPT.INI
 	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/comment.cmtx $(DEVELCONF)/devel/gpo/school/Machine/comment.cmtx
 	@install -D -oroot -groot --mode=0644 sophomorix-samba/config-devel/gpo/school/Machine/Registry.pol $(DEVELCONF)/devel/gpo/school/Machine/Registry.pol

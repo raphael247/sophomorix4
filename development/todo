@@ -73,14 +73,18 @@ weiter:
 ------------------------------------------------------------
 
 DRINGEND GPO: an schule anlegen anbauen
-DRINGEND: Drucker und GPO
-sophomorix-device --sync xml file erzeugen und /var/lib/sophomorix/gpo:
+
+
+OK: Drucker und GPO
+sophomorix-device --sync xml file erzeugen in /var/lib/sophomorix/gpo/school/<name>:
    für jeden Drucker(role printer) ein Eintrag in 
     Printers.xml erzeugen (template mit @@PRINTSERVER@@ usw. )
       sophomorix-samba/config-devel/gpo/printers.xml.template
     M. tested die Datei, wenn OK wird sie eingespielt
-Datum aktualisieren??
-printserver je schule konfigurierbar, falls unkonfiguriert, server nehmen
+    printserver je schule konfigurierbar, falls unkonfiguriert, server nehmen
+FRAGEN:
+   Datum in Printers.xml aktualisieren??
+   netbiosname(uppercase, so ist's jetzt) or DNSname(lowercase) für printserver nehmen?
 
 Später (abwarten, ob aktuelleres samba genutzt wird)
 1) --> in Schule anlegen einbauen:alte entfernen und mit neuer überschreiben
