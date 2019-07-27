@@ -1719,7 +1719,8 @@ sub AD_computer_create {
 #                   sn   => "Account",
 #                   cn   => $name_token,
                    cn   => $name,
-                   accountExpires => '9223372036854775807', # means never
+                   #accountExpires => '9223372036854775807', # means in very long future
+                   accountExpires => '0', # means never
                    servicePrincipalName => \@service_principal_name,
 #                   unicodePwd => $uni_password,
 #                   sophomorixExitAdminClass => "unknown", 
