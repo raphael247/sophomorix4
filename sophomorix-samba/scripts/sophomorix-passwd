@@ -94,15 +94,14 @@ my $interactive=0;
 my $nofirstpassupdate=0;
 my $char_num=0;
 
+my $show_password_expiry_days="";
+
 my $hide=0;
 my $force=0;
 
 # flag, if (1) user has specified ONE password for all (-p or --common)  , 
 #    or if (2) password must be calculated for each user
 my $password_given=0;
-
-my $password_lehrer="";
-my $password_other="";
 
 my $info_line="";
 
@@ -142,6 +141,7 @@ my $testopt=GetOptions(
            "test-firstpassword" => \$test_firstpassword,
            "set-firstpassword" => \$set_firstpassword,
            "show-password-charlist" => \$show_password_charlist,
+           "show-password-expiry-days=s" => \$show_password_expiry_days,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
@@ -208,6 +208,11 @@ Create userlist:
   -u <user1>,<user2>,...  /  --user  <user1>,<user2>,...
 Create computerlist
   --computer <computer1>,<computer2>,...
+
+
+Password expiry info:
+  -show-password-expiry-days <user>
+
 
 Console examples:
   Interactively change password of a user (Always with --hide and --nofirstpassupdate)
@@ -467,6 +472,26 @@ if ($show_password_charlist==1){
         print " $char";
     }
     print "\n";
+    exit;
+}
+
+
+
+
+if ($show_password_expiry_days ne ""){
+    my $user=$show_password_expiry_days;
+    my $ldb_command="ldbsearch -H ldap://localhost -UAdministrator%`cat /etc/linuxmuster/.secret/administrator` ".
+                    "-b dc=linuxmuster,dc=local cn=".
+                    $user.
+                    " msDS-UserPasswordExpiryTimeComputed".
+                    " | grep --color=never msDS-UserPasswordExpiryTimeComputed";
+    my $line=`$ldb_command`;
+    my ($tmp,$wintime)=split(":",$line);
+    chomp($wintime);
+    $wintime=&Sophomorix::SophomorixBase::remove_embracing_whitespace($wintime);
+    my $unix_expire_time=$wintime/10000000-11644473600;
+    my $days=($unix_expire_time-$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'})/86400;
+    print "Password of user $user expires in $days days\n";
     exit;
 }
 
