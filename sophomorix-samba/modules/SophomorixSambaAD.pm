@@ -1719,7 +1719,6 @@ sub AD_computer_create {
 #                   sn   => "Account",
 #                   cn   => $name_token,
                    cn   => $name,
-                   #accountExpires => '9223372036854775807', # means in very long future
                    accountExpires => '0', # means never
                    servicePrincipalName => \@service_principal_name,
 #                   unicodePwd => $uni_password,
@@ -2225,6 +2224,7 @@ sub AD_user_create {
         sophomorixWebuiDashboard => "---",
         sophomorixExamMode => "---", 
         userAccountControl => $user_account_control,
+        accountExpires => 0,
                     ];
     if (defined $uidnumber_migrate and $uidnumber_migrate ne "---"){
         my $intrinsic_string="MIGRATION uidNumber: ".$uidnumber_migrate;
