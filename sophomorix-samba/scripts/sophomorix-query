@@ -776,6 +776,9 @@ for( my $index = 0 ; $index < $max ; $index++) {
         $search_object_used=$search_object;
     }
     push @{ $search{'LISTS'}{$top_key} }, $sam;
+
+    # add DN to result
+    $search{$top_key}{$sam}{'DN'}=$dn;
     # read single value attributes into %search 
     foreach my $attribute ( @{ $single_attrs } ){
         $search{$top_key}{$sam}{$attribute}=$entry->get_value($attribute);    
@@ -897,8 +900,10 @@ for( my $index = 0 ; $index < $max ; $index++) {
             if ($max==0){
                 next;
             } else {
-                # the is one result
+                # there is one result
                 my $entry = $mesg->entry(0);
+                # add DN to result
+                $search{$top_key_members}{$sam}{$usersam}{'DN'}=$entry->dn;
                 foreach my $attribute ( @{ $single_attrs } ){
                     $search{$top_key_members}{$sam}{$usersam}{$attribute}=$entry->get_value($attribute);    
                 }
