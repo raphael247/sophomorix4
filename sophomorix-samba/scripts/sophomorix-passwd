@@ -12,6 +12,11 @@ use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
 use Net::LDAP;
 use JSON;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -51,6 +56,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_computer_update
                                  AD_get_user
+                                 AD_get_AD_for_check
                                     );
 
 my @arguments = @ARGV;
@@ -95,6 +101,7 @@ my $nofirstpassupdate=0;
 my $char_num=0;
 
 my $show_password_expiry_days="";
+my $set_password_noexpiry_all_sophomorix_users=0;
 
 my $hide=0;
 my $force=0;
@@ -142,6 +149,7 @@ my $testopt=GetOptions(
            "set-firstpassword" => \$set_firstpassword,
            "show-password-charlist" => \$show_password_charlist,
            "show-password-expiry-days=s" => \$show_password_expiry_days,
+           "set-password-noexpiry-all-sophomorix-users" => \$set_password_noexpiry_all_sophomorix_users,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
@@ -209,9 +217,9 @@ Create userlist:
 Create computerlist
   --computer <computer1>,<computer2>,...
 
-
-Password expiry info:
-  -show-password-expiry-days <user>
+ Password expiry stuff:
+  --show-password-expiry-days <user> (show info)
+  --set-password-noexpiry-all-sophomorix-users (set all password of sophomorix users to nonexpiry)
 
 
 Console examples:
@@ -498,6 +506,24 @@ if ($show_password_expiry_days ne ""){
     my $days=($unix_expire_time-$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'})/86400;
     print "\nPassword of user $user expires in $days days\n\n";
     exit;
+}
+
+if ($set_password_noexpiry_all_sophomorix_users==1){
+    my ($ref_AD) = &AD_get_AD_for_check({ldap=>$ldap,
+                                         root_dse=>$root_dse,
+                                         root_dns=>$root_dns,
+                                         admins=>"FALSE",
+                                         sophomorix_config=>\%sophomorix_config,
+                                        });
+    #print Dumper($ref_AD->{'sAMAccountName'});
+    foreach my $sam (keys %{ $ref_AD->{'sAMAccountName'} } ) {
+        my $command="samba-tool user setexpiry ".$sam." --noexpiry";
+        print "\n";
+        print "$sam:\n";
+        print "   $command\n";
+        system($command);
+    }
+    print "\n";
 }
 
 
