@@ -4819,7 +4819,7 @@ sub smbclient_dirlist {
     
     if (defined $home_dir and not defined $share_subdir){
         # extract share_subdir from complete dir
-        $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$share";
+        $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}/$share";
         ($tmp,$share_subdir)=split(/$share/,$home_dir);
     }
 
@@ -4836,7 +4836,7 @@ sub smbclient_dirlist {
     #print "home_subdir: $home_subdir\n";
     #print "user: $sam\n";
 
-    $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$share";
+    $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}/$share";
     $tree{'SMB_PATH'}="smb:".$server.$share_subdir;
 
     # scan the contents
@@ -4926,7 +4926,7 @@ sub dir_listing_user {
     $ref_sessions->{'TRANSFER_DIRS'}{$sam}{'TRANSFER_LIST'}=();
 
     # extract subdir in schoolshare
-    my $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{ServerDNS}/$school";
+    my $server="//$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}/$school";
     my ($tmp,$sub_path)=split(/$school\//,$smb_dir);
 
     # scan the contents
@@ -5569,7 +5569,7 @@ sub smb_file_rewrite {
         my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$smb_share ".
+            " //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$smb_share ".
             " -c 'lcd \"$source_dir\"; cd \"$smb_top_path/$uuid/$smb_low_path\"; prompt; put \"$source_file\" ; exit;'";
         print "$smbclient_command_put\n";
         my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
@@ -5593,7 +5593,7 @@ sub smb_file_rewrite {
         my $smbclient_command_put=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
             " -U ".$DevelConf::sophomorix_file_admin.
             "%'******'".
-            " //$root_dns/$smb_share ".
+            " //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$smb_share ".
             " -c 'lcd \"$tmp_dir\"; cd \"$smb_top_path/$uuid/$smb_low_path\"; prompt; put \"$tmp_file\" \"$source_file\" ; exit;'";
         print "$smbclient_command_put\n";
         my ($return_value_put,@out_lines_put)=&Sophomorix::SophomorixBase::smb_command($smbclient_command_put,$smb_admin_pass);
@@ -5669,7 +5669,7 @@ sub NTACL_set_file {
         }
     }
     $smbcacls_option="\"".$smbcacls_option."\"";
-    my $server_share="//".$root_dns."/".$school;
+    my $server_share="//".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$school;
 
     if ($ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCACLS_SERVER_FIX'} eq "TRUE"){
         if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}{'msdfs root'} and
@@ -5699,7 +5699,7 @@ sub NTACL_set_file {
     $smbcacls_display_command=~s/--set/\n      --set/;
     my $smbcacls_out_ident=&ident_output($smbcacls_out,8);
     if($smbcacls_return==0){
-        print "OK ($smbcacls_return): smbcacls-NTACL on //$root_dns/$school $smbpath\n";
+        print "OK ($smbcacls_return): smbcacls-NTACL on //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$school $smbpath\n";
         if($Conf::log_level>1){
             print "     COMMAND:\n";
             print "        $smbcacls_display_command\n";
@@ -5708,7 +5708,7 @@ sub NTACL_set_file {
             print $smbcacls_out_ident;
         }
     } else {
-        print "ERROR: smbcacls on //$root_dns/$school $smbpath\n";
+        print "ERROR: smbcacls-NTACL on //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$school $smbpath\n";
         print "     COMMAND:\n";
         print "        $smbcacls_display_command\n";
         print "     RETURN VALUE: $smbcacls_return\n";

@@ -1168,7 +1168,7 @@ sub AD_repdir_using_file {
                          }
                         my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                             " -U ".$DevelConf::sophomorix_file_admin."%'******'".
-                            " //$root_dns/$share -c 'mkdir \"$path_after_user_smb\"'";
+                            " //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$share." -c 'mkdir \"$path_after_user_smb\"'";
                         my $user_typeout;
                         if ($user eq ""){
                             $user_typeout="<none>";
@@ -3202,7 +3202,7 @@ sub AD_user_setquota {
                           " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                           " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                           $smb_admin_pass."'".
-                          " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //$root_dns/$share";
+                          " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
     ############################################################
     # run the command
     $smbcquotas_out=`$smbcquotas_command`;
@@ -8156,6 +8156,7 @@ sub AD_login_test {
 
 
 
+
 sub AD_examuser_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -8317,6 +8318,7 @@ sub AD_examuser_create {
                    sophomorixComment => "created by sophomorix", 
                    sophomorixExamMode => $exammode_AD, 
                    userAccountControl => $DevelConf::default_user_account_control,
+                   accountExpires => 0,
                    objectclass => ['top', 'person',
                                      'organizationalPerson',
                                      'user' ],
@@ -8491,7 +8493,7 @@ sub AD_smbcquotas_queryuser {
         " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
-        " -u $user //$root_dns/$share";
+        " -u $user //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
     my $display_command=$smbcquotas_command;
 
     # hide password
@@ -8550,7 +8552,7 @@ sub AD_smbcquotas_testshare {
         " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
-        " -F //$root_dns/$share";
+        " -F //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$share;
         my $return_quota=system("$smbcquotas_command > /dev/null");
         if ($return_quota==0){
             $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";
