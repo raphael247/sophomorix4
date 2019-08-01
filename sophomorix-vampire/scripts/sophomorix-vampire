@@ -95,12 +95,6 @@ my $create_class_adminadd_script=0;
 my $class_adminadd_script_input="/data/root/sophomorix-dump-viewdumps/memberdata_view.sql";
 my $class_adminadd_script_output="/root/sophomorix-vampire/sophomorix-vampire-classes-adminadd.sh";
 
-# --verify-uid-gid
-my $verify_uid_gid=0;
-my $verify_uid=0;
-my $verify_gid=0;
-
-
 ############################################################
 # rsync data
 # --path-oldserver
@@ -152,9 +146,6 @@ my $testopt=GetOptions(
            "create-project-script" => \$create_project_script,
            "create-class-script" => \$create_class_script,
            "create-class-adminadd-script" => \$create_class_adminadd_script,
-           "verify-uid-gid" => \$verify_uid_gid,
-           "verify-uid" => \$verify_uid,
-           "verify-gid" => \$verify_gid,
            "path-oldserver=s" => \$path_oldserver,
            "rsync-all-student-homes" => \$rsync_all_student_homes,
            "rsync-student-home=s" => \$rsync_student_home,
@@ -268,11 +259,6 @@ Vampire data into the new server V7:
 
 1x. Manually do the rest (will be automated):
     Copy files in /etc/linuxmuster/sophomorix/user/mail/* to new server.
-
-Do some tests:
-Verify uid and gid of created users ang groups
-    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-uid
-    # sophomorix-vampire --datadir /path/to/dir/sophomorix-dump --verify-gid
 
 Getting information:
   -i / --info
@@ -1098,212 +1084,6 @@ if ($create_project_script==1){
     close(PROSCRIPT);
     system("chmod 755 $project_script_output");
 }
-
-
-
-# --verify-uid
-if ($verify_uid==1){
-    print "Verifying if uidNumbers are correct (using perl getpwuid)\n";
-    my @loglines=();
-    my %uid_seen=();
-    my ($ldap,$root_dse) = &AD_bind_admin();
-    my $lines=0;
-    my $errors=0;
-
-    my %reverse_test=();
-
-
-    open(USERMIGRATE,"<$users_to_migrate") || die "ERROR: $!";
-    while (<USERMIGRATE>){
-        my $line=$_;
-        chomp($line);
-        #print $line."\n";
-        my ($user,$uidnumber,$status,$samba_account_flags,$gidnumber)=split(/::/,$line);
-        $reverse_test{$user}{'UIDNUMBER'}=$uidnumber;
-        $reverse_test{$user}{'STATUS'}=$status;
-        $reverse_test{$user}{'FLAG'}=$samba_account_flags;
-        $reverse_test{$user}{'GIDNUMBER'}=$gidnumber;
-
-        # Test 1: Users on old server that are not on new server
-        if (not exists $uid_seen{$uidnumber}){
-            print "  $lines) Testing user $user($uidnumber) in group ($gidnumber)\n";
-            $uid_seen{$uidnumber}="seen";
-            $lines++;
-
-            my $uid_full_sys = getpwuid($uidnumber);
-            if (not defined $uid_full_sys){
-                $errors++;
-                # No uidnumber found
-                if ($status eq "D"){
-                    print "     WARNING: User $user was deacivated, now it has been removed\n";
-                    push @loglines, "WARNING: User $user was deacivated, now it has been removed\n";
-                } else {
-                    print "     ERROR: Uidnumber for $user not found: $uidnumber\n";
-                    push @loglines, "ERROR: $user: uidnumber not found\n";
-                }
-            } else {
-                my ($string,$uid_sys)=split(/\\/,$uid_full_sys);
-                if ($uid_sys eq $user){
-                    print "     OK: uidNumber $uidnumber is user $uid_sys\n";
-                } else {
-                    $errors++;
-                    print "     ERROR: $uidnumber and $user\n";
-                    push @loglines, "ERROR: user $user should have uidNumber $uidnumber, but $uidnumber was given to $uid_sys\n";
-                }
-            }
-        } 
-    }
-    close(USERMIGRATE);
-
-    # Test: are all users there?
-    # are there to many users in AD?
-    # are all groups there (other sub), to many groups?
-
-    # Test 2: Reverse Test: Users on new server that are not on old server
-    #print Dumper(\%reverse_test);
-    my $entries=0;
-
-    my $filter="(& (objectClass=user) (sophomorixRole=*) )";
-    my $mesg = $ldap->search( # perform a search
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attrs => ['sAMAccountName',
-                                'sophomorixStatus',
-                                'sophomorixUnid',
-                                'uidNumber',
-                                'objectClass',
-                               ]);
-    my $max = $mesg->count;
-    for ( my $index = 0 ; $index < $max ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
-        my $uidnumber=$entry->get_value('uidNumber');
-        my $unid=$entry->get_value('sophomorixUnid');
-        my $status=$entry->get_value('sophomorixStatus');
-
-        my $computer=0;
-        # computer accounts ausnehmen?
-        my @object_classes = $entry->get_value('objectClass');
-        foreach my $object_class (@object_classes){
-            if ($object_class eq "computer"){
-                # skip this entry
-                $computer=1;
-            }
-	}
-
-        if ($computer==0){
-            $entries++;
-            # test this entry if its not a computer
-            print "  $entries) Testing user $sam (Status=$status, uidNumber=$uidnumber, Unid=$unid) \n";
-            if (exists $reverse_test{$sam} and 
-                $reverse_test{$sam}{'UIDNUMBER'} eq $uidnumber and
-                $reverse_test{$sam}{'STATUS'} eq $status
-               ){
-                # OK
-                print "     OK: user $sam correctly migrated ($reverse_test{$sam}{'UIDNUMBER'} --> $uidnumber)\n";
-            } elsif (exists $reverse_test{$sam} and 
-                    ($status eq "T" or ($reverse_test{$sam}{'STATUS'} eq "T" and $status eq "D"))){
-                # should be OK
-                print "     WARNING: $sam migrated to new status: $reverse_test{$sam}{'STATUS'}->$status (Should be OK)\n";
-                $errors++; 
-                push @loglines, "WARNING: $sam migrated to new status: $reverse_test{$sam}{'STATUS'}->$status (Should be OK)\n";
-            } elsif (exists $reverse_test{$sam}){
-                # Not with correct data
-                $errors++; 
-                print "     ERROR: user $sam incorrectly migrated\n";
-                print "        $reverse_test{$sam}{'UIDNUMBER'}  ---> $uidnumber\n";
-                print "        $reverse_test{$sam}{'STATUS'}  ---> $status\n";
-                push @loglines, "ERROR: $sam incorrectly migrated\n";
-            } else {
-                $errors++;
-                print "     ERROR: $sam should not exist on the new server\n";
-                push @loglines, "ERROR: $sam should not exist on the new server\n";
-            }
-        }
-     }
-   
-    # SUMMARY
-    print "\nSummary:\n";
-    print "   $errors WARNINGS/ERRORS:\n";
-    foreach my $line (@loglines){
-        print "     * $line";
-    }
-
-    
-
-}
-
-
-
-# --verify-gid
-if ($verify_gid==1){
-    print "Verifying if gidNumbers are correct (using command: id)\n";
-    my @loglines=();
-    my %gid_seen=();
-    my ($ldap,$root_dse) = &AD_bind_admin();
-    my $lines=0;
-    my $errors=0;
-    open(MEMBER,"<$class_adminadd_script_input") || die "ERROR: $!";
-    while (<MEMBER>){
-        my $line=$_;
-        chomp();
-        my ($user,$uidnumber,$gecos,$adminclass,,$status,$group,$gidnumber)=split(/\|/,$line);
-        $user=~s/^\s+//g;# remove leading whitespace
-        $user=~s/\s+$//g;# remove trailing whitespace
-        $uidnumber=~s/^\s+//g;# remove leading whitespace
-        $uidnumber=~s/\s+$//g;# remove trailing whitespace
-        $gecos=~s/^\s+//g;# remove leading whitespace
-        $gecos=~s/\s+$//g;# remove trailing whitespace
-        $group=~s/^\s+//g;# remove leading whitespace
-        $group=~s/\s+$//g;# remove trailing whitespace
-        $gidnumber=~s/^\s+//g;# remove leading whitespace
-        $gidnumber=~s/\s+$//g;# remove trailing whitespace
-
-        if ($lines==0 or
-            $gecos eq "Computer" or 
-            $gecos eq "ExamAccount" or
-            $user eq "wwwadmin" or
-            $user eq "pgmadmin" or
-            $user eq "domadmin" or
-            $user eq "NextFreeUnixId" or
-            $user eq "administrator"){
-                print "Skipping $user\n";
-                # header is line 0, add to counter to avoid loop
-                if ($lines==0){
-                    $lines=1;
-                }
-                next;
-        }
-
-        #system("id $user > /dev/null");
-        # testing primary group -> gidNumber
-        if (not exists $gid_seen{$gidnumber}){
-            print "$lines) Testing group $group($gidnumber)\n";
-            $gid_seen{$gidnumber}="seen";
-            $lines++;
-
-            my $printout =`wbinfo --gid-info $gidnumber` ;
-            my ($gid_full_sys,@rest)=split(/:/,$printout);
-            my ($string,$gid_sys)=split(/\\/,$gid_full_sys);
-            print "GID: $gid_full_sys $gid_sys     $gidnumber\n";
-            if ($gid_sys eq $group){
-                print "   OK: gidNumber $gidnumber is group $gid_sys (check with: # wbinfo --gid-info $gidnumber )\n";
-            } else {
-                $errors++;
-                print "ERROR: $gidnumber and $group\n";
-                push @loglines, 
-                  "group $group and gidNumber $gidnumber with problems (check with: # wbinfo --gid-info $gidnumber)\n";
-            }
-        }
-
-    }
-    print "\n$errors ERRORS:\n";
-    foreach my $line (@loglines){
-        print "  * $line";
-    }
-}
-
 
 
 
