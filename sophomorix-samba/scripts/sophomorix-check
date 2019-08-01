@@ -448,6 +448,7 @@ if ($analyze_encoding ne ""){
                                                          $ref_encoding_data,
                                                          $ref_encoding_check_results,
                                                          \%sophomorix_config,
+                                                         \%sophomorix_result
                                                         );
     &print_analyzed_encoding($analyze_encoding,$ref_encoding_check_results,$ref_encoding_data);
     my $result="$analyze_encoding is $enc encoded";
@@ -504,6 +505,7 @@ foreach my  $user_file (@filelist){
                                                          $ref_encoding_data,
                                                          $ref_encoding_check_results,
                                                          \%sophomorix_config,
+                                                         \%sophomorix_result
                                                         );
 }
 #print Dumper ($ref_encoding_check_results);

@@ -6585,7 +6585,8 @@ sub analyze_encoding {
         $non_umlaut,
         $ref_encoding_data,
         $ref_encoding_check_results,
-        $ref_sophomorix_config)=@_;
+        $ref_sophomorix_config,
+        $ref_sophomorix_result)=@_;
     # $file ist for printout and path in config hash only
     # $file_tmp will be analyzed
     my $filename = basename($file);
@@ -6697,6 +6698,7 @@ sub analyze_encoding {
                     my $old=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'none'};
                     my $new=$old+1;
                     $ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'none'}=$new;
+		    $ref_sophomorix_result->{'FILES'}{$file}{'UNKNOWN_FIRSTNAMES'}{$first}="LINE $count";
                 }
             }
         }
@@ -6754,6 +6756,7 @@ sub analyze_encoding {
                     my $old=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'none'};
                     my $new=$old+1;
                     $ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'none'}=$new;
+		    $ref_sophomorix_result->{'FILES'}{$file}{'UNKNOWN_LASTNAMES'}{$last}="LINE $count";
                 }
             }
         }
@@ -6777,8 +6780,9 @@ sub analyze_encoding {
     if ($nonstandard_name_count==0){
         # none non ascii names encountered -> treat as UTF8 for convenience
         $ref_encoding_check_results->{$file}{'RESULT'}="UTF8";
-        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}="UTF8";
+        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'ENCODING_CHECKED'}="UTF8";
         $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
+	$ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="TRUE";
     } else {
         # test if result is sure (TRUE/FALSE)
         my $enc_nonzero=0;
@@ -6790,13 +6794,16 @@ sub analyze_encoding {
 
         if ($enc_nonzero==1){
             $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
+  	    $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="TRUE";
         } else {
             $ref_encoding_check_results->{$file}{'SURE'}="FALSE";
+  	    $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="FALSE";
         }
 
         # save result in config hash
-        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED}=
-            $ref_encoding_check_results->{$file}{'RESULT'};
+        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{'ENCODING_CHECKED'}=
+	     $ref_encoding_check_results->{$file}{'RESULT'};
+	$ref_sophomorix_result->{'FILES'}{$file}{'ENCODING_CHECKED'}=$ref_encoding_check_results->{$file}{'RESULT'};
     }
     if($Conf::log_level>=2){
         print "$file_tmp --> $ref_encoding_check_results->{$file}{'RESULT'}\n";
