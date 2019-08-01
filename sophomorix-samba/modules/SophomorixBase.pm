@@ -6649,9 +6649,9 @@ sub analyze_encoding {
         # split at 'space' and '-'
         $firstname=&remove_embracing_whitespace($firstname);
         my @firstnames=split(/[ ,-]/, $firstname); # split for double names
-
         foreach my $first (@firstnames){
-            if ($first=~/[^a-zA-Z\-]/) {
+            # ASCII Test
+            if ($first=~/[^a-zA-Z0-9\-_.]/) {
                 $nonstandard_name_count++; 
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
@@ -6707,7 +6707,8 @@ sub analyze_encoding {
         $lastname=&remove_embracing_whitespace($lastname);
         my @lastnames=split(/[ ,-]/, $lastname); # split for double names
         foreach my $last (@lastnames){
-            if ($last=~/[^a-zA-Z\-]/) {
+            # ASCII Test
+            if ($last=~/[^a-zA-Z0-9\-_.]/) {
                 $nonstandard_name_count++;
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
