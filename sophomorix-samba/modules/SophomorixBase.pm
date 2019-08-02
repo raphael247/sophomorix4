@@ -5855,6 +5855,14 @@ sub create_plain_password {
 
 # filesystem
 ######################################################################
+sub smb_share_subpath_from_homedir_attr {
+    my ($homedir_attr,$school)=@_;
+    my ($server,$sub_path)=split(/\/$school\//,$homedir_attr);
+    my $share=$server."/".$school;
+    return($share,$sub_path);
+}
+
+
 sub get_homedirectory {
     my ($root_dns,$school,$group_basename,$user,$role,$ref_sophomorix_config)=@_;
     my $homedirectory;  # as needed to fill the attribute 'homeDirectory (using \\)
@@ -5868,6 +5876,7 @@ sub get_homedirectory {
         $school_smbshare=$school;
     }
     my $unc="//".$root_dns."/".$school_smbshare;
+    my $smb_server="//".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$school_smbshare; 
 
     my $dns=$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{$ref_sophomorix_config->{'INI'}{'VARS'}{'HOMEDIRECTORY_HOST'}};
     
@@ -5917,7 +5926,7 @@ sub get_homedirectory {
         $homedirectory="\\\\".$dns."\\".$school_smbshare."\\unknown\\".$group_basename."\\".$user;
         $unix_home=$DevelConf::homedir_all_schools."/".$school."/unknown/".$group_basename."/".$user;
     }
-    return ($homedirectory,$unix_home,$unc,$smb_rel_path);
+    return ($homedirectory,$unix_home,$unc,$smb_rel_path,$smb_server);
 }
 
 

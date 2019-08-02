@@ -8413,38 +8413,30 @@ sub AD_examuser_kill {
             " user delete ". $examuser;
         &Sophomorix::SophomorixBase::smb_command($command,$smb_admin_pass);
 
-        # rewrite smb_dir with msdfs root
-        $smb_home=&Sophomorix::SophomorixBase::rewrite_smb_path($smb_home,$ref_sophomorix_config);
+        my ($smb_server,
+            $smb_rel_path)=&Sophomorix::SophomorixBase::smb_share_subpath_from_homedir_attr($home_directory_AD,
+                                                                                            $school_AD);
+        my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+            " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
+            $smb_server." -c 'deltree \"$smb_rel_path\";'";
+        my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
-        # deleting home
-        my $smb = new Filesys::SmbClient(username  => $DevelConf::sophomorix_file_admin,
-                                         password  => $smb_admin_pass,
-                                         debug     => 0);
-        #print "Deleting: $smb_home\n"; # smb://linuxmuster.local/<school>/subdir1/subdir2
-        my $return=$smb->rmdir_recurse($smb_home);
-        if($return==1){
-            print "OK: Deleted with succes $smb_home\n";
-        } else {
-            print "ERROR: rmdir_recurse $smb_home $!\n";
-        }
-
-        # deleting subdir if empty and not examusers
-        my $subdir=$smb_home;
+        # deleting subdir if empty and not 'examusers'-topdir
+        my $subdir=$smb_rel_path;
         $subdir=~s/\/$//; # make sure trailing / are gone 
         $subdir=~s/\/$examuser$//; # remove <user>-exam
+
         if ($subdir=~m/$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{USER_SUB_DIR}$/){
-            # examusers still needed
+            # 'examusers' still needed
             print "Not deleting $subdir (still needed)\n";
         } else {
             # deleting subdir
-            my $return=$smb->rmdir($subdir);
-            if($return==1){
-                print "OK: Deleted empty dir: $subdir\n";
-            } else {
-                print "Not deleted: $subdir ($!)\n";
-            }
-        }
+            my $smbclient_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+                " --debuglevel=0 -U ".$DevelConf::sophomorix_file_admin."%'******' ".
+                $smb_server." -c 'rmdir \"$subdir\";'";
 
+            my $smbclient_return=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+        }
         return;
     } else {
         print "   * User $examuser nonexisting ($count results)\n";
