@@ -109,14 +109,11 @@ Logging ist done to:
      *.filtered       filtered/copied file(when there is no filter) 
      *.filtered.utf8  filtered and converted to UTF(this file is installed to /etc)
 
-
-
 - New files are deleted after registration
   (option --filteronly keeps the files)
 - New files and overwritten files are logged
 - a filter is applied if configured
   (check with --filteronly)
-- (later: encoding is analyzed and written to extended attributes)
 
 Options:
   -h  / --help
@@ -148,7 +145,6 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-
 
 
 # --info
@@ -193,7 +189,10 @@ my $newfile_log_utf8;
 my $etcfile_log;
 my $filter_script;
 
-# calculate paths
+my $tmp_dir=$sophomorix_config{'INI'}{'PATHS'}{'TMP_FILTERED'};
+my $tmp=$tmp_dir."/newfile_filtered.tmp";
+
+# calculate paths for logging
 if ($name ne ""){
     # option --name ....
     if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$name}){
@@ -237,15 +236,35 @@ if ($name ne ""){
 }
 
 
-if($Conf::log_level>=3){
-    print "\n";
-    print "Analyzing encoding\n";
-}
 my $ref_encoding_data=&read_encoding_data();
 my $enc;
 my $ref_encoding_check_results;
-($enc,$ref_encoding_check_results)=&analyze_encoding($newfile,
-                                                     $newfile,
+
+# cp or filter temporary 
+if ($filter_script eq "---"){
+    print "cp, not filtering\n";
+    system("cp $newfile_abs $tmp")
+} elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
+    print "\nERROR: The configured Filter is not an executable script:\n";
+    print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
+    print "\n";
+    exit 88;
+} else {
+    # filter to tmp
+    print "filtering, not cp\n";
+    system("mkdir -p $tmp_dir");
+    my $command="$filter_script $newfile_abs $tmp";
+    print "$command\n";
+    system("$filter_script $newfile_abs $tmp");
+}
+
+
+if($Conf::log_level>=3){
+    print "\n";
+    print "Analyzing encoding of $tmp\n";
+}
+($enc,$ref_encoding_check_results)=&analyze_encoding($tmp,
+                                                     $tmp,
                                                      $show_special_char_lines,
                                                      $non_umlaut,
                                                      $ref_encoding_data,
@@ -253,32 +272,29 @@ my $ref_encoding_check_results;
                                                      \%sophomorix_config,
                                                      \%sophomorix_result,
                                                     );
-print "\n";
-print "ENCODING IS $enc ($ref_encoding_check_results->{$newfile}{'SURE'}, $newfile)\n";
 
-print "   * New file:         $basename  (Renamed to: $name)\n";
-print "     * Newfile_abs:    $newfile_abs\n";
-print "   * Target file:      $target\n";
-print "   * Target school:    $target_school\n";
-print "   * Log new file to:  $newfile_log\n";
-print "     * filtered:       $newfile_log_filter\n";
-print "     * utf8:           $newfile_log_utf8\n";
-print "   * Log old file to:  $etcfile_log\n";
-print "   * Filterscript:  $filter_script\n";
+
+print "\n";
+print "ENCODING is $enc ($ref_encoding_check_results->{$tmp}{'SURE'}, $tmp)\n";
+print "\n";
+print "   * New file:          $basename  (Renamed to: $name)\n";
+print "     * Newfile_abs:     $newfile_abs\n";
+print "   * Target file:       $target\n";
+print "   * Target school:     $target_school\n";
+print "   * Logging new files:\n";
+print "     * original file:   $newfile_log\n";
+print "     * filtered file:   $newfile_log_filter\n";
+print "     * filter + utf8:   $newfile_log_utf8\n";
+print "   * Loggging old file:\n";
+print "     * file from etc:   $etcfile_log\n";
+print "   * Filterscript:      $filter_script\n";
+print "     * filtered tmp to: $tmp\n";
+
 
 # exit if something is wrong
 ############################################################
-
-# filterscript not there
-if ($filter_script eq "ERROR_FILTERSCRIPT"){
-    print "\nERROR: The configured Filter is not an executable script:\n";
-    print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
-    print "\n";
-    exit 88;
-}
-
-# autoconversion to utf8 can't be done
-if ($ref_encoding_check_results->{$newfile}{'SURE'} ne "TRUE"){
+# EXIT if autoconversion to utf8 can't be done
+if ($ref_encoding_check_results->{$tmp}{'SURE'} ne "TRUE"){
     print "\n";
     print "ERROR: Encoding could not be determined for this file:\n";
     print "   $newfile\n";
@@ -290,6 +306,7 @@ if ($ref_encoding_check_results->{$newfile}{'SURE'} ne "TRUE"){
     print "\n";
     exit 88;
 }
+
 
 
 
@@ -318,20 +335,20 @@ if (-e $target and $test_only==0){
 
 # 2) cp newfile to log as *.orig
 my $command_2="cp $newfile_abs $newfile_log";
-print "2) Copy newfile to log as *.orig:\n";
+print "2) Logging newfile as *.orig:\n";
 print "   $command_2\n";
 system($command_2);
 
 
-# 3) filter or NOT to *.filter
+# 3) *.filter or NOT to *.filter
 if ($filter_script eq "---"){
-    print "3) NOT filtering ($filter_script), just copying:\n";
+    print "3) NOT filtering ($filter_script), just logging as *.filter:\n";
     my $command_3="cp $newfile_abs $newfile_log_filter";
     print "   $command_3\n";
     system($command_3);
 } else {
-    print "3) Filtering with: $filter_script\n";
-    my $command_3="$filter_script $newfile_abs $newfile_log_filter";
+    print "3) Logging(moving) temporary filtered file as *.filter\n";
+    my $command_3="mv $tmp $newfile_log_filter";
     print "   $command_3\n";
     system($command_3);
 }
@@ -340,12 +357,12 @@ if ($filter_script eq "---"){
 # 4) cp or iconv to *.filter.utf8
 if ($enc eq "UTF8" and $ref_encoding_check_results->{$newfile}{'SURE'} eq "TRUE"){
     my $command_4="cp $newfile_log_filter $newfile_log_utf8";
-    print "4) File is $enc: just copying filtered file:\n";
+    print "4) File is $enc: just logging filtered file as *.filter.utf8:\n";
     print "   $command_4\n";
     system($command_4);
 } else {
     my $command_4="iconv -f $enc -t UTF8 -o $newfile_log_utf8 $newfile_log_filter";
-    print "4) File is $enc: converting to UTF8:\n";
+    print "4) File is $enc: converting to UTF8 as *.filter.utf8:\n";
     print "   $command_4\n";
     system($command_4);
 }
@@ -366,11 +383,12 @@ print "5) Install filtered utf8 file in /etc:\n";
 print "   $command_5\n";
 system($command_5);
 
+
 # 6) delete newfile
 my $command_6="rm $newfile_abs";
-    print "6) Deleting newfile:\n";
-    print "   $command_6\n";
-    system($command_6);
+print "6) Deleting newfile:\n";
+print "   $command_6\n";
+system($command_6);
 
 print "\n";
 
@@ -396,4 +414,3 @@ sub print_valid_filenames {
     }
     print "\n";
 }
-
