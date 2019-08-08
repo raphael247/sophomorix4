@@ -2,23 +2,16 @@
 # This script converts the cvs dump of Atlantis Listenfilter 
 # to the students.csv format for linuxmuster.net 7
 #
-# This script might be updated after installing an sophomorix-base package.
-# You must copy it by hand to its location and adjust the configuration.
-#
-#
 # Fetch data from Atlantis the following way:
-# as described in http://www.linuxmuster.net/wiki/dokumentation:sophomorix:svp_atlantis
-
+# as described in https://github.com/linuxmuster/sophomorix4/wiki/Export-and-Filters
 
 ############################################################
 # Start configure 
 ############################################################
 
-#my $current_year_string=$ARGV[0];
-my $source=$ARGV[0];
-my $target=$ARGV[1];
-
-my $current_year_string="2018/19";
+my $current_year_string=$ARGV[0];
+my $source=$ARGV[1];
+my $target=$ARGV[2];
 
 my $tmp="/var/lib/sophomorix/tmp/students.csv.filter.tmp-atlantis-csv-listenauswahl.filter";
 
@@ -29,7 +22,11 @@ my %unid_store=();
 ############################################################
 
 open(SOURCE, "<$source") || die "Error: $! $source not found!"; 
-open(TMP, ">$tmp") || die "Error: $! $tmp not found!"; 
+open(TMP, ">$tmp") || die "Error: $! $tmp not found!";
+print TMP "# created by filterscript\n";
+print TMP "# $0\n";
+print TMP "# @ARGV\n";
+
 while (<SOURCE>){
     chomp();
     my ($number,

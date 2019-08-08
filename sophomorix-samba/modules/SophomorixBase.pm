@@ -4346,13 +4346,18 @@ sub load_school_ini {
 	            my $filter_script=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT};
                     if ($filter_script eq "---"){
                         #$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
- 	            } elsif (-f $filter_script and -x $filter_script and $filter_script=~m/^\//){
-                        # configured value is a file and executable
-                        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
-                    } else {
-                        $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
-                        &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
-                            "FILTERSCRIPT=".$filter_script." -> FILTERSCRIPT must be an absolute path to an executable script");
+ 	            } else {
+                        # test if first part of configured value is a file and executable
+                        my ($executable,@options)=split(/ +/,$filter_script);
+                        if (-f $executable and -x $executable and $executable=~m/^\//){
+                            # first part of configured value is a file and executable
+                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}=$filter_script;
+                        } else {
+                            $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{FILTERSCRIPT}="ERROR_FILTERSCRIPT";
+                            &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,
+                                "FILTERSCRIPT=".$filter_script." -> FILTERSCRIPT must be an absolute path to an executable script");
+                        }
+			#exit;
                     }
                 }
                 # test encoding

@@ -355,7 +355,7 @@ if ($filter_script eq "---"){
 
 
 # 4) cp or iconv to *.filter.utf8
-if ($enc eq "UTF8" and $ref_encoding_check_results->{$newfile}{'SURE'} eq "TRUE"){
+if ($enc eq "UTF8" and $ref_encoding_check_results->{$tmp}{'SURE'} eq "TRUE"){
     my $command_4="cp $newfile_log_filter $newfile_log_utf8";
     print "4) File is $enc: just logging filtered file as *.filter.utf8:\n";
     print "   $command_4\n";
