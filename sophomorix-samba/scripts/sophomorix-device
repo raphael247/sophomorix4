@@ -2116,12 +2116,15 @@ sub update_printer_gpos {
         system("mkdir -p $target_dir");
         # write prefix
         system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_PRE'} >> $target");
+        my $school_printer_count=0;
         foreach my $device (@{ $ref_devices_file->{'LISTS'}{'devices_by_school'}{$school} }){
             if ($ref_devices_file->{'device'}{$device}{'sophomorixRole'} eq "printer"){
                 # only work on printers
+                $school_printer_count++;
                 my $workgroup=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'workgroup'};
                 my $printer_uppercase=$ref_devices_file->{'device'}{$device}{'COMPUTER'};
                 my $printer_lowercase=$ref_devices_file->{'device'}{$device}{'sophomorixDnsNodename'};
+                my $printer_sid=&name_to_sid($printer_lowercase);
 
                 # printserver can be overridden in school.conf
                 my $printserver=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PRINTSERVER'};
@@ -2131,6 +2134,7 @@ sub update_printer_gpos {
                 my $replace = "-e \"s/\@\@LINUXMUSTER\@\@/$workgroup/g\" ".
                               "-e \"s/\@\@PRINTSERVER\@\@/$printserver/g\" ".
                               "-e \"s/\@\@PRINTER_LOWERCASE\@\@/$printer_lowercase/g\" ".
+                              "-e \"s/\@\@PRINTER_SID\@\@/$printer_sid/g\" ".
                               "-e \"s/\@\@PRINTER\@\@/$printer_uppercase/g\" ";
                 my $sed_command="cat ".$template." | sed ".$replace." >> ".$target;
                 if($Conf::log_level>=3){
@@ -2141,8 +2145,25 @@ sub update_printer_gpos {
         }
         # write postfix
         system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_POST'} >> $target");
+        if($Conf::log_level>=2){
+            printf  "School %-14s:%4s printers found\n",$school,$school_printer_count;
+        }
+        # ????? TODO
+        # if 0 printers, delete file in gpo
+        # else cp file to GPO
+
     }
     print "\n";
+}
+
+
+
+sub name_to_sid {
+    my ($name)=@_;
+    my $string=`wbinfo -n $name`;
+    chomp($string);
+    my ($sid,@rest)=split(/\s+/,$string);
+    return $sid;
 }
 
 
