@@ -2383,10 +2383,10 @@ if ($add==1 or $test_add==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -2400,7 +2400,8 @@ if ($add==1 or $test_add==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -2413,7 +2414,8 @@ if ($add==1 or $test_add==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -2428,9 +2430,11 @@ if ($add==1 or $test_add==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -2630,7 +2634,8 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -2669,6 +2674,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -2712,7 +2718,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\jonsonad42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -2739,6 +2745,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -2750,7 +2757,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\samardze42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -2777,6 +2784,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -2864,10 +2872,10 @@ if ($add==1 or $test_add==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -2881,7 +2889,8 @@ if ($add==1 or $test_add==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -2894,7 +2903,8 @@ if ($add==1 or $test_add==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -2909,9 +2919,11 @@ if ($add==1 or $test_add==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -2985,7 +2997,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\lordjo42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lordjo42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\lordjo42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3012,6 +3024,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3023,7 +3036,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\blackmri42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\blackmri42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\blackmri42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3050,6 +3063,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3132,7 +3146,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\gal42:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\gal42:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
-                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3237,10 +3251,10 @@ if ($add==1 or $test_add==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -3254,7 +3268,8 @@ if ($add==1 or $test_add==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -3267,7 +3282,8 @@ if ($add==1 or $test_add==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -3282,9 +3298,11 @@ if ($add==1 or $test_add==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -3358,7 +3376,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\schneima42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3385,6 +3403,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3396,7 +3415,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\fisch42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\fisch42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\fisch42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3423,6 +3442,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3434,7 +3454,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\schaf42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\schaf42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\schaf42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3461,6 +3481,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3472,7 +3493,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\hund42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\hund42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\hund42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3499,6 +3520,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3510,14 +3532,14 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\katze42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\katze42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\katze42:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
-                 'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/CHANGE',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
                  'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                  'ACL:BUILTIN\Administrators:DENIED/0x0/PO',
@@ -3537,6 +3559,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3548,7 +3571,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\maus42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\maus42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\maus42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3575,6 +3598,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3586,7 +3610,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\hahn42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\hahn42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\hahn42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3613,6 +3637,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3624,7 +3649,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\gans42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\gans42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\gans42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3651,6 +3676,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3662,7 +3688,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\frosch42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\frosch42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\frosch42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3689,6 +3715,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3700,7 +3727,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\hamster42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\hamster42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\hamster42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3727,6 +3754,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3738,7 +3766,7 @@ if ($add==1 or $test_add==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\schwein42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\schwein42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\schwein42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -3765,6 +3793,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -3813,7 +3842,7 @@ if ($add==1 or $test_add==1){
                  'ACL:LINUXMUSTER\sch42:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
-                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -5279,10 +5308,10 @@ if ($mod==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -5296,7 +5325,8 @@ if ($mod==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -5309,7 +5339,8 @@ if ($mod==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -5324,9 +5355,11 @@ if ($mod==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -5500,7 +5533,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\maiersa42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -5527,6 +5560,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -5538,7 +5572,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\muellegr42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\muellegr42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\muellegr42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -5565,6 +5599,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -5608,7 +5643,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\jonsonad42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -5635,6 +5670,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -5646,7 +5682,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\samardze42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -5673,6 +5709,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -5760,10 +5797,10 @@ if ($mod==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -5777,7 +5814,8 @@ if ($mod==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -5790,7 +5828,8 @@ if ($mod==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -5805,9 +5844,11 @@ if ($mod==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -5881,7 +5922,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\lordjo42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lordjo42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\lordjo42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -5908,6 +5949,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -5919,7 +5961,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\blackmri42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\blackmri42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\blackmri42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -5946,6 +5988,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -6011,7 +6054,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\kep42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\kep42:ALLOWED/OI|CI|IO/CHANGE',
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE',
-                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/CHANGE',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -6133,10 +6176,10 @@ if ($mod==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -6150,7 +6193,8 @@ if ($mod==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -6163,7 +6207,8 @@ if ($mod==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -6178,9 +6223,11 @@ if ($mod==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -6254,7 +6301,7 @@ if ($mod==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\schneima42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -6281,6 +6328,7 @@ if ($mod==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -7941,10 +7989,10 @@ if ($ses==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -7958,7 +8006,8 @@ if ($ses==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -7971,7 +8020,8 @@ if ($ses==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -7986,9 +8036,11 @@ if ($ses==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -8162,7 +8214,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\maiersa42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8189,6 +8241,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -8200,7 +8253,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\muellegr42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\muellegr42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\muellegr42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8227,6 +8280,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -8270,7 +8324,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\jonsonad42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8297,6 +8351,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -8308,7 +8363,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\samardze42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8335,6 +8390,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -8422,10 +8478,10 @@ if ($ses==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -8439,7 +8495,8 @@ if ($ses==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -8452,7 +8509,8 @@ if ($ses==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -8467,9 +8525,11 @@ if ($ses==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -8543,7 +8603,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\lordjo42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lordjo42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\lordjo42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8570,6 +8630,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -8581,7 +8642,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\blackmri42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\blackmri42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\blackmri42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8608,6 +8669,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -8795,10 +8857,10 @@ if ($ses==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -8812,7 +8874,8 @@ if ($ses==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -8825,7 +8888,8 @@ if ($ses==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -8840,9 +8904,11 @@ if ($ses==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -8916,7 +8982,7 @@ if ($ses==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\schneima42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -8943,6 +9009,7 @@ if ($ses==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -10946,10 +11013,10 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -10963,7 +11030,8 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -10976,7 +11044,8 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -10991,9 +11060,11 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -11099,7 +11170,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\oe42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\oe42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\oe42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -11126,6 +11197,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -11235,7 +11307,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\maiersa42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\maiersa42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -11262,6 +11334,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -11305,7 +11378,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\muellegr42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\muellegr42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\muellegr42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -11332,6 +11405,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -11407,7 +11481,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\jonsonad42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\jonsonad42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -11434,6 +11508,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -11445,7 +11520,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\samardze42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\samardze42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -11472,6 +11547,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -11559,10 +11635,10 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -11576,7 +11652,8 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -11589,7 +11666,8 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -11604,9 +11682,11 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -11790,10 +11870,10 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/lin/share/classes
     &NTACL_test ("lin",
@@ -11807,7 +11887,8 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/management
@@ -11820,7 +11901,8 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/school
@@ -11835,9 +11917,11 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/lin/share/projects
     &NTACL_test ("lin",
@@ -12009,7 +12093,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\kep42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\kep42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\kep42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -12036,6 +12120,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -12123,10 +12208,10 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/ghs/share/classes
     &NTACL_test ("ghs",
@@ -12140,7 +12225,8 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/management
@@ -12153,7 +12239,8 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/school
@@ -12168,9 +12255,11 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/ghs/share/projects
     &NTACL_test ("ghs",
@@ -12244,7 +12333,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\gal42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\gal42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\gal42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -12271,6 +12360,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -12390,10 +12480,10 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -12407,7 +12497,8 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -12420,7 +12511,8 @@ if ($update==1 or $test_update==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -12435,9 +12527,11 @@ if ($update==1 or $test_update==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -12543,7 +12637,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\schneima42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\schneima42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -12570,6 +12664,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -12645,7 +12740,7 @@ if ($update==1 or $test_update==1){
                  \%fs_test_result,
                  "REVISION:1",
                  "CONTROL:SR|DP",
-                 'OWNER:LINUXMUSTER\sch42', 
+                 'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\sch42:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\sch42:ALLOWED/OI|CI|IO/CHANGE', 
@@ -12672,6 +12767,7 @@ if ($update==1 or $test_update==1){
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE', 
                  'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI/FULL',
                  'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
@@ -13349,10 +13445,10 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -13366,7 +13462,8 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -13379,7 +13476,8 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -13394,9 +13492,11 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -13738,10 +13838,10 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -13755,7 +13855,8 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -13768,7 +13869,8 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -13783,9 +13885,11 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -13935,10 +14039,10 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/lin/share/classes
     &NTACL_test ("lin",
@@ -13952,7 +14056,8 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/management
@@ -13965,7 +14070,8 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/school
@@ -13980,9 +14086,11 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/lin/share/projects
     &NTACL_test ("lin",
@@ -14196,10 +14304,10 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/ghs/share/classes
     &NTACL_test ("ghs",
@@ -14213,7 +14321,8 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/management
@@ -14226,7 +14335,8 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/school
@@ -14241,9 +14351,11 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/ghs/share/projects
     &NTACL_test ("ghs",
@@ -14425,10 +14537,10 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -14442,7 +14554,8 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -14455,7 +14568,8 @@ if ($kill==1 or $test_kill==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -14470,9 +14584,11 @@ if ($kill==1 or $test_kill==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -15051,10 +15167,10 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -15068,7 +15184,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -15081,7 +15198,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -15096,9 +15214,11 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -15249,10 +15369,10 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -15266,7 +15386,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -15279,7 +15400,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -15294,9 +15416,11 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -15414,10 +15538,10 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/lin/share/classes
     &NTACL_test ("lin",
@@ -15431,7 +15555,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/management
@@ -15444,7 +15569,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/school
@@ -15459,9 +15585,11 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/lin/share/projects
     &NTACL_test ("lin",
@@ -15670,10 +15798,10 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/ghs/share/classes
     &NTACL_test ("ghs",
@@ -15687,7 +15815,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/management
@@ -15700,7 +15829,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/school
@@ -15715,9 +15845,11 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/ghs/share/projects
     &NTACL_test ("ghs",
@@ -15867,10 +15999,10 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -15884,7 +16016,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -15897,7 +16030,8 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -15912,9 +16046,11 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
@@ -16403,10 +16539,10 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_bsz:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/bsz/share/classes
     &NTACL_test ("bsz",
@@ -16420,7 +16556,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/management
@@ -16433,7 +16570,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/bsz/share/school
@@ -16448,9 +16586,11 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\bsz-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\bsz-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\bsz-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/bsz/share/projects
     &NTACL_test ("bsz",
@@ -16600,10 +16740,10 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_uni:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/uni/share/classes
     &NTACL_test ("uni",
@@ -16617,7 +16757,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/management
@@ -16630,7 +16771,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/uni/share/school
@@ -16645,9 +16787,11 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\uni-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\uni-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\uni-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\uni-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/uni/share/projects
     &NTACL_test ("uni",
@@ -16765,10 +16909,10 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_lin:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/lin/share/classes
     &NTACL_test ("lin",
@@ -16782,7 +16926,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/management
@@ -16795,7 +16940,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/lin/share/school
@@ -16810,9 +16956,11 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\lin-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\lin-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\lin-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\lin-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/lin/share/projects
     &NTACL_test ("lin",
@@ -16994,10 +17142,10 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_ghs:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/ghs/share/classes
     &NTACL_test ("ghs",
@@ -17011,7 +17159,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/management
@@ -17024,7 +17173,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/ghs/share/school
@@ -17039,9 +17189,11 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\ghs-students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\ghs-teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\ghs-admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/ghs/share/projects
     &NTACL_test ("ghs",
@@ -17191,10 +17343,10 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\s_default-school:ALLOWED/0x0/READ',
                 );
     # /srv/samba/schools/default-school/share/classes
     &NTACL_test ("default-school",
@@ -17208,7 +17360,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/0x0/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/READ',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/management
@@ -17221,7 +17374,8 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  "CONTROL:SR|DP",
                  'OWNER:BUILTIN\Administrators', 
                  'GROUP:LINUXMUSTER\Domain Users',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE',
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL',
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
                 );
     # /srv/samba/schools/default-school/share/school
@@ -17236,9 +17390,11 @@ if ($groupkill_2==1 or $test_groupkill_2==1){
                  'GROUP:LINUXMUSTER\Domain Users',
                  'ACL:LINUXMUSTER\students:ALLOWED/OI|CI/READ',
                  'ACL:LINUXMUSTER\teachers:ALLOWED/0x0/RWX', 
-                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/FULL',
-                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/FULL', 
+                 'ACL:LINUXMUSTER\teachers:ALLOWED/OI|CI|IO/CHANGE',
+                 'ACL:LINUXMUSTER\admins:ALLOWED/OI|CI|I/CHANGE', 
+                 'ACL:LINUXMUSTER\global-admins:ALLOWED/OI|CI|I/FULL', 
                  'ACL:LINUXMUSTER\Administrator:ALLOWED/OI|CI|I/FULL',
+                 'ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE',
                 );
     # /srv/samba/schools/default-school/share/projects
     &NTACL_test ("default-school",
