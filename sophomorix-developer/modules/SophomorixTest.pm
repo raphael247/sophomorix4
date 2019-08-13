@@ -1181,7 +1181,7 @@ sub NTACL_test {
         is ($ok,1,"* NTACL contains: $testline");
     }
     # if not 100% ok print what is and what shoul be
-    if ($count_test==$count_test_success){
+    if ($count_test==$count_test_success and $count_test==$count_lines){
         #ok
     } else {
         foreach my $line (@test){
