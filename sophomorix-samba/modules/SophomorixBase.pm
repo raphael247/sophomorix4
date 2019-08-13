@@ -6666,7 +6666,7 @@ sub analyze_encoding {
         my @firstnames=split(/[ ,-]/, $firstname); # split for double names
         foreach my $first (@firstnames){
             # ASCII Test
-            if ($first=~/[^a-zA-Z0-9\-_.]/) {
+            if ($first=~/[^a-zA-Z0-9\-_'.]/) {
                 $nonstandard_name_count++; 
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
@@ -6724,7 +6724,7 @@ sub analyze_encoding {
         my @lastnames=split(/[ ,-]/, $lastname); # split for double names
         foreach my $last (@lastnames){
             # ASCII Test
-            if ($last=~/[^a-zA-Z0-9\-_.]/) {
+            if ($last=~/[^a-zA-Z0-9\-_'.]/) {
                 $nonstandard_name_count++;
                 # continue with non-standard(~non-ascii) chars
                 my $hit_count=0;
