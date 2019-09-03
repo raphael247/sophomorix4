@@ -308,6 +308,7 @@ if ( ($clone_from_user ne "" and $clone_to_user eq "") or
 ############################################################
 # --test-login
 if ($test_login==1 and $password ne ""){
+    $sophomorix_result{'LOGINTEST'}{$user}{'EXISTS'}="FALSE";
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
     my $mesg = $ldap->search(
                       base   => $root_dse,
@@ -316,6 +317,7 @@ if ($test_login==1 and $password ne ""){
                       attr => ['cn']
                             );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
     my $max = $mesg->count;
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
@@ -323,9 +325,15 @@ if ($test_login==1 and $password ne ""){
         my $sam_account=$entry->get_value ('sAMAccountName');
         print "* $sam_account: $dn\n";
         my ($res,$testpassword,$res1,$res2)=&AD_login_test($ldap,$root_dse,$dn,$password);
+        $sophomorix_result{'LOGINTEST'}{$sam_account}{'EXISTS'}="TRUE";
+        $sophomorix_result{'LOGINTEST'}{$sam_account}{'PAM'}{'RETURN'}=$res1;
+        $sophomorix_result{'LOGINTEST'}{$sam_account}{'KERBEROS'}{'RETURN'}=$res2;
+
         if ($res==0){
+            $sophomorix_result{'LOGINTEST'}{$sam_account}{'LOGIN_OK'}="TRUE";
             print "   ---> Pam/Kerberos Login with password \"$password\" OK!\n";
         } else {
+            $sophomorix_result{'LOGINTEST'}{$sam_account}{'LOGIN_OK'}="FALSE";
             print "   ---> ERROR logging in with password \"$password\": $res (pam: $res1, kerberos: $res2)\n";
         }
     }
