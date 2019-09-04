@@ -243,6 +243,7 @@ my $ref_encoding_check_results;
 # cp or filter temporary 
 if ($filter_script eq "---"){
     print "cp, not filtering\n";
+    system("mkdir -p $tmp_dir");
     system("cp $newfile_abs $tmp")
 } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
     print "\nERROR: The configured Filter is not an executable script:\n";
