@@ -5148,7 +5148,12 @@ sub AD_create_new_mail {
         $role=$role_file;
         $school=$school_file;
     }
-    my $mail=$sam."@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+    my $mail;
+    if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} eq "NONE"){
+        $mail="NONE";
+    } else {
+        $mail=$sam."@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+    }
     return $mail;
 }
  
