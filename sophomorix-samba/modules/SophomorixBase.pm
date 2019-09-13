@@ -5807,7 +5807,7 @@ sub get_passwd_charlist {
                 'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T',
                 'U','V','W','X','Y','Z',
                 '2','3','4','5','6','7','8','9',
-                '!','$','&','(',')','=','?'
+                '!','$','&','(',')','?'
                 );
    return @zeichen;
 }
@@ -5841,7 +5841,7 @@ sub get_plain_password {
 sub create_plain_password {
     my ($num,@password_chars)=@_;
     my $password="";
-    until ($password=~m/[!,\$,&,\(,\),=,?]/ and 
+    until ($password=~m/[!,\$,&,\(,\),?]/ and 
            $password=~m/[a-z]/ and 
            $password=~m/[A-Z]/ and
            $password=~m/[0-9]/
