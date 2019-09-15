@@ -4577,7 +4577,7 @@ sub AD_get_AD_for_check {
        if (defined $entry->get_value('sophomorixRole')){
            ##### a sophomorix user #####
            $role=$entry->get_value('sophomorixRole');
-           $forbidden_warn="$sam forbidden, $sam is a sophomorix user";
+           $forbidden_warn="$sam forbidden, $sam exists already as a sophomorix user";
            if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'} or
                $role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'} or
                $role eq "schooladministrator" or 
@@ -4648,10 +4648,10 @@ sub AD_get_AD_for_check {
        } elsif (defined $entry->get_value('sophomorixType')){
            ##### a sophomorix group #####
            $type=$entry->get_value('sophomorixType');
-           $forbidden_warn="$sam forbidden, $sam is a sophomorix group";
+           $forbidden_warn="$sam forbidden, $sam exists already as a sophomorix group";
        } else {
            ##### a non sophomorix object #####
-           $forbidden_warn="$sam forbidden, $sam is a non-sophomorix object";
+           $forbidden_warn="$sam forbidden, $sam exists already as a non-sophomorix object";
        }
 
        $AD{'FORBIDDEN'}{$sam}=$forbidden_warn;
