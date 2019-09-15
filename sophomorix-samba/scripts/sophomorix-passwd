@@ -69,7 +69,7 @@ my $info=0;
 my $json=0;
 
 my $school="";
-my $test_login=0;
+my $test_login="";
 my $test_firstpassword=0;
 my $set_firstpassword=0;
 
@@ -144,7 +144,7 @@ my $testopt=GetOptions(
 #           "samba-pwd-must-change!" => \$smb_pw_m_change,
 #           "shell|loginshell=s" => \$shell,
 #           "force" => \$force,
-           "test-login" => \$test_login,
+           "test-login=s" => \$test_login,
            "test-firstpassword" => \$test_firstpassword,
            "set-firstpassword" => \$set_firstpassword,
            "show-password-charlist" => \$show_password_charlist,
@@ -168,6 +168,9 @@ if ($school ne ""){
 my $user_filter="";
 if ($user ne ""){
     $user_filter="(sAMAccountName=$user)";
+}
+if ($test_login ne ""){
+    $user_filter="(sAMAccountName=$test_login)";
 }
 
 
@@ -307,7 +310,7 @@ if ( ($clone_from_user ne "" and $clone_to_user eq "") or
 
 ############################################################
 # --test-login
-if ($test_login==1 and $password ne ""){
+if ($test_login ne "" and $password ne ""){
     $sophomorix_result{'LOGINTEST'}{$user}{'EXISTS'}="FALSE";
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
     my $mesg = $ldap->search(
