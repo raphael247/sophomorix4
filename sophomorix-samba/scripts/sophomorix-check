@@ -1477,9 +1477,8 @@ sub test_user_update {
         ${$new_mail_ref}="---";
     } else {
         # update
-        print "update of $sam:\n";
-        print "   ${$old_mail_ref}\n";
-        print "   ${$new_mail_ref}\n";
+        $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'mail'}{'OLD'}=${$old_mail_ref};
+        $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'mail'}{'NEW'}=${$new_mail_ref};
         ${$update_ref}++;
     }
 
