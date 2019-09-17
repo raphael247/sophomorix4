@@ -3792,6 +3792,7 @@ sub config_sophomorix_read {
         my $cn_group="CN=".$groupname.",".$sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_CN'}{$cn_group}=$groupname;
+        $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_OPTION'}{$groupname}=$cn_group;
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP'}{$groupname}=
             $sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
@@ -3808,6 +3809,7 @@ sub config_sophomorix_read {
             my $cn_group="CN=".$groupname.",".$sub_ou.",".
                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_CN'}{$cn_group}=$groupname;
+            $sophomorix_config{'SCHOOLS'}{$school}{'GROUP_OPTION'}{$groupname}=$cn_group;
             $sophomorix_config{'SCHOOLS'}{$school}{'GROUP'}{$groupname}=
                 $sub_ou.",".
                 $sophomorix_config{'SCHOOLS'}{$school}{'OU_TOP'};

@@ -10,6 +10,7 @@ use strict;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
 use Net::LDAP;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -30,6 +31,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  json_dump
+                                 remove_embracing_whitespace
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -42,6 +44,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_group_removemember
                                  AD_get_groups_v
                                  AD_get_full_groupdata
+                                 AD_get_AD_for_check
+                                 AD_debug_logdump
                                     );
 
 my @arguments = @ARGV;
@@ -73,6 +77,8 @@ my $nowebfilter="";
 my $noprinting="";
 my $noadmins="";
 
+my $set_wifi="";
+
 my $skiplock=0;
 
 # Parsen der Optionen
@@ -95,6 +101,8 @@ my $testopt=GetOptions(
            "nowebfilter=s" => \$nowebfilter,
            "noprinting=s" => \$noprinting,
            "noadmins=s" => \$noadmins,
+           "school=s" => \$school,
+           "set-wifi=s" => \$set_wifi,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-managementgroup");
@@ -269,16 +277,109 @@ if ($noadmins ne ""){
     &manage_groupmemberships("admins","remove",$noadmins);
 }
 
+
+############################################################
+# set
+############################################################
+if ($school eq "---"){
+    $school=$DevelConf::name_default_school;
+}
+
+
+# --set-wifi <name>
+if ($set_wifi ne ""){
+    &set_access_from_file("wifi",$set_wifi,$school);
+}
+
+
+
 &AD_unbind_admin($ldap);
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 
-
-
 ############################################################
 # sub
 ############################################################
+
+sub set_access_from_file {
+    my ($type,$name,$school)=@_;
+
+    my $file_path;
+    if ($school eq $DevelConf::name_default_school){
+        $file_path=$DevelConf::path_conf_sophomorix."/".$school."/".$type.".".$name.".conf";
+    } else {
+        $file_path=$DevelConf::path_conf_sophomorix."/".$school."/".$school.".".$type.".".$name.".conf";
+    }
+
+    print "Configuring $type\n";
+    if (not -e $file_path){
+        print "\nERROR: $file_path nonexisting\n\n";
+        exit 88;
+    } else {
+        print "   Reading $file_path\n";
+        my %config=(); # save config from file
+        my @new_member=(); # for update
+        open(CONFIG, "<$file_path");
+        while(<CONFIG>){
+            my $line=$_;
+            chomp($line);
+            my ($opt,$arguments)=split(/=/,$line);
+            $opt=&remove_embracing_whitespace($opt);
+            my @args=split(/,/,$arguments);
+            foreach my $arg (@args){
+                $arg=&remove_embracing_whitespace($arg);
+                $config{$opt}{$arg}="seen";
+            }
+        }
+
+        # walk through all users
+        my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                                   root_dse=>$root_dse,
+                                                   root_dns=>$root_dns,
+                                                   admins=>"TRUE",
+                                                   sophomorix_config=>\%sophomorix_config,
+                                                 });
+        foreach my $sam (keys %{ $ref_AD_check->{'sAMAccountName'} }){
+            if (not $school eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}){
+                next;
+            }
+            # role
+            if (exists $config{'MEMBER_ROLE'}{$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'}}){
+                push @new_member,$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
+            }
+            # class
+            if (exists $config{'MEMBER_CLASS'}{$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}}){
+                push @new_member,$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
+            }
+        }
+
+        @new_member = uniq(@new_member);
+
+        my $groupname;
+        if ($school eq $DevelConf::name_default_school){
+	    $groupname=$type;
+        } else {
+	    $groupname=$school."-".$type;
+        }
+
+        my $dn=$sophomorix_config{'SCHOOLS'}{$school}{'GROUP_OPTION'}{$groupname};
+        print "Setting member attribute of managementgroup\n";
+        print "  $dn\n";
+        print "to:\n";
+        print Dumper (\@new_member);
+        my $member_count=$#new_member+1;
+        print "$member_count member in config \"$name\" for managemengroup \"$type\" in school \"$school\"\n";
+        print "\n";
+
+        my $mesg = $ldap->modify( $dn,
+                          replace => { 'member' => \@new_member } 
+                         );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+}
+
+
 
 sub manage_groupmemberships {
     my ($basegroup,$action,$groupstring)=@_;
