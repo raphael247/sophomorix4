@@ -2492,6 +2492,7 @@ sub AD_user_update {
     my $birthdate = $arg_ref->{birthdate};
     my $unid = $arg_ref->{unid};
     my $quota = $arg_ref->{quota};
+    my $quota_force = $arg_ref->{quota_force};
     my $quota_calc = $arg_ref->{quota_calc};
     my $quota_info = $arg_ref->{quota_info};
     my $mailquota = $arg_ref->{mailquota};
@@ -2660,6 +2661,9 @@ sub AD_user_update {
 
     # quota
     if (defined $quota){
+        if (not defined $quota_force){
+            $quota_force="FALSE";
+        }
         my %quota_new=();
         my @quota_new=();
         my @quota_old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixQuota");
@@ -2669,6 +2673,7 @@ sub AD_user_update {
             if (not defined $calc){$info="---";}
 	    # save old values in quota_new
             $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+            $quota_new{'QUOTA'}{$share}{'OLD_INDIVIDUAL_VALUE'}=$value;
             $quota_new{'QUOTA'}{$share}{'CALC'}=$calc;
             $quota_new{'QUOTA'}{$share}{'INFO'}=$info;
             $quota_new{'QUOTA'}{$share}{'COMMENT'}=$comment;
@@ -2690,7 +2695,15 @@ sub AD_user_update {
             # overriding quota_new:
             # -----------------------
             # A) user value (used by sophomorix-user)
-    	    $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+	    if ($quota_force eq "TRUE"){
+                # use new forced value
+                $quota_new{'QUOTA'}{$share}{'VALUE_FORCE'}="TRUE";
+                $quota_new{'QUOTA'}{$share}{'VALUE'}=$value;
+            } else {
+                # use old individual value
+                $quota_new{'QUOTA'}{$share}{'VALUE_FORCE'}="FALSE";
+                $quota_new{'QUOTA'}{$share}{'VALUE'}=$quota_new{'QUOTA'}{$share}{'OLD_INDIVIDUAL_VALUE'};
+            }
 
             # B) calc value (used by sophomorix-quota)
             if (defined $quota_calc){
@@ -3239,6 +3252,7 @@ sub AD_user_setquota {
             print "smbcquotas RETURNED: $quota_user has used $used of $hard_limit\n";
             print "Updating quota for user $user to $share_quota:\n";
         }
+
         my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
         &AD_user_update({ldap=>$ldap,
                          root_dse=>$root_dse,

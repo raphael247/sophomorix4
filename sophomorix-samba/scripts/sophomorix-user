@@ -794,7 +794,7 @@ if ($user ne "" and defined $intrinsic_5){
 
 
 ############################################################
-# -user <user> --quota <school1>:<number1>;<school2>:<number2>
+# -user <user> --quota <school1>:<number1>,<school2>:<number2>
 if ($user ne "" and defined $quota){
     print "Updating quota for user $user:\n";
     &AD_user_update({ldap=>$ldap,
@@ -802,6 +802,7 @@ if ($user ne "" and defined $quota){
                      dn=>$dn,
                      user=>$user,
                      quota=>$quota,
+                     quota_force=>"TRUE",
                      user_count=>"1",
                      max_user_count=>"1",
                      json=>$json,
