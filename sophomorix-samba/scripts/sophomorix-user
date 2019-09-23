@@ -283,10 +283,25 @@ These are done by the automatic workflow, you shold not need them
   -D --user <user>  /   --deactivate --user <user>
   -R --user <user>  /   --removable --user <user>
 
-Updating Quota/MailQuota of a user:
-    --quota <linuxmuster-global>:<number(MiB)>:<comment>,
-            <share1>:<quota1 in MiB>:<comment1>,...
-    --mailquota <mailquota in MiB)>:<comment>
+Share Quota:
+    Updating individual Quota of a user:
+        --quota <linuxmuster-global>:<number(MiB)>:<comment>,
+                <share1>:<quota1 in MiB>:<comment1>,...
+    Resetting individual Quota of a user:
+        --quota <linuxmuster-global>:---:<comment>,
+                <share1>:---:<comment1>,...
+    Resetting Quota of all students of a school:
+        --quota-reset-students <schoolname>
+    Resetting Quota of all teachers of a school:
+        --quota-reset-students <schoolname>
+
+To update the quota on the smb share use sophomorix-quota!
+
+MailQuota:
+    Updating MailQuota of a user:
+        --quota <linuxmuster-global>:<number(MiB)>:<comment>,
+                <share1>:<quota1 in MiB>:<comment1>,...
+        --mailquota <mailquota in MiB)>:<comment>
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
