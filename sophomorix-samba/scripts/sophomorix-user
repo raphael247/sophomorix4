@@ -128,6 +128,8 @@ my $remove_intrinsic_multi_4;
 my $remove_intrinsic_multi_5;
 
 my $quota;
+my $quota_reset_students;
+my $quota_reset_teachers;
 my $mailquota;
 
 # stati
@@ -206,6 +208,8 @@ my $testopt=GetOptions(
        "remove-intrinsic-multi4=s" => \$remove_intrinsic_multi_4,
        "remove-intrinsic-multi5=s" => \$remove_intrinsic_multi_5,
        "quota=s" => \$quota,
+       "quota-reset-students=s" => \$quota_reset_students,
+       "quota-reset-teachers=s" => \$quota_reset_teachers,
        "mailquota=s" => \$mailquota,
        "webui-dashboard=s" => \$webui_dashboard,
        "webui-permissions=s" => \$webui_permissions,
@@ -627,6 +631,103 @@ if ($user ne "" and $info==1){
 #}
 
 
+############################################################
+# --quota-reset-students <schoolname>
+if (defined $quota_reset_students and $quota_reset_students ne ""){
+    print "\n";
+    print "Resetting individual quota for all students in school $quota_reset_students:\n";
+    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  school=>$quota_reset_students,
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+
+    my $max_user_count=$#{ $ref_user_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$quota_reset_students}{'student'} }+1;
+    my $user_count=0;
+    foreach my $user (@{ $ref_user_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$quota_reset_students}{'student'} }){
+        my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+        $user_count++;
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$dn,
+                         user=>$user,
+                         quota=>"linuxmuster-global:---:quota-reset-students",
+                         quota_force=>"TRUE",
+                         user_count=>$user_count,
+                         max_user_count=>$max_user_count,
+                         json=>$json,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                       });
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$dn,
+                         user=>$user,
+                         quota=>"default-school:---:quota-reset-students",
+                         quota_force=>"TRUE",
+                         user_count=>$user_count,
+                         max_user_count=>$max_user_count,
+                         json=>$json,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                       });
+    }
+    print "\n";
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
+
+############################################################
+# --quota-reset-teachers <schoolname>
+if (defined $quota_reset_teachers and $quota_reset_teachers ne ""){
+    print "\n";
+    print "Resetting individual quota for all teachers in school $quota_reset_teachers:\n";
+    my $ref_user_v=&AD_get_users_v({ldap=>$ldap,
+                                  root_dse=>$root_dse,
+                                  root_dns=>$root_dns,
+                                  school=>$quota_reset_teachers,
+                                  sophomorix_config=>\%sophomorix_config,
+                                });
+
+    my $max_user_count=$#{ $ref_user_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$quota_reset_teachers}{'teacher'} }+1;
+    my $user_count=0;
+    foreach my $user (@{ $ref_user_v->{'LISTS'}{'USER_by_sophomorixSchoolname'}{$quota_reset_teachers}{'teacher'} }){
+        my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+        $user_count++;
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$dn,
+                         user=>$user,
+                         quota=>"linuxmuster-global:---:quota-reset-students",
+                         quota_force=>"TRUE",
+                         user_count=>$user_count,
+                         max_user_count=>$max_user_count,
+                         json=>$json,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                       });
+        &AD_user_update({ldap=>$ldap,
+                         root_dse=>$root_dse,
+                         dn=>$dn,
+                         user=>$user,
+                         quota=>"default-school:---:quota-reset-students",
+                         quota_force=>"TRUE",
+                         user_count=>$user_count,
+                         max_user_count=>$max_user_count,
+                         json=>$json,
+                         sophomorix_config=>\%sophomorix_config,
+                         sophomorix_result=>\%sophomorix_result,
+                       });
+    }
+    print "\n";
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
+
+
+
+######################################################################
+# Options that need a valis user follow here
+######################################################################
 
 # get dn if user exists and continue
 ############################################################
@@ -825,6 +926,7 @@ if ($user ne "" and defined $quota){
                      sophomorix_result=>\%sophomorix_result,
                    });
 }
+
 
 ############################################################
 # --user <user> --intrinsic-multi1(-5) "Test for intrinsic-multi1(-5)"
