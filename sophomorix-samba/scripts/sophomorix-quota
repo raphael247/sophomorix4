@@ -454,6 +454,8 @@ if($developer_setquota ne "" and $user ne ""){
 # continue with the calculated quota from $ref_quota
 ################################################################################
 
+
+
 # --set-quota-only
 if ($set_quota_only==1){
     # do not set other stuff
@@ -461,11 +463,14 @@ if ($set_quota_only==1){
 }
 
 
+
 # --set-mailquota-only
 if ($set_mailquota_only==1){
     # do not set other stuff
     $set_quota=0;
 }
+
+
 
 my %user_updated=(); # make sure user is not updated twice
 my $user_count=0; # count the users for progression output 
