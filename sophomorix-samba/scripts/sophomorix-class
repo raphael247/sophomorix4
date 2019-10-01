@@ -43,6 +43,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_unbind_admin
                                  AD_user_create
+                                 AD_get_user
                                  AD_group_create
                                  AD_group_kill
                                  AD_group_addmember
@@ -87,7 +88,7 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "removemembers";
 # define which options deliver which object
 $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
-$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes,update-maildomain";
+$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes,delete-all-teacheronly-classes,update-maildomain";
 # define option that can modify which object
 $options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
                                      "teacherclass,".
@@ -130,6 +131,7 @@ my $testopt=GetOptions(\%options,
                        "addmembers=s",
                        "removemembers=s",
                        "delete-all-empty-classes",
+                       "delete-all-teacheronly-classes",
                        "update-maildomain",
                       );    
 
@@ -225,6 +227,7 @@ This is for migration/testing/fixing only (only one class allowed as option):
 Be careful with this commands:
   Delete empty classes (no students and no teachers)
     --delete-all-empty-classes
+    --delete-all-teacheronly-classes
   Delete a class
     --kill --class <class>,<class2>,...
 
@@ -336,8 +339,8 @@ if (defined $options{'update-maildomain'}){
 
 
 
-# --delete-all-empty-classes
-if (defined $options{'delete-all-empty-classes'}){
+# --delete-all-empty-classes / --delete-all-teacheronly-classes
+if (defined $options{'delete-all-empty-classes'} or defined $options{'delete-all-teacheronly-classes'}){
     my @to_delete=();
     my @school_list;
     if ($options{'school'} eq "" or $options{'school'} eq "---"){
@@ -359,7 +362,6 @@ if (defined $options{'delete-all-empty-classes'}){
         print $line1;
         print "Looking for adminclasses in school $school:\n";
         foreach my $adminclass (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'adminclass'} }){
-            #print Dumper($ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'adminclass'});
             my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
                                                    root_dse=>$root_dse,
                                                    root_dns=>$root_dns,
@@ -371,19 +373,81 @@ if (defined $options{'delete-all-empty-classes'}){
                 # membership can be determined
                 my $member_count=$#{ $ref_groups->{'GROUPS'}{$adminclass}{'member'} }+1;
                 my $status=$ref_group_v->{'GROUPS'}{$adminclass}{'sophomorixStatus'};
-                if ($member_count==0){
-                    if ($status eq "L"){
-                        print "   * $adminclass ($status) has $member_count members: $adminclass can be deleted!\n";
-                        push @to_delete,$adminclass;
-                    } elsif ($status eq "P") {
-                        print "   * $adminclass has $member_count members but is permanent ($status): Not deleting!\n";
-                    } else {
-                        print "   * $adminclass has unkown status $status! Doing nothing!\n";
+
+                my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                                       root_dse=>$root_dse,
+                                                       root_dns=>$root_dns,
+                                                       grouplist=>$adminclass,
+                                                       sophomorix_config=>\%sophomorix_config,
+                                                     });
+                # Test if all members are teachers
+                if($Conf::log_level>=2){
+                    print "* $adminclass: Testing members\n";
+                }
+                my $not_teacher_count=0;
+                my $count=0;
+                foreach my $member ( @{ $ref_groups->{'GROUPS'}{$adminclass}{'member'} } ){
+                    $count++;
+                    my ($sam,@unused)=split(/,/,$member);
+                    $sam=~s/^CN=//g; # remove leading CN=
+                    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+                        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+                        &AD_get_user({ldap=>$ldap,
+                                      root_dse=>$root_dse,
+                                      root_dns=>$root_dns,
+                                      user=>$sam,
+                                    });
+                        if  ($role_AD ne $sophomorix_config{'INI'}{'ROLE_USER'}{'TEACHER'}){
+                            if($Conf::log_level>=2){
+                                print "    $count) $sam is a $role_AD (not a $sophomorix_config{'INI'}{'ROLE_USER'}{'TEACHER'})\n";
+                            }
+                            $not_teacher_count++;
+                        } else {
+                            if($Conf::log_level>=2){
+                                print "    $count) $sam is a $role_AD\n";
+                            }
+                        }
+                }
+
+                # conclusions from above queries
+                if ($status eq "L"){
+                    if (defined $options{'delete-all-empty-classes'}){
+                        if ($member_count==0){
+                            # delete empty class
+                            print "  -> $adminclass has $member_count members: $adminclass can be deleted!\n";
+                            push @to_delete,$adminclass;
+                        } else {
+                            print "  -> $adminclass has still $member_count member(s): Not deleting!\n";
+                        }
+		    } elsif (defined $options{'delete-all-teacheronly-classes'}){
+                        if ($not_teacher_count==0){
+                            # delete teachers only class
+                            print "  -> $adminclass has only teachers as members: $adminclass can be deleted!\n";
+                            push @to_delete,$adminclass;
+                        } else {
+                            print "  -> $adminclass ($status) has $not_teacher_count non-teacher(s) as members: Not deleting!\n";
+                        }
+		    }
+                } elsif ($status eq "P") {
+                    if (defined $options{'delete-all-empty-classes'}){
+                        if ($member_count==0){
+                            print "  -> $adminclass has $member_count members but is permanent ($status): Not deleting!\n";
+                        } else {
+                            print "  -> $adminclass has $member_count member(s) and is permanent ($status): Not deleting!\n";
+                        }
+		    } elsif (defined $options{'delete-all-teacheronly-classes'}){
+                        if ($not_teacher_count==0){
+                            print "  -> $adminclass has only teachers as members but is permanent ($status): Not deleting!\n";
+                        } else {
+                            print "  -> $adminclass has $not_teacher_count non-teacher(s) as members ".
+                                  "and is permanent ($status): Not deleting!\n";
+                        }
                     }
                 } else {
-                    # Test if all members are teachers
-                    print "     $adminclass ($status) has still $member_count members: Not changing anything!\n";
+                    print "  -> $adminclass has unkown status $status! Doing nothing!\n";
                 }
+
             } else {
                 # membership unknown
                 print "\nERROR: adminclass $adminclass not found to count members!\n\n";
@@ -420,6 +484,8 @@ if (defined $options{'delete-all-empty-classes'}){
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 }
+
+
 
 
 
