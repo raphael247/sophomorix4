@@ -200,7 +200,7 @@ Changing one/multiple admin-/extra-/teacherclass:
     --mailquota <mailquota in MiB>:<Comment>
     --mailalias, --nomailalias
     --maillist, --nomaillist 
-    --status <P,K> (Permanent or Killable)
+    --status <P,L> (Permanent or Locked)
     --join,  --nojoin
     --hide,  --nohide
     --maxmembers number
@@ -580,8 +580,7 @@ if (defined $options{'maillist'}){
 
 # --status <P> --class <class1>,<class2>,...
 if (defined $options{'status'}){
-    print "HERE: >$options{'status'}<\n";
-    if ($options{'status'} ne "P" and $options{'status'} ne "K"){
+    if ($options{'status'} ne "P" and $options{'status'} ne "L"){
         &log_script_exit("Status $options{'status'} not allowed for classes",1,1,0,
                          \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 
