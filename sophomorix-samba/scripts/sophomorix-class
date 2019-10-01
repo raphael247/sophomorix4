@@ -370,11 +370,19 @@ if (defined $options{'delete-all-empty-classes'}){
             if (exists $ref_groups->{'GROUPS'}{$adminclass}{'member'}){
                 # membership can be determined
                 my $member_count=$#{ $ref_groups->{'GROUPS'}{$adminclass}{'member'} }+1;
+                my $status=$ref_group_v->{'GROUPS'}{$adminclass}{'sophomorixStatus'};
                 if ($member_count==0){
-                    print "   * $adminclass has $member_count members: $adminclass can be deleted!\n";
-                    push @to_delete,$adminclass;
+                    if ($status eq "L"){
+                        print "   * $adminclass ($status) has $member_count members: $adminclass can be deleted!\n";
+                        push @to_delete,$adminclass;
+                    } elsif ($status eq "P") {
+                        print "   * $adminclass has $member_count members but is permanent ($status): Not deleting!\n";
+                    } else {
+                        print "   * $adminclass has unkown status $status! Doing nothing!\n";
+                    }
                 } else {
-                    print "     $adminclass has still $member_count members: Not changing anything!\n";
+                    # Test if all members are teachers
+                    print "     $adminclass ($status) has still $member_count members: Not changing anything!\n";
                 }
             } else {
                 # membership unknown
@@ -392,9 +400,9 @@ if (defined $options{'delete-all-empty-classes'}){
     my $delete_count=$#to_delete+1;
     print "I'm deleting permanently the following $delete_count adminclasses:\n\n";
     foreach my $adminclass (@to_delete){
-        print "    $adminclass will be  permanently DELETED\n";
+        print "    $adminclass will be DELETED permanently!\n";
     }
-    print "\n$delete_count adminclasses will be permanently deleted\n";
+    print "\n$delete_count adminclasses will be DELETED permanently!\n";
     print $line2;
     print "\nYou have 10 seconds to abort with Ctrl+c\n\n";
     sleep 10;
