@@ -202,7 +202,7 @@ Changing one/multiple admin-/extra-/teacherclass:
     --mailquota <mailquota in MiB>:<Comment>
     --mailalias, --nomailalias
     --maillist, --nomaillist 
-    --status <P,L> (Permanent or Locked)
+    --status <P,M> (Permanent or Managed)
     --join,  --nojoin
     --hide,  --nohide
     --maxmembers number
@@ -411,7 +411,7 @@ if (defined $options{'delete-all-empty-classes'} or defined $options{'delete-all
                 }
 
                 # conclusions from above queries
-                if ($status eq "L"){
+                if ($status eq "M"){
                     if (defined $options{'delete-all-empty-classes'}){
                         if ($member_count==0){
                             # delete empty class
@@ -652,9 +652,9 @@ if (defined $options{'maillist'}){
 
 
 
-# --status <P> --class <class1>,<class2>,...
+# --status <P,M> --class <class1>,<class2>,...
 if (defined $options{'status'}){
-    if ($options{'status'} ne "P" and $options{'status'} ne "L"){
+    if ($options{'status'} ne "P" and $options{'status'} ne "M"){
         &log_script_exit("Status $options{'status'} not allowed for classes",1,1,0,
                          \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
 
