@@ -865,7 +865,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     #     $Match{'ACTION'}{$new_line}{'login'}="???";
     # }
 
-    &test_class_move($sam,\$old_class,\$new_class,\%sophomorix_config);
+
+    &test_attic_move($sam,\$old_class,\$new_class,\%sophomorix_config);
     ##################################################
 
     ##################################################
@@ -996,6 +997,7 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                           $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
                           $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
             print KILL $kill_line;
+            $counters{'KILL'}++;
         } else {
             # write to sophomorix.nochange
             my $nochange_line=$sam."::".
@@ -1123,6 +1125,13 @@ if ($#{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }>0){
 
 sub test_UEAS_T_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
+    my $new_line;
+    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
+        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+    } else {
+        $new_line="---";
+    }
+
     if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "U" or
              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "E" or
              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "A" or
@@ -1136,9 +1145,10 @@ sub test_UEAS_T_update{
             ${$new_status_ref}="T";
             ${$update_ref}++;
         } else {
-            # existing from test_class_move
-            my $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
-            if ($Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"){
+            # existing from test_attic_move
+            if (exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and 
+                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
+               ){
                 if($Conf::log_level>=2){
                     print "   * $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
 	        }
@@ -1153,14 +1163,11 @@ sub test_UEAS_T_update{
 
 sub test_T_DA_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
-
-    # ????? advance only
+    my $new_line;
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
-        my $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
-        if (exists $Match{'ACTION'}{$new_line}{'status'} and 
-            $Match{'ACTION'}{$new_line}{'status'} eq "KEEP_STATUS"){
-            return;
-        }
+        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+    } else {
+        $new_line="---";
     }
 
     if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"){
@@ -1183,8 +1190,15 @@ sub test_T_DA_update{
                   " +  $toleration_time_days days)\n";
             print "    Today:          $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
-        if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-            $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch){
+        if (
+               (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch 
+               ) or (
+                exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" and
+                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch
+               )
+            ){
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
@@ -1193,7 +1207,8 @@ sub test_T_DA_update{
             }
             ${$new_status_ref}="D";
             ${$update_ref}++;
-	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam}){
+	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+                 $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} ne "TRUE"){
             # update to A if 
             #     - matched to a user in files
             if($Conf::log_level>=2){
@@ -1214,6 +1229,13 @@ sub test_T_DA_update{
 
 sub test_DL_RA_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
+    my $new_line;
+    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
+        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+    } else {
+        $new_line="---";
+    }
+
     if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D" or
         $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "L"
        ){
@@ -1237,8 +1259,15 @@ sub test_DL_RA_update{
             print "    Today:            $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
         ########################################
-        if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-            $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch){
+        if (
+               ( not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+                 $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch
+               ) or (
+                 exists $Match{'action_BY_sAMAccountName'}{$sam} and
+                 $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" and 
+                 $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch
+               )
+           ){
             # update to R/put in kill-file  if 
             #     - not matched to a user in files
             #     - and deactivation time expired
@@ -1248,29 +1277,31 @@ sub test_DL_RA_update{
 	    }
             ${$new_status_ref}="R";
             ${$update_ref}++;
-            # 2) put user in kill file
-            if($Conf::log_level>=2){
-                print "    ----> $sam is put into kill file\n";
-	    }
-            # creating the line
-            my $kill_line=
-                $ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
-                $sam."::".
-                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
-                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
-            print KILL $kill_line;
-            # create result
-            push @{ $sophomorix_result{'CHECK_RESULT'}{'KILLLIST'} }, $sam;
-            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'IDENTIFIER_ASCII'}=
-               $ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
-            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sAMAccountName'}=$sam;
-            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixAdminClass'}=
-               $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
-            $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixSchoolname'}=
-               $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
-            $counters{'KILL'}++;
+            # # 2) put user in kill file
+            # if($Conf::log_level>=2){
+            #     print "    ----> $sam is put into kill file\n";
+	    # }
+            # # creating the line
+            # my $kill_line=
+            #     $ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
+            #     $sam."::".
+            #     $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
+            #     $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
+            # print KILL $kill_line;
+            # # create result
+            # push @{ $sophomorix_result{'CHECK_RESULT'}{'KILLLIST'} }, $sam;
+            # $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'IDENTIFIER_ASCII'}=
+            #    $ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
+            # $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sAMAccountName'}=$sam;
+            # $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixAdminClass'}=
+            #    $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+            # $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixSchoolname'}=
+            #    $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+            # $counters{'KILL'}++;
         } elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-            $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D"){
+                 $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D" and
+                 not exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
+                ){
             # update to A if 
             #     - matched to a user in files
             #     - old status is D (not for status L)
@@ -1292,8 +1323,15 @@ sub test_DL_RA_update{
 
 sub test_R_A_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
+    my $new_line;
+    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
+        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+    } else {
+        $new_line="---";
+    }
     if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and 
-        exists $Match{'action_BY_sAMAccountName'}{$sam} 
+        exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+        not exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
        ){
         # update R to A if 
         #     - matched to a user in files
@@ -1309,8 +1347,26 @@ sub test_R_A_update{
 
 sub test_RK_kill{
     my ($sam,$kill_ref)=@_;
-    if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "K" or
-         ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and not exists $Match{'action_BY_sAMAccountName'}{$sam})
+    my $new_line;
+    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
+        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+    } else {
+        $new_line="---";
+    }
+    if ( ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "K" and 
+          not exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
+       ) or (
+          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "K" and
+          defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
+          $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
+       ) or (
+          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and
+          defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
+          $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
+       ) or (
+          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" 
+          and not exists $Match{'action_BY_sAMAccountName'}{$sam}
+         )
        ){
         # kill if status is  R or K
         if($Conf::log_level>=2){
@@ -1322,11 +1378,13 @@ sub test_RK_kill{
 
 # test class movement (moves previously unmoved classes due to a bug prior to 3.71.1)
 ################################################################################
-sub test_class_move {
+sub test_attic_move {
     my ($sam,$old_class_ref,$new_class_ref,$ref_sophomorix_config)=@_;
 
+    # not matched (=not in files anymore), but also not in attic -> move to attic
     if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-        ${$old_class_ref} ne $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'}){
+        ${$old_class_ref} ne $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'}
+       ){
         ${$new_class_ref}=$ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'};
         my $new_line=${$new_class_ref}.";".$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}.";---";
 
