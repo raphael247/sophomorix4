@@ -285,7 +285,7 @@ if ($help==1) {
    my $scriptname = pop @list;
    # Befehlsbeschreibung
    print('
-sophomorix-check checks the configured user files and finds out which users should be added, updated, moved and killed
+sophomorix-check checks the configured user files and finds out which users should be added, updated and killed
 
 
 Options:
@@ -765,17 +765,6 @@ if ($dump_login_avoid==1){
 
 
 
-# --dump-matches
-if ($dump_matches==1){
-    &json_dump({json => $json,
-                jsoninfo => "MATCH",
-                jsoncomment => "File user -> AD matches",
-                log_level => $Conf::log_level,
-                hash_ref=>\%Match,
-                sophomorix_config=>\%sophomorix_config,
-              });
-}
-
 
 
 ###########################################################################
@@ -824,24 +813,60 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     my $old_role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
     my $new_role="---";
 
-    my $new_class="---";
     my $old_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
     my $new_school="---";
+
+    # dirty fix to have class without school
+    my $old_class=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+    $old_class=~s/^$old_school-//;
+    my $old_class_with_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+    my $new_class="---";
 
     my $old_homedirectory=$ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'};;
     my $new_homedirectory="---";
     
     my $old_mail=$ref_AD_check->{'sAMAccountName'}{$sam}{'mail'};
     my $new_mail="---";
-    # dirty fix to have class without
-    my $old_class=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
-    $old_class=~s/^$old_school-//;
     
-   # old webui string is sorted already
-   my $old_webui_string=join(",",@{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} });
-   # new webui string
-   my $new_webui_string="---";
+    # old webui string is sorted already
+    my $old_webui_string=join(",",@{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} });
+    # new webui string
+    my $new_webui_string="---";
 
+    ##################################################
+    # unmatched users are moved into attic (if not there already) 
+    # using old values from AD (new values from files do not exist)
+    # if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and $old_class ne "attic"){
+    #     $new_class="attic";
+    #     my $new_line=$new_class.";".$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}.";---";
+
+    #     $Match{'action_BY_sAMAccountName'}{$sam}=$new_line;
+
+    #     # add data for moving to attic
+    #     $Match{'ACTION'}{$new_line}{'sAMAccountName'}=$sam;
+    #     $Match{'ACTION'}{$new_line}{'identifier_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
+    #     $Match{'ACTION'}{$new_line}{'class'}=$new_class;
+    #     $Match{'ACTION'}{$new_line}{'surname_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
+    #     $Match{'ACTION'}{$new_line}{'surname_utf8'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sn'};
+    #     $Match{'ACTION'}{$new_line}{'firstname_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'};
+    #     $Match{'ACTION'}{$new_line}{'firstname_utf8'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'};
+    #     $Match{'ACTION'}{$new_line}{'birthdate'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'};
+    #     $Match{'ACTION'}{$new_line}{'unid'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'};
+
+    #     $Match{'ACTION'}{$new_line}{'school'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+    #     $Match{'ACTION'}{$new_line}{'role'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
+    #     $Match{'ACTION'}{$new_line}{'filename'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
+    #     $Match{'ACTION'}{$new_line}{'status'}="KEEP_STATUS";
+    #     $Match{'ACTION'}{$new_line}{'line_count'}=0;
+
+    #     $Match{'ACTION'}{$new_line}{'MATCH_SUB'}="??";
+    #     $Match{'ACTION'}{$new_line}{'class_type'}="???";
+    #     $Match{'ACTION'}{$new_line}{'inject'}="???";
+    #     $Match{'ACTION'}{$new_line}{'login'}="???";
+    # }
+
+    &test_class_move($sam,\$old_class,\$new_class,\%sophomorix_config);
+    ##################################################
 
     ##################################################
     # check status update for users in AD
@@ -849,7 +874,7 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     &test_T_DA_update($sam,\$update,\$new_status);
     &test_DL_RA_update($sam,\$update,\$new_status);
     &test_R_A_update($sam,\$update,\$new_status);
-    ##################################################
+
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
         # check identifier update for matched users in AD
         &test_user_update($sam,
@@ -995,6 +1020,18 @@ close(NOCHANGE);
 close(ERROR);
 
 
+# --dump-matches
+if ($dump_matches==1){
+    &json_dump({json => $json,
+                jsoninfo => "MATCH",
+                jsoncomment => "File user -> AD matches",
+                log_level => $Conf::log_level,
+                hash_ref=>\%Match,
+                sophomorix_config=>\%sophomorix_config,
+              });
+}
+
+
 ############################################################
 # create overview in %sophomorix_result
 ############################################################
@@ -1083,6 +1120,7 @@ if ($#{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }>0){
 
 # test status updates
 ################################################################################
+
 sub test_UEAS_T_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
     if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "U" or
@@ -1090,20 +1128,41 @@ sub test_UEAS_T_update{
              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "A" or
              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "S"
            ){
-            # update to T if not matched to a user in files
-            if (not exists $Match{'action_BY_sAMAccountName'}{$sam}){
+        # update to T if not matched to a user in files
+        if (not exists $Match{'action_BY_sAMAccountName'}{$sam}){
+            if($Conf::log_level>=2){
+                print "   * $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
+	    }
+            ${$new_status_ref}="T";
+            ${$update_ref}++;
+        } else {
+            # existing from test_class_move
+            my $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+            if ($Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"){
                 if($Conf::log_level>=2){
                     print "   * $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
 	        }
                 ${$new_status_ref}="T";
                 ${$update_ref}++;
             }
+        }
     }
 }
 
 
+
 sub test_T_DA_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
+
+    # ????? advance only
+    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
+        my $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
+        if (exists $Match{'ACTION'}{$new_line}{'status'} and 
+            $Match{'ACTION'}{$new_line}{'status'} eq "KEEP_STATUS"){
+            return;
+        }
+    }
+
     if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"){
         if($Conf::log_level>=2){
             print "* Testing $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
@@ -1261,9 +1320,49 @@ sub test_RK_kill{
     }
 }
 
+# test class movement (moves previously unmoved classes due to a bug prior to 3.71.1)
+################################################################################
+sub test_class_move {
+    my ($sam,$old_class_ref,$new_class_ref,$ref_sophomorix_config)=@_;
+
+    if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+        ${$old_class_ref} ne $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'}){
+        ${$new_class_ref}=$ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'};
+        my $new_line=${$new_class_ref}.";".$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}.";---";
+
+        $Match{'action_BY_sAMAccountName'}{$sam}=$new_line;
+
+        # add ACTION data for moving to 'attic'-group
+        $Match{'ACTION'}{$new_line}{'sAMAccountName'}=$sam;
+        $Match{'ACTION'}{$new_line}{'identifier_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
+        $Match{'ACTION'}{$new_line}{'class'}=${$new_class_ref};
+        $Match{'ACTION'}{$new_line}{'surname_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
+        $Match{'ACTION'}{$new_line}{'surname_utf8'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sn'};
+        $Match{'ACTION'}{$new_line}{'firstname_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'};
+        $Match{'ACTION'}{$new_line}{'firstname_utf8'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'};
+        $Match{'ACTION'}{$new_line}{'birthdate'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'};
+        $Match{'ACTION'}{$new_line}{'unid'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'};
+
+        $Match{'ACTION'}{$new_line}{'school'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+        $Match{'ACTION'}{$new_line}{'role'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
+        $Match{'ACTION'}{$new_line}{'filename'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
+        $Match{'ACTION'}{$new_line}{'status'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'};
+#        $Match{'ACTION'}{$new_line}{'status'}="KEEP_STATUS";
+        $Match{'ACTION'}{$new_line}{'line_count'}=0;
+
+        my $sub=(caller(0))[3];
+        $Match{'ACTION'}{$new_line}{'MATCH_SUB'}="$sub";
+        $Match{'ACTION'}{$new_line}{'class_type'}="???";
+        $Match{'ACTION'}{$new_line}{'inject'}="???";
+        $Match{'ACTION'}{$new_line}{'login'}="???";
+
+        $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}="TRUE";
+
+    }
+}
 
 
-# test user update
+# test user update (matched users only)
 ################################################################################
 sub test_user_update {
     my ($sam,
