@@ -496,11 +496,11 @@ if ($show_password_charlist==1){
 
 
 
-
+# --show-password-expiry-days <user>
 if ($show_password_expiry_days ne ""){
     my $user=$show_password_expiry_days;
     my $ldb_command="ldbsearch -H ldap://localhost -UAdministrator%`cat /etc/linuxmuster/.secret/administrator` ".
-                    "-b dc=linuxmuster,dc=local sAMAccountname=".
+                    "-b $root_dse sAMAccountname=".
                     $user.
                     " msDS-UserPasswordExpiryTimeComputed".
                     " | grep --color=never msDS-UserPasswordExpiryTimeComputed";
@@ -519,6 +519,9 @@ if ($show_password_expiry_days ne ""){
     exit;
 }
 
+
+
+# --set-password-noexpiry-all-sophomorix-users
 if ($set_password_noexpiry_all_sophomorix_users==1){
     my ($ref_AD) = &AD_get_AD_for_check({ldap=>$ldap,
                                          root_dse=>$root_dse,
