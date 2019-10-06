@@ -1585,14 +1585,24 @@ sub test_user_update {
         $identifier_class_changes++;
     }
 
+    my $role_for_homedirectory;
+    if (${$new_role_ref} ne "---"){
+        # role changes, use new role
+        $role_for_homedirectory=${$new_role_ref};
+    } else {
+        # no role change: role according to filename
+        $role_for_homedirectory=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{sophomorixRole};
+    }
+
     # homedirectory could not be calculated for %Match, calculating here
     my ($homedirectory_new,$unix_home,$unc,$smb_rel_path)=
     &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
                                                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{'SCHOOL'},
                                                    $Match{'ACTION'}{$line_new}{'class'}, # groupname is the subdir
                                                    $sam,
-                                                   $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{sophomorixRole},
+                                                   $role_for_homedirectory,
                                                    $ref_sophomorix_config);
+
     if ( $homedirectory_new eq $ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'} ){
         # no update
         ${$new_homedirectory_ref}="---";
