@@ -903,7 +903,7 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     }
 
     if ($update>0){
-        # write to sophomorix.update
+        # write a line to sophomorix.update
         my $update_line=$sam."::".
                         $old_unid."::".
                         $new_unid."::".
@@ -986,32 +986,34 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
             $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'NEW'}=$new_school;
         }
         $counters{'UPDATE'}++;
-    } else {
-        # nothing to update 
-        # write to sophomorix.kill or sophomorix.nochange
-        &test_RK_kill($sam,\$kill);
-        if ($kill>0){
-            # write to sophomorix.kill
-            my $kill_line=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
-                          $sam."::".
+    }
+
+    &test_RK_kill($sam,\$kill);
+    if ($kill>0){
+        # write to sophomorix.kill
+        my $kill_line=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
+                      $sam."::".
+                      $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
+                      $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
+        print KILL $kill_line;
+        $counters{'KILL'}++;
+
+    }
+
+    # neither updated nor killed: nochange
+    if ($update==0 and $kill==0){
+        # write to sophomorix.nochange
+        my $nochange_line=$sam."::".
+                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sn'}."::".
+                          $ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'}."::".
+                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}."::".
+                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'}."::".
                           $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
-                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
-            print KILL $kill_line;
-            $counters{'KILL'}++;
-        } else {
-            # write to sophomorix.nochange
-            my $nochange_line=$sam."::".
-                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sn'}."::".
-                              $ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'}."::".
-                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}."::".
-                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'}."::".
-                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
-                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}."::".
-                              "\n";
-            print NOCHANGE $nochange_line;
-            #push @{ $sophomorix_result{'CHECK_RESULT'}{'NOCHANGELIST'} }, $sam;
-            $counters{'NOCHANGE'}++;
-        }
+                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}."::".
+                          "\n";
+        print NOCHANGE $nochange_line;
+        #push @{ $sophomorix_result{'CHECK_RESULT'}{'NOCHANGELIST'} }, $sam;
+        $counters{'NOCHANGE'}++;
     }
 }
 
@@ -1350,6 +1352,7 @@ sub test_R_A_update{
 
 sub test_RK_kill{
     my ($sam,$kill_ref)=@_;
+    print "Testing $sam to kill?\n";
     my $new_line;
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
         $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
