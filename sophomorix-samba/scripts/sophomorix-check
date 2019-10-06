@@ -1408,7 +1408,6 @@ sub test_attic_move {
         $Match{'ACTION'}{$new_line}{'unid'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'};
 
         $Match{'ACTION'}{$new_line}{'school'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
-        $Match{'ACTION'}{$new_line}{'role'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
         $Match{'ACTION'}{$new_line}{'filename'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
         $Match{'ACTION'}{$new_line}{'status'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'};
 #        $Match{'ACTION'}{$new_line}{'status'}="KEEP_STATUS";
@@ -1422,6 +1421,8 @@ sub test_attic_move {
 
         $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}="TRUE";
 
+        # role in attic is student
+        $Match{'ACTION'}{$new_line}{'role'}=$sophomorix_config{'INI'}{'ROLE_USER'}{'STUDENT'};
     }
 }
 
