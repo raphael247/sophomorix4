@@ -2472,14 +2472,14 @@ if ($modify_3_check==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
-    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdra="CN=".$sigurdra.",OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdra,"20160101000002.0Z","20170101000002.0Z");
-    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdgy="CN=".$sigurdgy.",OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_sigurdgy,"20160101000003.0Z","20170101000003.0Z");
 
-    my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_skula99="CN=skula99,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_skula99,"20160101000005.0Z","20170101000005.0Z");
-    my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_bjarna99="CN=bjarna99,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_bjarna99,"20160101000006.0Z","20170101000006.0Z");
 
     my $command_modify_3="sophomorix-check $all_options ".
@@ -2550,10 +2550,10 @@ if ($modify_3_do==1){
     print "U: $sigurdra\n";
     print "U: $sigurdgy\n";
 
-    my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-    my $dn_sigurdra="CN=".$sigurdra.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-    my $dn_skula99="CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
-    my $dn_bjarna99="CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdgy="CN=".$sigurdgy.",OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_sigurdra="CN=".$sigurdra.",OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_skula99="CN=skula99,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    my $dn_bjarna99="CN=bjarna99,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
 
     &run_command("sophomorix-add $all_options");
     &run_command("sophomorix-update $all_options");
@@ -2661,7 +2661,7 @@ if ($modify_3_do==1){
                    userPrincipalName => $halldoha."@".$root_dns,
                    mail => $halldoha."@".$root_dns,
                    sophomorixAdminClass => "7a",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixExitAdminClass => "attic",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Hannes Thor",
                    sophomorixSurnameASCII  => "Halldorsson",
@@ -2704,7 +2704,7 @@ if ($modify_3_do==1){
                    userPrincipalName => $gunnarar."@".$root_dns,
                    mail => $gunnarar."@".$root_dns,
                    sophomorixAdminClass => "7a",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixExitAdminClass => "attic",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Aron",
                    sophomorixSurnameASCII  => "Gunnarsson",
@@ -2741,13 +2741,13 @@ if ($modify_3_do==1){
                    name=>$sigurdra,
                    sAMAccountname=>$sigurdra,
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\default-school\\students\\7a\\".$sigurdra,
-                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/".$sigurdra,
+                   homeDirectory=>"\\\\bionic\\default-school\\students\\attic\\".$sigurdra,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/attic/".$sigurdra,
                    sn=>"Sigurðsson",
                    userPrincipalName => $sigurdra."@".$root_dns,
                    mail => $sigurdra."@".$root_dns,
-                   sophomorixAdminClass => "7a",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "attic",
+                   sophomorixExitAdminClass => "7a",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Ragnar",
                    sophomorixSurnameASCII  => "Sigurdsson",
@@ -2772,7 +2772,7 @@ if ($modify_3_do==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66050",
-                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                   memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
     # $sigurdgy
     #my $dn_sigurdgy="CN=".$sigurdgy.",OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
@@ -2784,13 +2784,13 @@ if ($modify_3_do==1){
                    name=>$sigurdgy,
                    sAMAccountname=>$sigurdgy,
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\default-school\\students\\7a\\".$sigurdgy,
-                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/7a/".$sigurdgy,
+                   homeDirectory=>"\\\\bionic\\default-school\\students\\attic\\".$sigurdgy,
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/attic/".$sigurdgy,
                    sn=>"Sigurðsson",
                    userPrincipalName => $sigurdgy."@".$root_dns,
                    mail => $sigurdgy."@".$root_dns,
-                   sophomorixAdminClass => "7a",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "attic",
+                   sophomorixExitAdminClass => "7a",
 #                   sophomorixFirstPassword => "Muster!",
                    sophomorixFirstnameASCII => "Gylfi Thor",
                    sophomorixSurnameASCII  => "Sigurdsson",
@@ -2815,7 +2815,7 @@ if ($modify_3_do==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66050",
-                   memberOf => "7a|wifi|internet|webfilter|intranet|printing",
+                   memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users class
     &AD_test_object({ldap=>$ldap,
@@ -2833,12 +2833,12 @@ if ($modify_3_do==1){
                    sophomorixMailList=>"FALSE",
                    sophomorixStatus=>"P",
                    sophomorixJoinable=>"TRUE",
-                   sophomorixMembers=>$halldoha."|".$gunnarar."|".$sigurdra."|".$sigurdgy,
+                   sophomorixMembers=>$halldoha."|".$gunnarar,
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "students",
-                   member => $halldoha."|".$gunnarar."|".$sigurdra."|".$sigurdgy,
+                   member => $halldoha."|".$gunnarar,
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-m3kk3t,OU=m3kk3t,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -2940,7 +2940,7 @@ if ($modify_3_do==1){
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "s_default-school|all-students",
-                   member => "7a|9b|global-students",
+                   member => "attic|7a|9b|global-students",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
@@ -3069,7 +3069,7 @@ if ($modify_3_do==1){
                    userPrincipalName => "olinst99@".$root_dns,
                    mail => "olinst99@".$root_dns,
                    sophomorixAdminClass => "teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixExitAdminClass => "attic",
 #                   sophomorixFirstPassword => "LinuxMuster23!",
                    sophomorixFirstnameASCII => "Olafur Indridi",
                    sophomorixSurnameASCII  => "Stefansson",
@@ -3112,7 +3112,7 @@ if ($modify_3_do==1){
                    userPrincipalName => "rukri99@".$root_dns,
                    mail => "rukri99@".$root_dns,
                    sophomorixAdminClass => "teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixExitAdminClass => "attic",
 #                   sophomorixFirstPassword => "LinuxMuster!",
                    sophomorixFirstnameASCII => "Runar",
                    sophomorixSurnameASCII  => "Kristinsson",
@@ -3140,20 +3140,20 @@ if ($modify_3_do==1){
                   });
     # skula99
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=skula99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   dn=>$dn_skula99,
                    #####
                    displayName=>"Ari Freyr Skúlason",
                    givenName=>"Ari Freyr",
                    name=>"skula99",
                    sAMAccountname=>"skula99",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula99",
-                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula99",
+                   homeDirectory=>"\\\\bionic\\default-school\\students\\attic\\skula99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/attic/skula99",
                    sn=>"Skúlason",
                    userPrincipalName => "skula99@".$root_dns,
                    mail => "skula99@".$root_dns,
-                   sophomorixAdminClass => "teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "attic",
+                   sophomorixExitAdminClass => "teachers",
 #                   sophomorixFirstPassword => "LinuxMuster!",
                    sophomorixFirstnameASCII => "Ari Freyr",
                    sophomorixSurnameASCII  => "Skulason",
@@ -3162,7 +3162,7 @@ if ($modify_3_do==1){
                    sophomorixCloudQuotaCalculated => "---",
                    sophomorixUserToken => "---",
                    sophomorixBirthdate  => "14.05.1987",
-                   sophomorixRole => "teacher",
+                   sophomorixRole => "student",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "teachers.csv",
@@ -3172,29 +3172,30 @@ if ($modify_3_do==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "R",
                    accountExpires => "0",
                    userAccountControl => "66050",
-                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                   memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
     # bjarna99
     &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+#                   dn=>"CN=bjarna99,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   dn=>$dn_bjarna99,
                    #####
                    displayName=>"Theódór Elmar Bjarnason",
                    givenName=>"Theódór Elmar",
                    name=>"bjarna99",
                    sAMAccountname=>"bjarna99",
                    homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna99",
-                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna99",
+                   homeDirectory=>"\\\\bionic\\default-school\\students\\attic\\bjarna99",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/students/attic/bjarna99",
                    sn=>"Bjarnason",
                    userPrincipalName => "bjarna99@".$root_dns,
                    mail => "bjarna99@".$root_dns,
-                   sophomorixAdminClass => "teachers",
-                   sophomorixExitAdminClass => "unknown",
+                   sophomorixAdminClass => "attic",
+                   sophomorixExitAdminClass => "teachers",
 #                   sophomorixFirstPassword => "LinuxMuster!",
                    sophomorixFirstnameASCII => "Theodor Elmar",
                    sophomorixSurnameASCII  => "Bjarnason",
@@ -3203,7 +3204,7 @@ if ($modify_3_do==1){
                    sophomorixCloudQuotaCalculated => "---",
                    sophomorixUserToken => "---",
                    sophomorixBirthdate  => "04.03.1987",
-                   sophomorixRole => "teacher",
+                   sophomorixRole => "student",
                    sophomorixSchoolPrefix => "---",
                    sophomorixSchoolname => "default-school",
                    sophomorixAdminFile => "teachers.csv",
@@ -3213,12 +3214,12 @@ if ($modify_3_do==1){
                    sophomorixComment => "created by sophomorix",
                    sophomorixWebuiDashboard => "---",
                    sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "R",
                    accountExpires => "0",
                    userAccountControl => "66050",
-                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                   memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users ou-teachers group
     &AD_test_object({ldap=>$ldap,
@@ -3228,12 +3229,12 @@ if ($modify_3_do==1){
                    sophomorixStatus=>"P",
                    sophomorixType=>"teacherclass",
                    mail => "teachers@".$root_dns,
-                   sophomorixMembers=>$mendelgr."|rukri99|olinst99|skula99|bjarna99",
+                   sophomorixMembers=>$mendelgr."|rukri99|olinst99",
                    sophomorixAdmins=>"",
                    sophomorixHidden=>"FALSE",
                    sophomorixSchoolname => "default-school",
                    memberOf => "s_default-school|all-teachers",
-                   member => $mendelgr."|rukri99|olinst99|skula99|bjarna99|global-teachers",
+                   member => $mendelgr."|rukri99|olinst99|global-teachers",
                   });
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bsz-teachers,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
