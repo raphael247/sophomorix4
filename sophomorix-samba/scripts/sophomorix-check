@@ -1211,8 +1211,8 @@ sub test_T_DA_update{
             ${$new_status_ref}="D";
             ${$update_ref}++;
 	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and
-                 defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and 
-                 $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} ne "TRUE"){
+                 not defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
+                ){
             # update to A if 
             #     - matched to a user in files
             if($Conf::log_level>=2){
@@ -1352,7 +1352,6 @@ sub test_R_A_update{
 
 sub test_RK_kill{
     my ($sam,$kill_ref)=@_;
-    print "Testing $sam to kill?\n";
     my $new_line;
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
         $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
