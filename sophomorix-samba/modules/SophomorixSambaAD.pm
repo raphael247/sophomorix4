@@ -7613,6 +7613,8 @@ sub AD_group_create {
         $group_ou=$sub_ou;
     } elsif ($file eq "none"){
         $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
+    } elsif ($group_basename eq $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'}){
+        $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
     } else {
         if (exists $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'}){
             $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
