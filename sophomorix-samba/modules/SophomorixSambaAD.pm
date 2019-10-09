@@ -7614,7 +7614,8 @@ sub AD_group_create {
     } elsif ($file eq "none"){
         $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_management_ou'};
     } elsif ($group_basename eq $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'}){
-        $group_ou=$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
+        # attic
+        $group_ou="OU=\@\@FIELD_1\@\@,".$ref_sophomorix_config->{'INI'}{'OU'}{'AD_student_ou'};
     } else {
         if (exists $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'}){
             $group_ou=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'GROUP_OU'};
@@ -7623,6 +7624,7 @@ sub AD_group_create {
         }
     }
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
+
     my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
     my $dn="CN=".$group.",".$target_branch;
 
