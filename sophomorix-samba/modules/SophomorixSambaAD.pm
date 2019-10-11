@@ -4665,7 +4665,7 @@ sub AD_get_AD_for_check {
 		   if(exists $AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii}
 		     ){
 		       $identifier_warn_count++;
-                       my $old_sam=$AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')};
+                       my $old_sam=$AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii};
                        my $old_unid=$AD{'sAMAccountName'}{$old_sam}{'sophomorixUnid'}; 
 		       # save warning for later use
                        $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{'TYPE'}="IDENTIFIER_ASCII multiple";
