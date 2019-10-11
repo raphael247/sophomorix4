@@ -4537,7 +4537,10 @@ sub AD_get_AD_for_check {
     my $admins = $arg_ref->{admins};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
-    # forbidden login names
+    my $unid_warn_count=0;
+    my $identifier_warn_count=0;
+
+        # forbidden login names
     $AD{'FORBIDDEN'}{'root'}="forbidden by Hand";
     $AD{'FORBIDDEN'}{'linbo'}="forbidden by Hand";
     $AD{'FORBIDDEN'}{'opsi'}="forbidden by Hand";
@@ -4637,6 +4640,44 @@ sub AD_get_AD_for_check {
                        $entry->get_value('sophomorixBirthdate');
                    # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
                    # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+
+
+                   # check for double sophomorixUnid in AD
+		   if($entry->get_value('sophomorixUnid') ne "---" and
+                       exists $AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')}
+		     ){
+		       $unid_warn_count++;  
+                       my $old_sam=$AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')};
+                       my $old_identifier_ascii=$AD{'sAMAccountName'}{$old_sam}{'IDENTIFIER_ASCII'}; 
+		       # save warning for later use
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{'TYPE'}="sophomorixUnid multiple";
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{'COUNT'}=$unid_warn_count;
+		       # current user
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{$sam}=$identifier_ascii;
+		       # other user
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{$old_sam}=$old_identifier_ascii;
+		   } else {
+                       $AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')}=$sam;
+		   }
+
+
+                   # check for double identifier in AD
+		   if(exists $AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii}
+		     ){
+		       $identifier_warn_count++;
+                       my $old_sam=$AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')};
+                       my $old_unid=$AD{'sAMAccountName'}{$old_sam}{'sophomorixUnid'}; 
+		       # save warning for later use
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{'TYPE'}="IDENTIFIER_ASCII multiple";
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{'COUNT'}=$identifier_warn_count;
+		       # current user
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{$sam}=$entry->get_value('sophomorixUnid');
+		       # other user
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{$old_sam}=$old_unid;
+		   } else {
+                       $AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii}=$sam;
+		   }
+
 
                    # save ui stuff
                    @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'} } =

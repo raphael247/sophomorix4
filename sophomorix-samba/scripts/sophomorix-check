@@ -1113,6 +1113,10 @@ if ($#{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }>0){
         sort @{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} };
 }
 
+if (exists $ref_AD_check->{'WARNINGS'}){
+    # show warnings
+    print Dumper ($ref_AD_check->{'WARNINGS'});
+}
 
 &AD_unbind_admin($ldap);
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
