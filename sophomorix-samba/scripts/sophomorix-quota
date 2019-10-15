@@ -154,9 +154,13 @@ Show sophomorix info about quota calculation
     -s <school>/<sharename> / --school <school>/<sharename> / --share <school>/<sharename>
   Limit the output to some users:
     -u / --user <user1>,<user2>,... 
+
+Query used space:
   Query the smbshare with smbcquotas for every user for 
   used space/softlimit/hardlimit (this is slow):
-    --smbcquotas
+    --smbcquotas -i
+  Query used space for some users:
+    --smbcquotas -i --user <user1>,<user2>,...
   
 Setting the user Quota/MailQuota
   set Quota/CloudQuota AND MailQuota
@@ -273,7 +277,7 @@ my $ref_quota=&AD_get_quota({ldap=>$ldap,
 
 
 
-# print Dumper($ref_quota);
+#print Dumper($ref_quota);
 # print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'blackmri42'});
 # print Dumper($ref_quota->{'QUOTA'}{'USERS'}{'lordjo42'});
 
@@ -628,8 +632,8 @@ if ($set_quota==1){
         NAME=>"UPDATED QUOTA", 
         RESULT=>$user_count, 
         RESULT_TYPE => "integer",
-        DESCRIPTION_POST => "users smbquota updated", 
-        DESCRIPTION_PRE => "users with updated smbquota", 
+        DESCRIPTION_POST => "users smbcquota updated", 
+        DESCRIPTION_PRE => "users with updated smbcquota", 
         FORMAT_TYPE => 1,
         sophomorix_result=>\%sophomorix_result,
       });
