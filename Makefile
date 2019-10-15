@@ -171,6 +171,7 @@ install-sophomorix-samba:
 	@install -d -m755 -oroot -groot $(DEVELCONF)/devel/master
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/master/school.conf.master $(DEVELCONF)/devel/master
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/master/sophomorix.conf.master $(DEVELCONF)/devel/master
+	@install -oroot -groot --mode=0644 sophomorix-samba/config-devel/master/group.default.conf.master $(DEVELCONF)/devel/master
 # config templates
 	@install -d -m755 -oroot -groot $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini $(DEVELCONF)/config-templates

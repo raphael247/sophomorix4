@@ -138,6 +138,16 @@ Examples
                               --printing  <user1,user2,...>   --noprinting  <user1,user2,...>
                               --admins    <user1,user2,...>   --noadmins <user1,user2,...>
 
+Set specific memberships from a file (only for group wifi at the moment ...):
+  A) Create and edit:
+     /etc/linuxmuster/sophomorix/<schoolname>/wifi.<name>.conf
+  B) Specify members according to:
+      /usr/share/sophomorix/devel/master/group.default.conf.master
+  C) Apply configured membeships:
+     # sophomorix-managementgroup --set-wifi <name>
+
+
+
 Please see the sophomorix-managementgroup(8) man pages for full documentation
 ');
    print "\n";
