@@ -1515,10 +1515,14 @@ sub _console_print_group_full {
                 print "$item\n";
             }
             print $line;
-            print "member:\n";
+            my $count_member=$#{ $ref_groups->{'GROUPS'}{$group}{'member'} }+1;
+            print "member ($count_member):\n";
             foreach my $item ( @{ $ref_groups->{'GROUPS'}{$group}{'member'} } ){
                 print "$item\n";
 	    }
+            if ($count_member>9){
+                print "... $ref_groups->{'GROUPS'}{$group}{'cn'} has $count_member entries in multivalue attribute member\n";
+            }
             print $line;
         }
 	print "\n";
