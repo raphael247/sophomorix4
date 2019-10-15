@@ -30,11 +30,8 @@ Host fleischsalat
 Todo:
 ############################################################
 
-Release 3.71.1-1:
-(Noch neues Paket packen mit aktualiserter hilfe)
 
 Bugs:
- * warning: 2 users for one UNID
  * sophomori-quota setzt nicht die quota, sophomorix-quota -u <user> tut
    prüfen mit sophomorix-quota -u <user> -iv
 
@@ -43,55 +40,8 @@ Bugs:
 
 Was ist neu:
 
-1) Bugix für Klassen versetzen:
-  Bug: bisher blieben tolerierte und deaktivierte user in ihrer Klasse, nun
-       werden sie nach attic versetzt.
-  Lösung nach Paketinstallation: Alle user updaten:
-          sophomorix-check
-	  sophomorix-update
-	    -> Einige Schüler sollten in den attic versetzt werden
-	    -> attic sollte unter OU=Students liegen, z.B.:
-	    # sophomorix-class -i -c attic
-  	    CN=attic,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,DC=bw,DC=de
-  Evtl. muss mehrfach sophomorix-check und sophomorix-update aufgerufen werden, bis nichts
-  mehr zu tun ist.
-  
-2) Bugfix für quota:
-   Schulweites quota wurde im Feld sophomorixQuota (Multivalue) bei jedem user
-   gesetzt: Jeder user hat nun ein individuelles Quota.
-   Schulweite quota-Änderungen werden nicht mehr umgesetzt, weil das
-   individuelle Quota gilt. 
-   Lösung nach Paketinstallation:
-     A) Bisherige quotaeinstellungen sichern (falls erforderlich):
-     # sophomorix-quota --show-nondefault > /root/oldquota
-     (Da jeder ein individuelles Quota hat, sieht man alle Schüler)
-     B) Individuelles quota entfernen bei allen usern (in ihrem AD-attribut sophomorix-quota):
-     # sophomorix-user --quota-reset-students <schoolname>
-     # sophomorix-user --quota-reset-teachers <schoolname>
-     C) Umsetzen individuelles quota entfernen
-     # sophomorix-quota
-     D) individuelles quota neu setzen, wo erforderlich:
-     # sophomorix-user --user <user> --quota <default-school>:<Quota in MiB>:<comment>
 
-     Sonderquota (außerhalb school.conf) anzeigen lassen:
-     # sophomorix-quota --nondefault
-
-     Quota setzen:
-     # sophomorix-quota
-     
-3) Klassenstatus P (permanent) oder M (managed)
-   Alle Klassen wurden bisher als permanent (Status: P) angelegt.
-   Deshalb werden leere Klassen durch die neuen Befehle
-     # sophomorix-class --delete-all-empty-classes
-     # sophomorix-class --delete-all-teacheronly-classes
-   NICHT gelöscht. Wenn man sie auf Status M setzt, werden sie gemanaged, also mit obigen
-   Befehlen gelöscht.
-   Also je nach Bedarf Klassen auf Status M setzen:
-     # sophomorix-class -c <klasse> --status M
-   Und dann mit obigen Befehlen leere Klassen entfernen.
-
-
-???) wifi default group, see
+1) wifi default group, see
      sophomorix-managementgroup --help
 
 
