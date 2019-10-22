@@ -30,6 +30,9 @@ Host fleischsalat
 Todo:
 ############################################################
 
+Bug: sophomorix-management --set wifi (schoolname fehlt, ohne:
+   default-school mit andere schule)
+
 
 Bugs:
  * sophomori-quota setzt nicht die quota, sophomorix-quota -u <user> tut
@@ -55,6 +58,37 @@ Klassen löschen:
 Status of classes, when created:
 bei Rolle student, je Schule: ADMINCLASS_CREATION_STATUS=P/M P default
 sophomorix-class --change-status-of-all-adminclasses P,M
+
+------------------------------------------------------------
+sophomorix-extraclass
+Erst abgespeckt:
+kurs: gast (Gruppenname)
+  --extraclass <gruppenname>
+basisname: gast (Basisname der user)
+  --user-basename <basename>
+anzahl: anzahl der user, ergibt gast 01 bis n
+  --user-number 30
+geburtsdatum (entfällt, das Anlegedatum wird genomen)
+comment: War gecos, nun im Kommentar
+  --comment "Für AK Linux"
+passwort: mit angeben
+  --password "......"
+valid until
+  --valid-until 10.10.2020
+
+-anlegen als tolerated users
+-normale Verfallszeitencheck
+
+Löschbefehl:
+--kill-extraclass <gruppenname>
+(Löscht die Klasse UND die user)
+
+später:
+--extraclass <gruppenname> --valid-until 05.05.2016
+--extraclass <gruppenname> --comment "neuer Kommentar"
+--extraclass <gruppenname> --password "neues passwort"  
+  (evtl. mit sophomorix-passwd)
+
 
 ------------------------------------------------------------
 
