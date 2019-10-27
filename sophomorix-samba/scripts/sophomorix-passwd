@@ -85,6 +85,7 @@ my $rooms="";
 my $ws=0;
 
 my $password="";
+my $use_smbpasswd=0;
 my $configfile=0;
 my $reset=0;
 my $common=0;
@@ -132,6 +133,7 @@ my $testopt=GetOptions(
 #           "room|rooms|r=s" => \$rooms,
 #           "workstations|workstation|w" => \$ws,
            "password|passwd|pass=s" => \$password,
+           "use-smbpasswd" => \$use_smbpasswd,
            "configfile" => \$configfile,
 #           "reset" => \$reset,
            "common" => \$common,
@@ -155,6 +157,13 @@ my $testopt=GetOptions(
 my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
 # Prüfen, ob Optionen erkannt wurden, sonst Abbruch
 &check_options($testopt,\%sophomorix_result,$json);
+
+if ($use_smbpasswd==1){
+    $use_smbpasswd="TRUE";
+} else {
+    $use_smbpasswd="FALSE";
+}
+
 
 # Setting the filters
 
@@ -207,8 +216,9 @@ Options:
   --nofirstpassupdate (do not update AD attribute sophomorixFirstPassword)
   --hide (hide display of password in console output, when updating)
 
-Create a password:
+Create and set password:
   --pass <password>, --password <password>
+  --pass <password>, --use-smbpasswd  (use smbpasswd to set the password)
   --interactive              (query new password twice on console)
   --random <num>             (create random password of <num> characters for each user individually)
   --random <num> --common    (create random password of <num> characters once and apply it to all users)
@@ -439,6 +449,7 @@ if ($set_firstpassword==1){
                      hide_pwd=>$hide,
 #                     firstpassword=>$firstpassword,
                      sophomorix_first_password=>$firstpassword,
+                     smbpasswd=>$use_smbpasswd,
                      json=>$json,
                      sophomorix_config=>\%sophomorix_config,
                      sophomorix_result=>\%sophomorix_result,
@@ -602,6 +613,7 @@ if ($userlist_count>0 and ($password ne "" or
                                  max_user_count=>$userlist_count,
                                  hide_pwd=>$hide,
                                  sophomorix_first_password=>$password,
+                                 smbpasswd=>$use_smbpasswd,
                                  # firstpassword=>$password, # not updated
                                  json=>$json,
                                  sophomorix_config=>\%sophomorix_config,
@@ -617,6 +629,7 @@ if ($userlist_count>0 and ($password ne "" or
                                  hide_pwd=>$hide,
                                  sophomorix_first_password=>$password,
                                  firstpassword=>$password,
+                                 smbpasswd=>$use_smbpasswd,
                                  json=>$json,
                                  sophomorix_config=>\%sophomorix_config,
                                  sophomorix_result=>\%sophomorix_result,
@@ -739,6 +752,7 @@ if ($interactive==1){
                                  max_user_count=>"1",
                                  hide_pwd=>"1",
                                  sophomorix_first_password=>$password_1,
+                                 smbpasswd=>$use_smbpasswd,
                                  # firstpassword=>$password, # not updated
                                  json=>$json,
                                  sophomorix_config=>\%sophomorix_config,

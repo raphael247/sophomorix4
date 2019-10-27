@@ -2504,6 +2504,7 @@ sub AD_user_update {
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword}; # sophomorixFirstpassword
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
+    my $smbpasswd = $arg_ref->{smbpasswd}; # u
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
@@ -2550,6 +2551,11 @@ sub AD_user_update {
 	$max_user_count="-";
     }
 
+    if (not defined $smbpasswd){
+        $smbpasswd="FALSE";
+    }
+    
+    
     my ($firstname_utf8_AD,
         $lastname_utf8_AD,
         $adminclass_AD,
@@ -2651,11 +2657,15 @@ sub AD_user_update {
     # firstpassword (to create hashed password)
     if (defined $sophomorix_first_password){
         my $uni_password=&_unipwd_from_plainpwd($sophomorix_first_password);
-        $replace{'unicodePwd'}=$uni_password;
-	if ($hide_pwd==1){
-	    print "   unicodePwd:                 ****** (omitted by --hide)\n";
+        if ($smbpasswd eq "TRUE"){
+            # update password later with smbpasswd
 	} else {
-	    print "   unicodePwd:                 $sophomorix_first_password\n";
+	    $replace{'unicodePwd'}=$uni_password;
+  	    if ($hide_pwd==1){
+	        print "   unicodePwd:                 ****** (omitted by --hide)\n";
+	    } else {
+	        print "   unicodePwd:                 $sophomorix_first_password\n";
+	    }
 	}
     }
 
@@ -3148,6 +3158,24 @@ sub AD_user_update {
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+
+    # set password with smbpasswd
+    if ($smbpasswd eq "TRUE"){
+	my $smbpasswd_command = "(echo \"$sophomorix_first_password\"; echo \"$sophomorix_first_password\")".
+                                " | $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBPASSWD'} -U $user -s";
+	my $smbpasswd_display = "(echo \"******\"; echo \"******\")".
+                                " | $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBPASSWD'} -U $user -s";
+	if ($hide_pwd==1){
+	    print "Executing (password omitted by --hide):\n"; 
+            print "  $smbpasswd_display\n";
+	    system($smbpasswd_command);
+	} else {
+	    print "Executing:\n"; 
+            print "  $smbpasswd_command\n";
+	    system($smbpasswd_command);
+	}
+    }
+    
     print "Logging user update\n";
     &Sophomorix::SophomorixBase::log_user_update({sAMAccountName=>$user,
                                                   unid=>$unid_AD,
