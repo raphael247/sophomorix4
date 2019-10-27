@@ -26,6 +26,16 @@ Host fleischsalat
  Port 22
 
 
+
+Was ist neu:
+
+
+1) Man kann (z.B. per cronjob) die wifi Gruppe zurücksetzen auf einen
+   (bzw. mehrere) defaults, siehe:
+     sophomorix-managementgroup --help
+2) option --smbpasswd to use smbpasswd on password change (allows § as
+   part of password). More testin needed
+
 ############################################################
 Todo:
 ############################################################
@@ -50,9 +60,29 @@ mit Unterrichtsmöglichkeit (classroom-studentscomputer)
 sophomorix-check -i mit use of unini, auf majestix3
 
 ------------------------------------------------------------
-
+siehe Mail: 22.10.19, 19:04
 sophomorix-quota, use of unini vom Dominik
 Zeilen 5765 und 5770
+
+------------------------------------------------------------
+Bug exam beenden:
+mail 24.10., 14:05
+
+------------------------------------------------------------
+Testen:
+extrastudents fliegen raus nach ablauf der Zeiten?
+
+------------------------------------------------------------
+fehlender JSON output #93
+
+sophomorix-passwd --smbpasswd #94, #95 #90
+
+Testen:
+(echo oldpasswd; echo newpasswd) | smbpasswd -U <user> -s
+
+
+--test-firstpassword je Klasse machen? 
+siehe: https://ask.linuxmuster.net/t/workaround-finde-alle-user-mit-erstpasswort/4342
 
 ------------------------------------------------------------
 
@@ -63,11 +93,6 @@ Bugs:
  * sophomorix-user -iv   : alphabetisch ordnen (nach loginnamen) 
 
 
-Was ist neu:
-
-
-1) wifi default group, see
-     sophomorix-managementgroup --help
 
 
 Bug?: sophomrix-user --user user -i -vv zeigt keine logdaten? 
