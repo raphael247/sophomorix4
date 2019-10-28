@@ -2504,7 +2504,7 @@ sub AD_user_update {
     my $user = $arg_ref->{user};
     my $firstpassword = $arg_ref->{firstpassword}; # sophomorixFirstpassword
     my $sophomorix_first_password = $arg_ref->{sophomorix_first_password}; # unicodePwd
-    my $smbpasswd = $arg_ref->{smbpasswd}; # u
+    my $smbpasswd = $arg_ref->{smbpasswd};
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
