@@ -178,9 +178,6 @@ my $user_filter="";
 if ($user ne ""){
     $user_filter="(sAMAccountName=$user)";
 }
-if ($test_login ne ""){
-    $user_filter="(sAMAccountName=$test_login)";
-}
 
 
 
@@ -322,32 +319,36 @@ if ( ($clone_from_user ne "" and $clone_to_user eq "") or
 # --test-login
 if ($test_login ne "" and $password ne ""){
     $sophomorix_result{'LOGINTEST'}{$user}{'EXISTS'}="FALSE";
-    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
-    my $mesg = $ldap->search(
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attr => ['cn']
-                            );
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my @users=split(",",$test_login);
+    foreach my $user (@users){
+	$user_filter="(sAMAccountName=$user)";
+        my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
+        my $mesg = $ldap->search(
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attr => ['cn']
+                                );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
-    my $max = $mesg->count;
-    for( my $index = 0 ; $index < $max ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $dn=$entry->dn();
-        my $sam_account=$entry->get_value ('sAMAccountName');
-        print "* $sam_account: $dn\n";
-        my ($res,$testpassword,$res1,$res2)=&AD_login_test($ldap,$root_dse,$dn,$password);
-        $sophomorix_result{'LOGINTEST'}{$sam_account}{'EXISTS'}="TRUE";
-        $sophomorix_result{'LOGINTEST'}{$sam_account}{'PAM'}{'RETURN'}=$res1;
-        $sophomorix_result{'LOGINTEST'}{$sam_account}{'KERBEROS'}{'RETURN'}=$res2;
+        my $max = $mesg->count;
+        for( my $index = 0 ; $index < $max ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn=$entry->dn();
+            my $sam_account=$entry->get_value ('sAMAccountName');
+            print "* $sam_account: $dn\n";
+            my ($res,$testpassword,$res1,$res2)=&AD_login_test($ldap,$root_dse,$dn,$password);
+            $sophomorix_result{'LOGINTEST'}{$sam_account}{'EXISTS'}="TRUE";
+            $sophomorix_result{'LOGINTEST'}{$sam_account}{'PAM'}{'RETURN'}=$res1;
+            $sophomorix_result{'LOGINTEST'}{$sam_account}{'KERBEROS'}{'RETURN'}=$res2;
 
-        if ($res==0){
-            $sophomorix_result{'LOGINTEST'}{$sam_account}{'LOGIN_OK'}="TRUE";
-            print "   ---> Pam/Kerberos Login with password \"$password\" OK!\n";
-        } else {
-            $sophomorix_result{'LOGINTEST'}{$sam_account}{'LOGIN_OK'}="FALSE";
-            print "   ---> ERROR logging in with password \"$password\": $res (pam: $res1, kerberos: $res2)\n";
+            if ($res==0){
+                $sophomorix_result{'LOGINTEST'}{$sam_account}{'LOGIN_OK'}="TRUE";
+                print "   ---> Pam/Kerberos Login with password \"$password\" OK!\n";
+            } else {
+                $sophomorix_result{'LOGINTEST'}{$sam_account}{'LOGIN_OK'}="FALSE";
+                print "   ---> ERROR logging in with password \"$password\": $res (pam: $res1, kerberos: $res2)\n";
+            }
         }
     }
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -365,7 +366,9 @@ if ($test_firstpassword==1){
     my @success=();
     my @fail=();
     my @nofirst=();
-    print "Testing if firstpassword works in the following Accounts\n";
+    print "Testing if firstpassword works  the following Accounts\n";
+
+    
     # search for all users
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)"; 
     if($Conf::log_level>=2){
@@ -378,6 +381,8 @@ if ($test_firstpassword==1){
                       attr => ['cn']
                             );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+
     my $max = $mesg->count;
     for( my $index = 0 ; $index < $max ; $index++) {
         my $entry = $mesg->entry($index);
