@@ -173,12 +173,23 @@ if ($school ne ""){
     $school_filter="(sophomorixSchoolPrefix=$school)";
 }
 
+
 # user filter
 my $user_filter="";
 if ($user ne ""){
-    $user_filter="(sAMAccountName=$user)";
+    my @users=split(",",$user);
+    if ($#users==0){
+	# single user
+        $user_filter="(sAMAccountName=$user)";
+    } else {
+	# multiple users
+	$user_filter="(| ";
+        foreach my $user (@users){
+            $user_filter=$user_filter."(sAMAccountName=$user) ";
+        }
+	$user_filter=$user_filter.")";
+    }
 }
-
 
 
 # --help
@@ -368,12 +379,11 @@ if ($test_firstpassword==1){
     my @nofirst=();
     print "Testing if firstpassword works  the following Accounts\n";
 
-    
-    # search for all users
-    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)"; 
-    if($Conf::log_level>=2){
+    my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
+
+#    if($Conf::log_level>=2){
         print "Filter to find users: $filter\n";
-    }
+#    }
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
@@ -381,7 +391,6 @@ if ($test_firstpassword==1){
                       attr => ['cn']
                             );
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
-
 
     my $max = $mesg->count;
     for( my $index = 0 ; $index < $max ; $index++) {
