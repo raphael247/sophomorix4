@@ -5396,6 +5396,8 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'USERS'}{$sam}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
         if ($mailquota_value ne "---" or $mailquota_comment ne "---"){
   	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixMailQuota'} }, $mailquota;
+	    $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'MAILQUOTA'}{'VALUE'}=$mailquota_value;
+	    $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'MAILQUOTA'}{'COMMENT'}=$mailquota_comment;
         }                
 
         # save USER quota
@@ -5413,6 +5415,11 @@ sub AD_get_quota {
             # remember nondefault quota
             if ($value ne "---" or $comment ne "---"){
     		push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixQuota'} }, $quota;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'QUOTA'}{$share}{'VALUE'}=$value;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'QUOTA'}{$share}{'SHARE'}=$share;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'QUOTA'}{$share}{'OLDCALC'}=$oldcalc;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'QUOTA'}{$share}{'QUOTASTATUS'}=$quotastatus;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'QUOTA'}{$share}{'COMMENT'}=$comment;
             }                
         }
         if (exists $quota{'NONDEFAULT_QUOTA'}{$school}{'USER'}{$sam}{'sophomorixAddQuota'} ){
@@ -5485,7 +5492,9 @@ sub AD_get_quota {
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailQuota'}{'VALUE'}=$mailquota_value;
         $quota{'QUOTA'}{'CLASSES'}{$sam}{'sophomorixMailQuota'}{'COMMENT'}=$mailquota_comment;
         if ($mailquota_value ne "---" or $mailquota_comment ne "---"){
-    	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixAddQuota'} }, $quota;
+    	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixMailQuota'} }, $mailquota;
+	    $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'MAILQUOTA'}{'VALUE'}=$mailquota_value;
+	    $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'MAILQUOTA'}{'COMMENT'}=$mailquota_comment;
         }                
 
         # quota
@@ -5496,6 +5505,9 @@ sub AD_get_quota {
             # remember nondefault quota
             if ($value ne "---" or $comment ne "---"){
     		push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'sophomorixQuota'} }, $quota;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'QUOTA'}{$share}{'VALUE'}=$value;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'QUOTA'}{$share}{'SHARE'}=$share;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$sam}{'QUOTA'}{$share}{'COMMENT'}=$comment;
             }                
 	    push @{ $quota{'LISTS'}{'CLASS_by_SHARE'}{$share} }, $sam; 
         }
@@ -5627,6 +5639,8 @@ sub AD_get_quota {
         # remember nondefault mailquota
         if ($addmailquota_value ne "---" or $addmailquota_comment ne "---"){
   	    push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddMailQuota'} }, $addmailquota;
+	    $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'ADDMAILQUOTA'}{'VALUE'}=$addmailquota_value;
+	    $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'ADDMAILQUOTA'}{'COMMENT'}=$addmailquota_comment;
         }                
 
         # addquota
@@ -5637,6 +5651,8 @@ sub AD_get_quota {
             # remember nondefault quota
             if ($value ne "---" or $comment ne "---"){
   	        push @{ $quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'sophomorixAddQuota'} }, $addquota;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'ADDQUOTA'}{$share}{'VALUE'}=$value;
+		$quota{'NONDEFAULT_QUOTA'}{$school}{'GROUPS'}{$sam}{'ADDQUOTA'}{$share}{'COMMENT'}=$comment;
             }                
 	    push @{ $quota{'LISTS'}{'GROUPS_by_SHARE'}{$share} }, $sam; 
         }
