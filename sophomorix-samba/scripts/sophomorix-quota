@@ -285,7 +285,7 @@ my $ref_quota=&AD_get_quota({ldap=>$ldap,
 # --nondefault / --show-nondefault
 if ($show_nondefault==1){
     foreach my $school (@sharelist){
-        &Sophomorix::SophomorixBase::print_title("Nondefault quota of school $school:");
+        &Sophomorix::SophomorixBase::print_title("Nondefault quota of school-share $school:");
         foreach my $class ( @{ $ref_quota->{'LISTS'}{'CLASS_by_SCHOOL'}{$school} }){
             #print "CLASS: $class\n";
             foreach my $quota ( @{ $ref_quota->{'NONDEFAULT_QUOTA'}{$school}{'CLASS'}{$class}{'sophomorixQuota'} }){
