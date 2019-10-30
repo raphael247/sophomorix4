@@ -380,10 +380,9 @@ if ($test_firstpassword==1){
     print "Testing if firstpassword works  the following Accounts\n";
 
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
-
-#    if($Conf::log_level>=2){
+    if($Conf::log_level>=2){
         print "Filter to find users: $filter\n";
-#    }
+    }
     my $mesg = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
