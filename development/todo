@@ -60,25 +60,42 @@ sophomorix-extraclass
 
 perl5 sockets nutzen: Anschauen, ob man das machen
 
-
+Bugfix:
    Sicherheitsabfrage einbauen:
    verzeichnis
-   sessen mit exammodus.
+   session mit exammodus.
    exammdus beenden
    aber läuft schon, sammelt zu viel ein
    gelöschter nutzer, dann wird zuviel abgeräumt
    (gelöschter nutzer=Verzeichnis fehlt) -> nix tun
    
 
-Prioritäten:
+   Prioritäten:
 
-
+   performance, unix socket:
+   sophomorix-query
+   socket-datei und port ?
+   
+   - smbstatus für Aktueller Raum -> kian und andy
+   1) --quell-ip
+   2) --quell-username
+   3) --all   
+      username, rolle, adminclass, name, vorname, ip, rechnername
+      --alle info die smbstatus hat anzeigen
+      evlt. userabfrage dazu (mit --info-user)
+   
    tea4cups: python3 möglichkeit quota umzusetzen
    hook-scripte möglich
    kann entsprechende Befehle bereitstellen, die quota im AD
    hochzählen
-   testen beim usre
-   Befehl um beim user einen Geldaccount zu erhöhen
+   testen beim user
+      Befehl um beim user einen Geldaccount zu erhöhen
+      sophomorix-user --increase-ledger
+      sophomorix-user --increase-ledger
+      sophomorix-user --increase-ledger
+      (anzeigen mit -i sollte tun)
+      mitloggen im ledger (pro Schule)
+      --ledger-comment "Drucken auf Drucker "
 
    ntacl linux-probleme
    mount option: filemode=0600
@@ -87,16 +104,14 @@ Prioritäten:
    nicht sichtbar WER was abgespeichert hat
    jetzt wildwest, früher ro
    
-   
-- smbstatus für Aktueller Raum -> kian und andy
-   - username
-
    sophomorix-extraclass
-- printers.xml
-- konfigurierbare standardzugehörigkeit
+
+   - printers.xml
+      
+  - konfigurierbare standardzugehörigkeit
    (wifi/default-school OK, andere schulen/Gruppen nicht)   
 
-
+later:
    1 Rechnername, mehrere MAC und IP's
    devices.csv
    umsetzen:
