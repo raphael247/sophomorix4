@@ -41,6 +41,72 @@ Was ist neu:
 Todo:
 ############################################################
 
+Arbeitstagung Essen:
+
+Linuxclient: 
+* Änderungen sollen in die Pakete einfließen, nicht ins cloop
+* Druckerauswertung aus printers.xml?
+* parallel dazu andere Dateien erstellen
+  für printers.conf
+
+   pykota?
+   oder kommerziell papercut (soll aber bald nur noch mit windows
+   server gehen)
+
+
+Entwickler:
+
+sophomorix-extraclass
+
+perl5 sockets nutzen: Anschauen, ob man das machen
+
+
+   Sicherheitsabfrage einbauen:
+   verzeichnis
+   sessen mit exammodus.
+   exammdus beenden
+   aber läuft schon, sammelt zu viel ein
+   gelöschter nutzer, dann wird zuviel abgeräumt
+   (gelöschter nutzer=Verzeichnis fehlt) -> nix tun
+   
+
+Prioritäten:
+
+
+   tea4cups: python3 möglichkeit quota umzusetzen
+   hook-scripte möglich
+   kann entsprechende Befehle bereitstellen, die quota im AD
+   hochzählen
+   testen beim usre
+   Befehl um beim user einen Geldaccount zu erhöhen
+
+   ntacl linux-probleme
+   mount option: filemode=0600
+   home: .ssh u.a. z.B. alles executable
+   klassentausch:
+   nicht sichtbar WER was abgespeichert hat
+   jetzt wildwest, früher ro
+   
+   
+- smbstatus für Aktueller Raum -> kian und andy
+   - username
+
+   sophomorix-extraclass
+- printers.xml
+- konfigurierbare standardzugehörigkeit
+   (wifi/default-school OK, andere schulen/Gruppen nicht)   
+
+
+   1 Rechnername, mehrere MAC und IP's
+   devices.csv
+   umsetzen:
+   dhcponly als rolle zulassen
+      -> nix machen: kein dns, kein computeraccount
+    
+
+   
+
+------------------------------------------------------------
 Bug: sophomorix-management --set wifi (schoolname fehlt, ohne:
    default-school mit andere schule)
 
@@ -98,6 +164,18 @@ Bug?: sophomrix-user --user user -i -vv zeigt keine logdaten?
 Wer ist angemeldet:
 6.x bisher letzte ip oktett ist raum
 
+smbstatus -p auswerten
+
+option quell ip (nicht rechnername, loginname)
+
+   --user <user> 
+
+   
+# smbstatus -p -f |grep -v computers | grep -v Username | grep -v version| awk '{print $2, $4}' | sort
+
+
+
+   
 ------------------------------------------------------------
 Klassen löschen:
 Status of classes, when created:
@@ -142,12 +220,6 @@ Umsetzen: sophomorix-user --list-teachers-by-year
 Passwortangabe mit %: mail vom 14.9. 19:16
 
 sophomorix-query
-
-smbstatus -p auswerten
-
-option quell ip (nicht rechnername, loginname)
-
-# smbstatus -p -f |grep -v computers | grep -v Username | grep -v version| awk '{print $2, $4}' | sort
 
 
 
