@@ -71,6 +71,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_zonecreate
                                  AD_dns_kill
                                  AD_dns_zonekill
+                                 AD_gpo_listall
                                     );
 
 
@@ -1571,7 +1572,7 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
     }
 
 
-    &update_printer_gpos(\%devices_file,\%sophomorix_config,$json);
+    &update_printer_gpos(\%devices_file,\%sophomorix_config,\%sophomorix_result,$json);
 
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
@@ -2104,9 +2105,14 @@ sub push_kill_devicegroup {
 
 
 sub update_printer_gpos {
-    my ($ref_devices_file,$ref_sophomorix_config,$json)=@_;
+    my ($ref_devices_file,$ref_sophomorix_config,$ref_result,$json)=@_;
     print "\n";
     &print_title("Creating Printers.xml for GPO in $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TARGET_DIR'}");
+    my $ref_gpo=&AD_gpo_listall({json=>-1,
+                                 sophomorix_config=>$ref_sophomorix_config,
+                                 sophomorix_result=>$ref_result,
+                               });
+
     foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
         my $template=$ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE'};
         my $target_dir=$ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TARGET_DIR'}."/".$school;
@@ -2145,13 +2151,34 @@ sub update_printer_gpos {
         }
         # write postfix
         system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_POST'} >> $target");
-        if($Conf::log_level>=2){
-            printf  "School %-14s:%4s printers found\n",$school,$school_printer_count;
+        # copy the file if necessary
+        printf  "School %-14s:%4s printers found\n",$school,$school_printer_count;
+        my $lookup_key="sophomorix:school:".$school;
+	my $gpo_display_name;
+        if (exists $ref_gpo->{'LOOKUP'}{'by_display_name'}{$lookup_key}){
+  	    my $gpo_display_name=$ref_gpo->{'LOOKUP'}{'by_display_name'}{$lookup_key};
+            my $target_gpo_file=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'sysvol'}{'path'}.
+                                "/".$root_dns.
+                                "/Policies/".
+                                $gpo_display_name.
+                                "/User/Preferences/Printers/Printers.xml";
+            if ($school_printer_count>0){
+  	        print "   copy: $target\n";
+  	        print "    ---> $target_gpo_file\n";
+                system("cp  $target $target_gpo_file");
+            } elsif ($school_printer_count==0) {
+  	        print "   rm $target_gpo_file\n";
+                system("rm -f $target_gpo_file");
+            }
+        } else {
+            # no GPO dir
+            $gpo_display_name="---";
+            if ($school_printer_count>0){
+                print "   WARNING: Cannot copy Printers.xml to GPO: Printers exist, but no GPO directory\n";
+            } elsif ($school_printer_count==0) {
+                # do not warn, Printers.xml does not exist, thats fine
+            }
         }
-        # ????? TODO
-        # if 0 printers, delete file in gpo
-        # else cp file to GPO
-
     }
     print "\n";
 }
