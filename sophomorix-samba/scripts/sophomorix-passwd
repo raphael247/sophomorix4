@@ -219,6 +219,10 @@ Testing stuff:
 
   --test-firstpassword                         (ALL users: Test sophomorixFirstPassword as password)
   --test-firstpassword -u <user1>,<user2>, ... (Test sophomorixFirstPassword as password)
+    Users that still use their firstpassword are logged into 
+     /var/lib/sophomorix/tmp_sophomorix-passwd/test-firstpassword.sh
+    where their password can be set.
+
 
 Options:
   --nofirstpassupdate (do not update AD attribute sophomorixFirstPassword)
@@ -377,6 +381,20 @@ if ($test_firstpassword==1){
     my @success=();
     my @fail=();
     my @nofirst=();
+    my $log_dir=$sophomorix_config{'INI'}{'PATHS'}{'LIB'}."/tmp_sophomorix-passwd";
+    my $log_file=$log_dir."/test-firstpassword.sh";
+
+    system("mkdir -p $log_dir");
+    open (LOG, ">$log_file");
+    print LOG "#!/bin/sh\n";
+    print LOG "echo\n";
+    print LOG "echo \"This script will change the password to a random password\"\n";
+    print LOG "echo \"for all users with a working firstpassword\"\n";
+    print LOG "echo\n";
+    print LOG "echo \"Hit Strg+c to abort within 10 seconds\"\n";
+    print LOG "echo\n";
+    print LOG "sleep 10\n";
+
     print "Testing if firstpassword works  the following Accounts\n";
 
     my $filter="( &(objectclass=user) (cn=*) (sophomorixRole=*) $school_filter $user_filter)";
@@ -396,6 +414,9 @@ if ($test_firstpassword==1){
         my $entry = $mesg->entry($index);
         my $dn=$entry->dn();
         my $sam_account=$entry->get_value ('sAMAccountName');
+        my $sn=$entry->get_value ('sn');
+        my $given_name=$entry->get_value ('givenName');
+        my $class=$entry->get_value ('sophomorixAdminClass');
         $count_tested++;
         print "* $count_tested) $sam_account: $dn\n";
         my ($res,$testpassword)=&AD_login_test($ldap,$root_dse,$dn,$password);
@@ -403,6 +424,7 @@ if ($test_firstpassword==1){
             print "   * Login with sophomorixFirstPassword $testpassword OK!\n";
             $count_success++;
             push @success, "OK: $dn\n";
+            print LOG "sophomorix-passwd --random 15 --nofirstpassupdate --user $sam_account   # $given_name $sn, $class\n";
         } elsif ( $res==-1) {
             print "   * No firstpassword found!\n";
             $count_nofirstpass++;
@@ -426,6 +448,10 @@ if ($test_firstpassword==1){
     print "$count_tested tested:  $count_success OK,",
           "  $count_fail Failed Logins,",
           " $count_nofirstpass Without Firstpassword Attribute\n";
+    # print the command
+    print LOG "";
+    close(LOG);
+    system("chmod +x $log_file");
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
