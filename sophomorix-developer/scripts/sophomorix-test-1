@@ -136,6 +136,10 @@ my $file_teachers_bsz=$testdata."/bsz.teachers.csv-1";
 my $file_students_uni=$testdata."/uni.students.csv-1";
 my $file_teachers_uni=$testdata."/uni.teachers.csv-1";
 
+my $file_wifi_daytime_defaultschool=$testdata."/managementgroup-testdata/wifi.daytime.conf.default-school";
+my $file_wifi_nighttime_defaultschool=$testdata."/managementgroup-testdata/wifi.nighttime.conf.default-school";
+my $file_wifi_all_defaultschool=$testdata."/managementgroup-testdata/wifi.all.conf.default-school";
+
 my $file_school=$testdata."/school.conf-1";
 my $file_school_bsz=$testdata."/bsz.school.conf-1";
 my $file_school_uni=$testdata."/uni.school.conf-1";
@@ -309,6 +313,11 @@ if ($cp_add==1){
     &run_command("cp -v $file_teachers_bsz /etc/linuxmuster/sophomorix/bsz/bsz.teachers.csv");
     &run_command("cp -v $file_students_uni /etc/linuxmuster/sophomorix/uni/uni.students.csv");
     &run_command("cp -v $file_teachers_uni /etc/linuxmuster/sophomorix/uni/uni.teachers.csv");
+
+    &run_command("cp -v  $file_wifi_daytime_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.daytime.conf");
+    &run_command("cp -v  $file_wifi_nighttime_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.nighttime.conf");
+    &run_command("cp -v  $file_wifi_all_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.all.conf");
+
 #    &run_command("cp -v $file_school /etc/linuxmuster/sophomorix/default-school/school.conf");
 #    &run_command("cp -v $file_school_bsz /etc/linuxmuster/sophomorix/bsz/bsz.school.conf");
 #    &run_command("cp -v $file_school_uni /etc/linuxmuster/sophomorix/uni/uni.school.conf");
@@ -7363,7 +7372,7 @@ if ($ses==1){
 
     #################### intranet
     # --nointranet, 1 user
-     &run_command("sophomorix-managementgroup $all_options --nointranet lordjo42");
+    &run_command("sophomorix-managementgroup $all_options --nointranet lordjo42");
     # # lordjo42
     &AD_test_object({ldap=>$ldap,
                     dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -7382,7 +7391,7 @@ if ($ses==1){
                   });
 
     # # --intranet, 1 user
-     &run_command("sophomorix-managementgroup $all_options --intranet lordjo42");
+    &run_command("sophomorix-managementgroup $all_options --intranet lordjo42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -7753,7 +7762,7 @@ if ($ses==1){
 
     #################### manangement options combined
     # all options
-     &run_command("sophomorix-managementgroup $all_options --admins lordjo42,blackmri42 --noprinting lordjo42,blackmri42 --nointranet lordjo42,blackmri42 --nowebfilter lordjo42,blackmri42 --nointernet lordjo42,blackmri42 --nowifi lordjo42,blackmri42");
+    &run_command("sophomorix-managementgroup $all_options --admins lordjo42,blackmri42 --noprinting lordjo42,blackmri42 --nointranet lordjo42,blackmri42 --nowebfilter lordjo42,blackmri42 --nointernet lordjo42,blackmri42 --nowifi lordjo42,blackmri42");
     # lordjo42
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=lordjo42,OU=12abc,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
@@ -7788,6 +7797,83 @@ if ($ses==1){
                    sophomorixStatus => "U",
                    memberOf => "uni-12abc|uni-wifi|uni-internet|uni-webfilter|uni-intranet|uni-printing",
                   });
+
+    
+    #################### setting a default group membership
+    print "############### sophomorix-managementgroup --set-... ###############\n";
+
+    # default-school, wifi: all 2 users of default-school in wifi
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=wifi,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "all-wifi",
+                   member => "schneima42|sch42",
+                  });
+
+    &run_command("sophomorix-managementgroup $all_options --set-wifi daytime");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=wifi,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "all-wifi",
+                   member => "sch42",
+                  });
+
+    &run_command("sophomorix-managementgroup $all_options --set-wifi nighttime");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=wifi,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "all-wifi",
+                   member => "",
+                  });
+
+    &run_command("sophomorix-managementgroup $all_options --set-wifi all");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=wifi,OU=Management,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "all-wifi",
+                   member => "schneima42|sch42",
+                  });
+
+
+
+    # bsz, wifi: all 6 users of bsz in wifi
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-wifi,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "bsz-wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "all-wifi",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
+                  });
+
 
     ############################################################
     # fs test

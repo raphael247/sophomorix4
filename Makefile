@@ -366,7 +366,6 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.teachers.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/uni.students.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/uni.teachers.csv-1 $(TESTDATA)
-
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/devices.csv-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/classrooms-1 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.devices.csv-1 $(TESTDATA)
@@ -387,6 +386,12 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/classrooms-5 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.devices.csv-5 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.classrooms-5 $(TESTDATA)
+
+	@install -d $(TESTDATA)/managementgroup-testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.daytime.conf.default-school $(TESTDATA)/managementgroup-testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.nighttime.conf.default-school $(TESTDATA)/managementgroup-testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.all.conf.default-school $(TESTDATA)/managementgroup-testdata
+
 	@install -d $(TESTDATA)/transfer-testdata
 	@install -d $(TESTDATA)/transfer-testdata/subdir1-level1
 	@install -d $(TESTDATA)/transfer-testdata/subdir2-level1
@@ -399,6 +404,8 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir1-level1/file* $(TESTDATA)/transfer-testdata/subdir1-level1
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir2-level1/file* $(TESTDATA)/transfer-testdata/subdir2-level1
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/transfer-testdata/subdir2-level1/subdir1-level2/file* $(TESTDATA)/transfer-testdata/subdir2-level1/subdir1-level2
+
+
 
 # installing sources.list examples
 #	@install -d $(TOOLS)/apt/s-lists
