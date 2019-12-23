@@ -677,6 +677,8 @@ sub _console_print_groups_overview {
     } else {
         @school_list=($school_opt);
     }
+    # display also global groups
+    unshift @school_list,"global";
 
     foreach my $school (@school_list){
         print "\n";
