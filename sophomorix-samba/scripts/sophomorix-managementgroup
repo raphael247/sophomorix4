@@ -78,7 +78,11 @@ my $nowebfilter="";
 my $noprinting="";
 my $noadmins="";
 
+my $set_internet="";
 my $set_wifi="";
+my $set_intranet="";
+my $set_webfilter="";
+my $set_printing="";
 
 my $set_group="";
 my $set_name="";
@@ -106,7 +110,11 @@ my $testopt=GetOptions(
            "noprinting=s" => \$noprinting,
            "noadmins=s" => \$noadmins,
            "school=s" => \$school,
+           "set-internet=s" => \$set_internet,
            "set-wifi=s" => \$set_wifi,
+           "set-intranet=s" => \$set_intranet,
+           "set-webfilter=s" => \$set_webfilter,
+           "set-printing=s" => \$set_printing,
            "set-group=s" => \$set_group,
            "set-name=s" => \$set_name,
           );
@@ -144,7 +152,14 @@ Examples
                               --printing  <user1,user2,...>   --noprinting  <user1,user2,...>
                               --admins    <user1,user2,...>   --noadmins <user1,user2,...>
 
-Set specific managementgroup memberships from a file (only for group wifi at the moment ...):
+Set specific managementgroup memberships from a file
+  sophomorix-managementgroup --set-internet <name> --school <school>
+  sophomorix-managementgroup --set-wifi <name> --school <school>
+  sophomorix-managementgroup --set-intranet <name> --school <school>
+  sophomorix-managementgroup --set-webfilter <name> --school <school>
+  sophomorix-managementgroup --set-printing <name> --school <school>
+
+Example for group wifi:
   A) Create and edit:
      /etc/linuxmuster/sophomorix/<schoolname>/[<schoolname.>]wifi.<name>.conf
   B) Specify members according to:
@@ -152,8 +167,9 @@ Set specific managementgroup memberships from a file (only for group wifi at the
   C) Apply configured membeships:
      # sophomorix-managementgroup --set-wifi <name> --school <school>
 
-Set any sophomorix-group memberships from a file:
-  A) create the group with sophomorix-group
+Set any sophomorix-group memberships from a file (i.e. epoptes):
+  A) create the group with 
+     # sophomorix-group --create --group epoptes
   B) Specify members according to:
       /usr/share/sophomorix/devel/master/group.default.conf.master
   C) Apply configured membeships:
@@ -313,10 +329,33 @@ if ($school eq "---"){
 }
 
 
+
+# --set-internet <name>
+if ($set_internet ne ""){
+    &set_members_from_file("internet",$set_internet,$school);
+}
+
 # --set-wifi <name>
 if ($set_wifi ne ""){
     &set_members_from_file("wifi",$set_wifi,$school);
 }
+
+# --set-intranet <name>
+if ($set_intranet ne ""){
+    &set_members_from_file("intranet",$set_intranet,$school);
+}
+
+# --set-webfilter <name>
+if ($set_webfilter ne ""){
+    &set_members_from_file("webfilter",$set_webfilter,$school);
+}
+
+# --set-printing <name>
+if ($set_printing ne ""){
+    &set_members_from_file("printing",$set_printing,$school);
+}
+
+
 
 # --set-group <group>
 # --set-name <confname>

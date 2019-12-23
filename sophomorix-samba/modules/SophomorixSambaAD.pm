@@ -3721,6 +3721,7 @@ sub AD_get_name_tokened {
         $role eq "group"){
         if ($school eq "---" 
             or $school eq ""
+            or $school eq "global"
             or $school eq $DevelConf::name_default_school
            ){
             # SCHOOL, no multischool
@@ -3827,7 +3828,9 @@ sub AD_school_create {
     }
 
     # school share
-    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school}){
+    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$school} or 
+        $school eq "global"
+       ){
         print "   * nothing to do: School share $school exists.\n";
     } else {
         &Sophomorix::SophomorixBase::print_title("Creating share for school $school");
@@ -3866,98 +3869,100 @@ sub AD_school_create {
         &Sophomorix::SophomorixBase::read_smb_net_conf_list($ref_sophomorix_config);
     }
 
-    &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (begin) ...");
-    ############################################################
-    # providing OU=SCHOOLS 
-    ############################################################
-    my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
-    my $result1 = $ldap->add($schools_ou,
-                        attr => ['objectClass' => ['top', 'organizationalUnit']]);
-    &AD_debug_logdump($result1,2,(caller(0))[3]);
-    ############################################################
-    # providing group 'SCHOOLS'
-    ############################################################
-    my $dn_schools="CN=".$DevelConf::AD_schools_group.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      dn_wish=>$dn_schools,
-                      school=>$DevelConf::AD_schools_group,
-                      group=>$DevelConf::AD_schools_group,
-                      group_basename=>$DevelConf::AD_schools_group,
-                      description=>"The group that includes all schools",
-                      type=>$ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SCHOOL_GROUP_TYPE'},
-                      status=>"P",
-                      joinable=>"FALSE",
-                      hidden=>"FALSE",
-                      smb_admin_pass=>$smb_admin_pass,
-                      sophomorix_config=>$ref_sophomorix_config,
-                      sophomorix_result=>$ref_sophomorix_result,
-                     });
-    ############################################################
-    # providing the OU=<school>,OU=SCHOOLS for schools
-    ############################################################
-    my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
-                        attr => ['objectClass' => ['top', 'organizationalUnit']]);
-    &AD_debug_logdump($result1,2,(caller(0))[3]);
-    ############################################################
-    # providing group s_<schoolname>
-    ############################################################
-    my $dn_schoolname="CN=".$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    &AD_group_create({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      dn_wish=>$dn_schoolname,
-                      school=>$school,
-                      group=>$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
-                      group_basename=>$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
-                      description=>"The school group of school ".$school, # no s_ (This is the schoolname)
-                      type=>"school",
-                      status=>"P",
-                      joinable=>"FALSE",
-                      hidden=>"FALSE",
-                      smb_admin_pass=>$smb_admin_pass,
-                      sophomorix_config=>$ref_sophomorix_config,
-                      sophomorix_result=>$ref_sophomorix_result,
-                     });
-    # make group s_<schoolname> member in SCHOOLS
-    &AD_group_addmember({ldap => $ldap,
-                         root_dse => $root_dse, 
-                         group => $DevelConf::AD_schools_group,
-                         addgroup => $ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school, # s_ (This is the group name)
-                        }); 
-    ############################################################
-    # sub ou's for OU=*    
-    if($Conf::log_level>=2){
-        print "   * Adding sub ou's for OU=$school ...\n";
-    }
-    foreach my $ref_sub_ou (@{ $ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SUB_OU'} } ){
-        my $sub_ou=$ref_sub_ou; # make copy to not modify the hash 
-        $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
-        print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
-        my $result = $ldap->add($dn,attr => ['objectClass' => ['top', 'organizationalUnit']]);
-        &AD_debug_logdump($result,2,(caller(0))[3]);
-    }
+    if ($school ne "global"){
+        &Sophomorix::SophomorixBase::print_title("Adding school $school in AD (begin) ...");
+        ############################################################
+        # providing OU=SCHOOLS 
+        ############################################################
+        my $schools_ou=$DevelConf::AD_schools_ou.",".$root_dse;
+        my $result1 = $ldap->add($schools_ou,
+                             attr => ['objectClass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result1,2,(caller(0))[3]);
+        ############################################################
+        # providing group 'SCHOOLS'
+        ############################################################
+        my $dn_schools="CN=".$DevelConf::AD_schools_group.",".$DevelConf::AD_schools_ou.",".$root_dse;
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          dn_wish=>$dn_schools,
+                          school=>$DevelConf::AD_schools_group,
+                          group=>$DevelConf::AD_schools_group,
+                          group_basename=>$DevelConf::AD_schools_group,
+                          description=>"The group that includes all schools",
+                          type=>$ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SCHOOL_GROUP_TYPE'},
+                          status=>"P",
+                          joinable=>"FALSE",
+                          hidden=>"FALSE",
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>$ref_sophomorix_config,
+                          sophomorix_result=>$ref_sophomorix_result,
+                         });
+        ############################################################
+        # providing the OU=<school>,OU=SCHOOLS for schools
+        ############################################################
+        my $result2 = $ldap->add($ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP},
+                             attr => ['objectClass' => ['top', 'organizationalUnit']]);
+        &AD_debug_logdump($result1,2,(caller(0))[3]);
+        ############################################################
+        # providing group s_<schoolname>
+        ############################################################
+        my $dn_schoolname="CN=".$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school.
+                          ",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+        &AD_group_create({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          dn_wish=>$dn_schoolname,
+                          school=>$school,
+                          group=>$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
+                          group_basename=>$ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
+                          description=>"The school group of school ".$school, # no s_ (This is the schoolname)
+                          type=>"school",
+                          status=>"P",
+                          joinable=>"FALSE",
+                          hidden=>"FALSE",
+                          smb_admin_pass=>$smb_admin_pass,
+                          sophomorix_config=>$ref_sophomorix_config,
+                          sophomorix_result=>$ref_sophomorix_result,
+                        });
+        # make group s_<schoolname> member in SCHOOLS
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => $DevelConf::AD_schools_group,
+                             addgroup => $ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school, # s_ (This is the group name)
+                           }); 
+        ############################################################
+        # sub ou's for OU=*    
+        if($Conf::log_level>=2){
+            print "   * Adding sub ou's for OU=$school ...\n";
+        }
+        foreach my $ref_sub_ou (@{ $ref_sophomorix_config->{'INI'}{'SCHOOLS'}{'SUB_OU'} } ){
+            my $sub_ou=$ref_sub_ou; # make copy to not modify the hash 
+            $dn=$sub_ou.",".$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
+            print "      * DN: $dn (RT_SCHOOL_OU) $school\n";
+            my $result = $ldap->add($dn,attr => ['objectClass' => ['top', 'organizationalUnit']]);
+            &AD_debug_logdump($result,2,(caller(0))[3]);
+        }
 
-    ############################################################
-    # OU=*    
-    if($Conf::log_level>=2){
-        print "   * Adding OU's for default groups in OU=$school ...\n";
-    }
+        ############################################################
+        # OU=*    
+        if($Conf::log_level>=2){
+            print "   * Adding OU's for default groups in OU=$school ...\n";
+        }
 
-    &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
-                             $school,$ref_sophomorix_config);
-    ############################################################
-    # adding groups to <schoolname>-group
-    foreach my $ref_membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
-    my $membergroup=$ref_membergroup; # make copy to not modify the hash
-    &AD_group_addmember({ldap => $ldap,
-                         root_dse => $root_dse, 
-                         group => $ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
-                         addgroup => $membergroup,
-                        }); 
+        &AD_create_school_groups($ldap,$root_dse,$root_dns,$smb_admin_pass,
+                                 $school,$ref_sophomorix_config);
+        ############################################################
+        # adding groups to <schoolname>-group
+        foreach my $ref_membergroup (@{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} } ){
+        my $membergroup=$ref_membergroup; # make copy to not modify the hash
+        &AD_group_addmember({ldap => $ldap,
+                             root_dse => $root_dse, 
+                             group => $ref_sophomorix_config->{'INI'}{'VARS'}{'SCHOOLGROUP_PREFIX'}.$school,
+                             addgroup => $membergroup,
+                           }); 
+        }
     }
-
     ############################################################
     # providing OU=GLOBAL
     ############################################################
@@ -4004,13 +4009,15 @@ sub AD_school_create {
 
     # creating fileystem at last, because groups are needed beforehand for the ACL's 
     # creating filesystem for school
-    &AD_repdir_using_file({root_dns=>$root_dns,
-                           repdir_file=>"repdir.school",
-                           school=>$school,
-                           smb_admin_pass=>$smb_admin_pass,
-                           sophomorix_config=>$ref_sophomorix_config,
-                           sophomorix_result=>$ref_sophomorix_result,
-                        });
+    if ($school ne "global"){
+        &AD_repdir_using_file({root_dns=>$root_dns,
+                               repdir_file=>"repdir.school",
+                               school=>$school,
+                               smb_admin_pass=>$smb_admin_pass,
+                               sophomorix_config=>$ref_sophomorix_config,
+                               sophomorix_result=>$ref_sophomorix_result,
+                            });
+    }
     # creating filesystem for global
     &AD_repdir_using_file({ldap=>$ldap,
                            root_dns=>$root_dns,
@@ -7671,6 +7678,7 @@ sub AD_object_move {
 
 
 
+
 sub AD_group_create {
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -7735,9 +7743,14 @@ sub AD_group_create {
     }
     $group_ou=~s/\@\@FIELD_1\@\@/$group_basename/g; 
 
-    my $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
-    my $dn="CN=".$group.",".$target_branch;
+    my $target_branch;
+    if ($school eq "global"){
+         $target_branch = $group_ou.",OU=GLOBAL,".$root_dse;
+    } else {
+         $target_branch = $group_ou.",OU=".$school.",".$DevelConf::AD_schools_ou.",".$root_dse;
+    }
 
+    my $dn="CN=".$group.",".$target_branch;
     my $mail = $group."\@".$root_dns;
     my $maildomain_key=$school."-".$type;
     if (exists $ref_sophomorix_config->{'TYPES'}{$maildomain_key}{'MAILDOMAIN'}){

@@ -216,6 +216,12 @@ if ($options{'info'}==1 and defined $options{'group'}){
 ############################################################
 if (defined $options{'create'} and defined $options{'group'}){
     my @groups_option=split(/,/,$options{'group'});
+    my $sub_ou;
+    if ($options{'school'} eq "global"){
+        $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_group_ou'};
+    } else {
+        $sub_ou=$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'};
+    }
     foreach my $group_option (@groups_option){
         # avoid names beginning with p_
         if ($group_option=~ m/^p\_/){
@@ -243,7 +249,7 @@ if (defined $options{'create'} and defined $options{'group'}){
                           description=>"Created by sophomorix-group",
                           type=>"sophomorix-group",
                           status=>"P",
-		          sub_ou=>$sophomorix_config{'INI'}{'OU'}{'AD_project_ou'},
+		          sub_ou=>$sub_ou,
                           smb_admin_pass=>$smb_admin_pass,
                           sophomorix_config=>\%sophomorix_config,
                           sophomorix_result=>\%sophomorix_result,

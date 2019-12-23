@@ -151,6 +151,13 @@ if (not defined $options{'school'}){
     $options{'school'}="---";
 }
 
+if ($options{'school'} eq "global"){
+    print "\n";
+    print "Global projects are not allowed at the moment.\n";
+    print "Global sophomorix-groups can be created with sophomorix-group.\n\n";
+    exit;
+}
+
 # Reading Configuration
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$options{'json'});
 my $root_dns=&AD_dns_get($root_dse);
