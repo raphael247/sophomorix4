@@ -46,6 +46,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_full_groupdata
                                  AD_get_AD_for_check
                                  AD_debug_logdump
+                                 AD_get_group
                                     );
 
 my @arguments = @ARGV;
@@ -79,6 +80,9 @@ my $noadmins="";
 
 my $set_wifi="";
 
+my $set_group="";
+my $set_name="";
+
 my $skiplock=0;
 
 # Parsen der Optionen
@@ -103,6 +107,8 @@ my $testopt=GetOptions(
            "noadmins=s" => \$noadmins,
            "school=s" => \$school,
            "set-wifi=s" => \$set_wifi,
+           "set-group=s" => \$set_group,
+           "set-name=s" => \$set_name,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-managementgroup");
@@ -138,14 +144,25 @@ Examples
                               --printing  <user1,user2,...>   --noprinting  <user1,user2,...>
                               --admins    <user1,user2,...>   --noadmins <user1,user2,...>
 
-Set specific memberships from a file (only for group wifi at the moment ...):
+Set specific managementgroup memberships from a file (only for group wifi at the moment ...):
   A) Create and edit:
-     /etc/linuxmuster/sophomorix/<schoolname>/wifi.<name>.conf
+     /etc/linuxmuster/sophomorix/<schoolname>/[<schoolname.>]wifi.<name>.conf
   B) Specify members according to:
       /usr/share/sophomorix/devel/master/group.default.conf.master
   C) Apply configured membeships:
-     # sophomorix-managementgroup --set-wifi <name>
+     # sophomorix-managementgroup --set-wifi <name> --school <school>
 
+Set any sophomorix-group memberships from a file:
+  A) create the group with sophomorix-group
+  B) Specify members according to:
+      /usr/share/sophomorix/devel/master/group.default.conf.master
+  C) Apply configured membeships:
+     # sophomorix-managementgroup --set-group <group> --set-name <name> --school <school>
+     Example for global epoptes group:
+     # sophomorix-managementgroup --set-group epoptes --set-name default --school global
+     (This will read the config in /etc/linuxmuster/sophomorix/global.epoptes.default.conf)
+
+Set any sophomorix-group  memberships
 
 
 Please see the sophomorix-managementgroup(8) man pages for full documentation
@@ -301,7 +318,11 @@ if ($set_wifi ne ""){
     &set_members_from_file("wifi",$set_wifi,$school);
 }
 
-
+# --set-group <group>
+# --set-name <confname>
+if ($set_group ne "" and $set_name ne ""){
+    &set_members_from_file($set_group,$set_name,$school);
+}
 
 &AD_unbind_admin($ldap);
 
@@ -318,6 +339,8 @@ sub set_members_from_file {
     my $file_path;
     if ($school eq $DevelConf::name_default_school){
         $file_path=$DevelConf::path_conf_sophomorix."/".$school."/".$type.".".$name.".conf";
+    } elsif ($school eq "global"){
+        $file_path=$DevelConf::path_conf_sophomorix."/global.".$type.".".$name.".conf";
     } else {
         $file_path=$DevelConf::path_conf_sophomorix."/".$school."/".$school.".".$type.".".$name.".conf";
     }
@@ -351,7 +374,10 @@ sub set_members_from_file {
                                                    sophomorix_config=>\%sophomorix_config,
                                                  });
         foreach my $sam (keys %{ $ref_AD_check->{'sAMAccountName'} }){
-            if (not $school eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}){
+            if ($school eq "global"){
+                # just go on
+            } elsif (not $school eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}){
+                # skip this user of another school
                 next;
             }
             # role
@@ -367,19 +393,32 @@ sub set_members_from_file {
         @new_member = uniq(@new_member);
 
         my $groupname;
-        if ($school eq $DevelConf::name_default_school){
+        if ($school eq $DevelConf::name_default_school or 
+            $school eq "global"
+           ){
 	    $groupname=$type;
         } else {
 	    $groupname=$school."-".$type;
         }
 
-        my $dn=$sophomorix_config{'SCHOOLS'}{$school}{'GROUP_OPTION'}{$groupname};
+        my ($existing_group,
+            $type_group,
+            $school_group,
+            $status,
+            $description,
+            $dn)=
+            &AD_get_group({ldap=>$ldap,
+                          root_dse=>$root_dse,
+                          root_dns=>$root_dns,
+                          group=>$groupname,
+                        });
+
         print "Setting member attribute of managementgroup\n";
         print "  $dn\n";
         print "to:\n";
         print Dumper (\@new_member);
         my $member_count=$#new_member+1;
-        print "$member_count member in config \"$name\" for managemengroup \"$type\" in school \"$school\"\n";
+        print "$member_count members in config \"$name\" for managemengroup \"$type\" in school \"$school\"\n";
         print "\n";
 
         my $mesg = $ldap->modify( $dn,

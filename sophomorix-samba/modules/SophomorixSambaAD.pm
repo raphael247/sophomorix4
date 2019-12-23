@@ -1500,7 +1500,8 @@ sub AD_group_kill {
         $type,
         $school,
         $status,
-        $description)=
+        $description,
+        $dn_unused)=
         &AD_get_group({ldap=>$ldap,
                       root_dse=>$root_dse,
                       root_dns=>$root_dns,
@@ -3397,6 +3398,7 @@ sub AD_get_group {
                               'sophomorixType',
                               'sophomorixStatus',
                               'description',
+                              'dn',
                              ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
 
@@ -3414,7 +3416,8 @@ sub AD_get_group {
         }
         my $status = $entry->get_value('sophomorixStatus');
         my $description = $entry->get_value('description');
-        return ($existing,$type,$school,$status,$description);
+        my $dn = $entry->dn();
+        return ($existing,$type,$school,$status,$description,$dn);
     }
 }
 
