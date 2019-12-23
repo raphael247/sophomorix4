@@ -139,6 +139,9 @@ my $file_teachers_uni=$testdata."/uni.teachers.csv-1";
 my $file_wifi_daytime_defaultschool=$testdata."/managementgroup-testdata/wifi.daytime.conf.default-school";
 my $file_wifi_nighttime_defaultschool=$testdata."/managementgroup-testdata/wifi.nighttime.conf.default-school";
 my $file_wifi_all_defaultschool=$testdata."/managementgroup-testdata/wifi.all.conf.default-school";
+my $file_wifi_daytime_bsz=$testdata."/managementgroup-testdata/wifi.daytime.conf.bsz";
+my $file_wifi_nighttime_bsz=$testdata."/managementgroup-testdata/wifi.nighttime.conf.bsz";
+my $file_wifi_all_bsz=$testdata."/managementgroup-testdata/wifi.all.conf.bsz";
 
 my $file_school=$testdata."/school.conf-1";
 my $file_school_bsz=$testdata."/bsz.school.conf-1";
@@ -317,6 +320,9 @@ if ($cp_add==1){
     &run_command("cp -v  $file_wifi_daytime_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.daytime.conf");
     &run_command("cp -v  $file_wifi_nighttime_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.nighttime.conf");
     &run_command("cp -v  $file_wifi_all_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.all.conf");
+    &run_command("cp -v  $file_wifi_daytime_bsz /etc/linuxmuster/sophomorix/bsz/wifi.daytime.conf");
+    &run_command("cp -v  $file_wifi_nighttime_bsz /etc/linuxmuster/sophomorix/bsz/wifi.nighttime.conf");
+    &run_command("cp -v  $file_wifi_all_bsz /etc/linuxmuster/sophomorix/bsz/wifi.all.conf");
 
 #    &run_command("cp -v $file_school /etc/linuxmuster/sophomorix/default-school/school.conf");
 #    &run_command("cp -v $file_school_bsz /etc/linuxmuster/sophomorix/bsz/bsz.school.conf");
@@ -7804,6 +7810,9 @@ if ($ses==1){
     &run_command("cp -v  $file_wifi_daytime_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.daytime.conf");
     &run_command("cp -v  $file_wifi_nighttime_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.nighttime.conf");
     &run_command("cp -v  $file_wifi_all_defaultschool /etc/linuxmuster/sophomorix/default-school/wifi.all.conf");
+    &run_command("cp -v  $file_wifi_daytime_bsz /etc/linuxmuster/sophomorix/bsz/bsz.wifi.daytime.conf");
+    &run_command("cp -v  $file_wifi_nighttime_bsz /etc/linuxmuster/sophomorix/bsz/bsz.wifi.nighttime.conf");
+    &run_command("cp -v  $file_wifi_all_bsz /etc/linuxmuster/sophomorix/bsz/bsz.wifi.all.conf");
 
 
     # default-school, wifi: all 2 users of default-school in wifi
@@ -7878,6 +7887,47 @@ if ($ses==1){
                    member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
                   });
 
+    &run_command("sophomorix-managementgroup $all_options --set-wifi daytime --school bsz");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-wifi,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "bsz-wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "all-wifi",
+                   member => "oe42|wu42",
+                  });
+
+    &run_command("sophomorix-managementgroup $all_options --set-wifi nighttime --school bsz");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-wifi,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "bsz-wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "all-wifi",
+                   member => "",
+                  });
+
+    &run_command("sophomorix-managementgroup $all_options --set-wifi all --school bsz");
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-wifi,OU=Management,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-wifi",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"wifiaccess",
+                   mail => "bsz-wifi@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "all-wifi",
+                   member => "maiersa42|muellegr42|jonsonad42|samardze42|oe42|wu42",
+                  });
 
     ############################################################
     # fs test

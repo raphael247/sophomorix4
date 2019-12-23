@@ -391,6 +391,9 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.daytime.conf.default-school $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.nighttime.conf.default-school $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.all.conf.default-school $(TESTDATA)/managementgroup-testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.daytime.conf.bsz $(TESTDATA)/managementgroup-testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.nighttime.conf.bsz $(TESTDATA)/managementgroup-testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.all.conf.bsz $(TESTDATA)/managementgroup-testdata
 
 	@install -d $(TESTDATA)/transfer-testdata
 	@install -d $(TESTDATA)/transfer-testdata/subdir1-level1

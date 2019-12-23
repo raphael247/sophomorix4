@@ -298,7 +298,7 @@ if ($school eq "---"){
 
 # --set-wifi <name>
 if ($set_wifi ne ""){
-    &set_access_from_file("wifi",$set_wifi,$school);
+    &set_members_from_file("wifi",$set_wifi,$school);
 }
 
 
@@ -312,7 +312,7 @@ if ($set_wifi ne ""){
 # sub
 ############################################################
 
-sub set_access_from_file {
+sub set_members_from_file {
     my ($type,$name,$school)=@_;
 
     my $file_path;
