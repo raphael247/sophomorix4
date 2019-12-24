@@ -53,7 +53,7 @@ Entwickler:
 
 sophomorix-extraclass
 
-perl5 sockets nutzen: Anschauen, ob man das machen
+perl5 sockets nutzen: Anschauen, ob man das machen kann
 
 Bugfix:
    Sicherheitsabfrage einbauen:
@@ -188,6 +188,30 @@ sophomorix-class --change-status-of-all-adminclasses P,M
 
 ------------------------------------------------------------
 sophomorix-extraclass
+example line:
+
+emacs /etc/linusmuster/sophomorix/default-school/extraclasses.csv
+gastgroup;gast;12;01.01.2019;Für die Gäste;Muster!;10.10.2010;
+-> tut nicht mehr
+
+Vorgehen:
+
+anlegen extraclass user
+sophomorix-check soll nicht mehr das file lesen, aber ignorieren
+wenn end date überschritten: kill
+
+kill extraclass users
+
+Enddate ändern
+anzahl ändern
+
+Kommentar, password mit sophomorix-class???
+
+gastgroup, basename nicht änderbar
+
+
+
+
 Erst abgespeckt:
 kurs: gast (Gruppenname)
   --extraclass <gruppenname>

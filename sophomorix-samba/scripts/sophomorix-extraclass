@@ -1,0 +1,185 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-extraclass) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_auk_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 remove_from_list
+                                 json_dump
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_dns_get
+                                 AD_unbind_admin
+                                 AD_user_create
+                                 AD_get_user
+                                 AD_group_create
+                                 AD_group_kill
+                                 AD_group_addmember
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_class_fetch
+                                 AD_group_update
+                                 AD_project_sync_members
+                                 AD_dn_fetch_multivalue
+                                 AD_get_passwd
+                                 AD_get_groups_v
+                                 AD_get_full_groupdata
+                                    );
+my @arguments = @ARGV;
+
+
+############################################################
+# Option handling
+############################################################
+my %options=();
+# define possible action in a script and what OBJECT they need
+$options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
+                                      "kill,".
+                                      "description";
+
+## define which options deliver which object
+#$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
+#$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes,delete-all-teacheronly-classes,update-maildomain";
+## define option that can modify which object
+#$options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
+#                                     "teacherclass,".
+#                                     "adminclass,".
+#                                     "extraclass,";
+## define more dependencies
+#$options{'CONFIG'}{'DEPENDS'}{'gidnumber-migrate'}="create";
+#$options{'CONFIG'}{'DEPENDS'}{'skip-school-creation'}="create";
+
+my $testopt=GetOptions(\%options, 
+                       "help|h",
+                       "info|i",
+                       "json|j+",
+                       "verbose|v+",
+                       "class|c=s",
+                       "all",
+                       "adminclass",
+                       "teacherclass",
+                       "extraclass",
+                       "create",
+                       "gidnumber=i",
+                       "kill",
+                       "skip-school-creation",
+                       "school=s",
+                       "description=s",
+                       "quota=s",
+                       "mailquota=s",
+                       "status=s",
+                       "maxmembers=s",
+                       "creationdate=s",
+                       "gidnumber-migrate=i",
+                       "mailalias!",
+                       "maillist!",
+                       "join!",
+                       "hide!",
+                       "admins=s",
+                       "addadmins=s",
+                       "removeadmins=s",
+                       "members=s",
+                       "addmembers=s",
+                       "removemembers=s",
+                       "delete-all-empty-classes",
+                       "delete-all-teacheronly-classes",
+                       "update-maildomain",
+                      );    
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-extraclass");
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
+
+print Dumper (\%options);
+
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$options{'json'});
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
+
+
+# --help
+#if ($help==1) {
+if (defined $options{'help'}) {
+   # Scriptname ermitteln
+   my @list = split(/\//,$0);
+   my $scriptname = pop @list;
+   # Befehlbeschreibung
+   print('
+sophomorix-extraclass creates and manages extraclasses
+
+Options
+  -h  / --help
+  -v  / --verbose
+  -vv / --verbose --verbose
+
+  -i  / --info          (Default: displays adminclass only)
+
+Please see the sophomorix-extraclass(8) man pages for full documentation
+');
+   print "\n";
+   exit;
+}
+
+
+############################################################
+# config values
+############################################################
+
+
+
+
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$options{'json'});
+############################################################
+# Start
+############################################################
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+
+
+
+############################################################
+# End
+############################################################
+&AD_unbind_admin($ldap);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+
+
+
+
+
+
+
