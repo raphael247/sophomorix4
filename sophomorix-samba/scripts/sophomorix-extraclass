@@ -7,6 +7,7 @@
 # modules
 use strict;
 use Getopt::Long;
+use Time::Local;
 Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use List::MoreUtils qw(uniq);
@@ -67,10 +68,16 @@ my %options=();
 # define possible action in a script and what OBJECT they need
 $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "kill,".
-                                      "description";
+                                      "user-basename,".
+                                      "user-number,".
+                                      "comment,".
+                                      "password,".
+                                      "valid-until,".
+                                      "description,";
+                                      "school";
 
-## define which options deliver which object
-#$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
+# define which options deliver which object
+$options{'CONFIG'}{'ONE_OF'}{'GROUP'}="extraclass";
 #$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes,delete-all-teacheronly-classes,update-maildomain";
 ## define option that can modify which object
 #$options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
@@ -86,41 +93,27 @@ my $testopt=GetOptions(\%options,
                        "info|i",
                        "json|j+",
                        "verbose|v+",
-                       "class|c=s",
-                       "all",
-                       "adminclass",
-                       "teacherclass",
-                       "extraclass",
                        "create",
-                       "gidnumber=i",
                        "kill",
-                       "skip-school-creation",
-                       "school=s",
+                       "extraclass=s",
+                       "user-basename=s",
+                       "user-number=i",
+                       "comment=s",
+                       "password=s",
+                       "valid-until=s",
                        "description=s",
-                       "quota=s",
-                       "mailquota=s",
-                       "status=s",
-                       "maxmembers=s",
-                       "creationdate=s",
-                       "gidnumber-migrate=i",
-                       "mailalias!",
-                       "maillist!",
-                       "join!",
-                       "hide!",
-                       "admins=s",
-                       "addadmins=s",
-                       "removeadmins=s",
-                       "members=s",
-                       "addmembers=s",
-                       "removemembers=s",
-                       "delete-all-empty-classes",
-                       "delete-all-teacheronly-classes",
-                       "update-maildomain",
+                       "school=s",
                       );    
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-extraclass");
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
+
+if (not defined $options{'school'}){
+    $options{'school'}="---";
+}
+
+my $class_type="extraclass";
 
 print Dumper (\%options);
 
@@ -147,7 +140,16 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
-  -i  / --info          (Default: displays adminclass only)
+  -i  / --info
+
+Create an extraclass:
+  --create
+  --extraclass <gruppenname>
+  --user-basename <basename>
+  --user-number 30
+  --comment "Für AK Linux"
+  --password "......" (ohne: random??)
+  --valid-until 10.10.2020
 
 Please see the sophomorix-extraclass(8) man pages for full documentation
 ');
@@ -159,7 +161,17 @@ Please see the sophomorix-extraclass(8) man pages for full documentation
 ############################################################
 # config values
 ############################################################
-
+my %convert_extension = qw(
+     1     01
+     2     02
+     3     03
+     4     04
+     5     05
+     6     06
+     7     07
+     8     08
+     9     09
+);
 
 
 
@@ -169,6 +181,39 @@ Please see the sophomorix-extraclass(8) man pages for full documentation
 ############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
+
+if (defined $options{'create'} and 
+    defined $options{'extraclass'} and
+    defined $options{'user-basename'} and
+    defined $options{'user-number'} and
+    defined $options{'valid-until'}
+   ){
+
+    #testing date ?????
+    my ($until_day, $until_month, $until_year)=split(/\./, $options{'valid-until'});
+    my $extraclass_enddate_epoch=timelocal(0, 0, 0, $until_day, $until_month-1, $until_year);
+    if ($extraclass_enddate_epoch>=$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}){
+    } else {
+        print "\nvalid-until is NOT in the future. Doing nothing!\n\n";
+        exit;
+    }
+
+
+    my $group_token=&AD_get_name_tokened($options{'extraclass'},$options{'school'},$class_type);
+    print "HERE create group $group_token  $extraclass_enddate_epoch\n";
+
+
+    for (my $i=1;$i<=$options{'user-number'};$i++){
+        my $extension;
+        if (exists $convert_extension{$i}){
+            $extension=$convert_extension{$i};
+        } else {
+            $extension=$i;
+        }
+        my $username=$options{'user-basename'}.$extension;
+        print "HERE: $username\n";
+    }
+}
 
 
 ############################################################

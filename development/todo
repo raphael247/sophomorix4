@@ -36,6 +36,71 @@ Was ist neu:
 Todo:
 ############################################################
 
+------------------------------------------------------------
+sophomorix-extraclass
+example line:
+
+emacs /etc/linusmuster/sophomorix/default-school/extraclasses.csv
+gastgroup;gast;12;01.01.2019;Für die Gäste;Muster!;10.10.2010;
+-> tut nicht mehr
+
+Vorgehen:
+
+anlegen extraclass user
+  --extraclass <gruppenname>
+  --user-basename <basename>
+  --user-number 30
+  --comment "Für AK Linux"
+  --password "......" (ohne: random??)
+  --valid-until 10.10.2020
+
+sophomorix-check soll nicht mehr das file lesen, aber ignorieren
+wenn end date überschritten: kill
+
+kill extraclass users
+
+Enddate ändern
+anzahl ändern
+
+Kommentar, password mit sophomorix-class???
+
+gastgroup, basename nicht änderbar
+
+bei kill die Gruppe mit löschen
+
+
+
+Erst abgespeckt:
+kurs: gast (Gruppenname)
+  --extraclass <gruppenname>
+basisname: gast (Basisname der user)
+  --user-basename <basename>
+anzahl: anzahl der user, ergibt gast 01 bis n
+  --user-number 30
+geburtsdatum (entfällt, das Anlegedatum wird genomen)
+comment: War gecos, nun im Kommentar
+  --comment "Für AK Linux"
+passwort: mit angeben
+  --password "......"
+valid until
+  --valid-until 10.10.2020
+
+-anlegen als tolerated users
+-normale Verfallszeitencheck
+
+Löschbefehl:
+--kill-extraclass <gruppenname>
+(Löscht die Klasse UND die user)
+
+später:
+--extraclass <gruppenname> --valid-until 05.05.2016
+--extraclass <gruppenname> --comment "neuer Kommentar"
+--extraclass <gruppenname> --password "neues passwort"  
+  (evtl. mit sophomorix-passwd)
+
+------------------------------------------------------------
+
+
 Arbeitstagung Essen:
 
 Linuxclient: 
@@ -185,60 +250,6 @@ Klassen löschen:
 Status of classes, when created:
 bei Rolle student, je Schule: ADMINCLASS_CREATION_STATUS=P/M P default
 sophomorix-class --change-status-of-all-adminclasses P,M
-
-------------------------------------------------------------
-sophomorix-extraclass
-example line:
-
-emacs /etc/linusmuster/sophomorix/default-school/extraclasses.csv
-gastgroup;gast;12;01.01.2019;Für die Gäste;Muster!;10.10.2010;
--> tut nicht mehr
-
-Vorgehen:
-
-anlegen extraclass user
-sophomorix-check soll nicht mehr das file lesen, aber ignorieren
-wenn end date überschritten: kill
-
-kill extraclass users
-
-Enddate ändern
-anzahl ändern
-
-Kommentar, password mit sophomorix-class???
-
-gastgroup, basename nicht änderbar
-
-
-
-
-Erst abgespeckt:
-kurs: gast (Gruppenname)
-  --extraclass <gruppenname>
-basisname: gast (Basisname der user)
-  --user-basename <basename>
-anzahl: anzahl der user, ergibt gast 01 bis n
-  --user-number 30
-geburtsdatum (entfällt, das Anlegedatum wird genomen)
-comment: War gecos, nun im Kommentar
-  --comment "Für AK Linux"
-passwort: mit angeben
-  --password "......"
-valid until
-  --valid-until 10.10.2020
-
--anlegen als tolerated users
--normale Verfallszeitencheck
-
-Löschbefehl:
---kill-extraclass <gruppenname>
-(Löscht die Klasse UND die user)
-
-später:
---extraclass <gruppenname> --valid-until 05.05.2016
---extraclass <gruppenname> --comment "neuer Kommentar"
---extraclass <gruppenname> --password "neues passwort"  
-  (evtl. mit sophomorix-passwd)
 
 
 ------------------------------------------------------------
