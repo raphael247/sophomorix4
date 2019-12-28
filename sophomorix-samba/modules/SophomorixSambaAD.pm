@@ -2077,6 +2077,9 @@ sub AD_user_create {
     # settingthe dates according to status
     if (defined $status and $status eq "T"){
         $deactivationdate=$DevelConf::default_date;
+    } elsif ($status eq "deaktivate" and $deactivationdate ne "---"){
+        # extraclass users
+        $status="T";
     } elsif (defined $status and 
        ($status eq "U" or 
         $status eq "A" or 

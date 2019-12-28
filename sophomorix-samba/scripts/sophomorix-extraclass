@@ -37,6 +37,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_print
                                  remove_from_list
                                  json_dump
+                                 epoch_to_ymdhms
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -197,11 +198,51 @@ if (defined $options{'create'} and
         print "\nvalid-until is NOT in the future. Doing nothing!\n\n";
         exit;
     }
+    my $extraclass_enddate_AD=$until_year.$until_month.$until_day."000000".".0Z";
 
+
+
+    # ???????? fix this
+    my $password="Muster!";
 
     my $group_token=&AD_get_name_tokened($options{'extraclass'},$options{'school'},$class_type);
-    print "HERE create group $group_token  $extraclass_enddate_epoch\n";
+    print "HERE create group $group_token $extraclass_enddate_AD \n";
 
+    # weiter: gruppe anlegen, user anlegen
+
+    &AD_school_create({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       school=>$options{'school'},
+                       smb_admin_pass=>$smb_admin_pass,
+                       sophomorix_config=>\%sophomorix_config,
+                       sophomorix_result=>\%sophomorix_result,
+                     });
+    &AD_group_create({ldap=>$ldap,
+                      root_dse=>$root_dse,
+                      root_dns=>$root_dns,
+                      school=>$options{'school'},
+                      group=>$group_token,
+                      group_basename=>$options{'extraclass'},
+                      description=>"created by sophomorix-extraclass",
+                      type=>$class_type,
+                      status=>"M",
+	              sub_ou=>"OU=".$options{'extraclass'}.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
+                      joinable=>"FALSE",
+                      hidden=>"FALSE",
+                      smb_admin_pass=>$smb_admin_pass,
+                      sophomorix_config=>\%sophomorix_config,
+                      sophomorix_result=>\%sophomorix_result,
+                    });
+
+
+
+    my $file;
+    if ($options{'school'} eq "---"){
+        $file="students.csv";
+    } else {
+        $file=$options{'school'}.".students.csv";
+    }
 
     for (my $i=1;$i<=$options{'user-number'};$i++){
         my $extension;
@@ -211,7 +252,35 @@ if (defined $options{'create'} and
             $extension=$i;
         }
         my $username=$options{'user-basename'}.$extension;
-        print "HERE: $username\n";
+
+        &AD_user_create({ldap=>$ldap,
+                        root_dse => $root_dse, 
+                        root_dns => $root_dns, 
+                        user_count => $i,
+                        max_user_count => $options{'user-number'},
+                        login => $username,
+                        group => $group_token,
+                        group_basename => $options{'extraclass'},
+                        firstname_ascii => "Extra",
+                        surname_ascii => "Class User",
+                        firstname_utf8 => "Extra",
+                        surname_utf8 => "Class User",
+                        birthdate => "---",
+                        sophomorix_first_password => $password,
+                        unid => "---",
+                        role => "student",
+                        type => "extraclass",
+                        school => $options{'school'},
+                        tolerationdate => '---',
+                        deactivationdate => $extraclass_enddate_AD,
+                        status => "deaktivate",
+                        file => $file,
+                        smb_admin_pass=>$smb_admin_pass,
+                        json=>$options{'json'},
+                        webui_permissions_calculated=>$sophomorix_config{'ROLES'}{$options{'school'}}{'student'}{'UI'}{'WEBUI_PERMISSIONS'},
+                        sophomorix_config=>\%sophomorix_config,
+                        sophomorix_result=>\%sophomorix_result,
+                       });
     }
 }
 

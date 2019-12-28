@@ -38,6 +38,7 @@ $Data::Dumper::Terse = 1;
             remove_from_list
             ymdhms_to_date
             ymdhms_to_epoch
+            epoch_to_ymdhms
             unlock_sophomorix
             lock_sophomorix
             log_script_start
