@@ -5518,7 +5518,8 @@ sub smb_command {
         ($smb_command_return==0 and $smb_command_out=~m/directory/) or
         ($smb_command_return==0 and $smb_command_out=~m/File:/) or
         ($smb_command_return==0 and $smb_command_out=~m/blocks available/) or
-        ($smb_command_return==0 and $smb_command_out=~m/Default Soft Limit/)
+        ($smb_command_return==0 and $smb_command_out=~m/Default Soft Limit/) or
+        ($smb_command_return==0 and $smb_command=~m/\/usr\/bin\/smbcquotas/)
       ){
         # empty output or "succesfully" in samba-tool
         print "OK ($smb_command_return): $smb_display_command\n";

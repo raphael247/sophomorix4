@@ -62,6 +62,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_project_sync_members
                                  AD_dn_fetch_multivalue
                                  AD_get_passwd
+                                 AD_smbcquotas_queryuser
                                     );
 my @arguments = @ARGV;
 
@@ -92,6 +93,7 @@ my $set_mailquota_only=0;
 my $set=0;
 
 my $smbcquotas=0;
+my $smbcquotas_only=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -110,6 +112,7 @@ my $testopt=GetOptions(
            "set-mailquota-only" => \$set_mailquota_only,
            "set" => \$set,
            "smbcquotas" => \$smbcquotas,
+           "smbcquotas-only" => \$smbcquotas_only,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-quota");
@@ -159,8 +162,11 @@ Query used space:
   Query the smbshare with smbcquotas for every user for 
   used space/softlimit/hardlimit (this is slow):
     --smbcquotas -i
-  Query used space for some users:
+  Query used space for some users (but still calculate all quota):
     --smbcquotas -i --user <user1>,<user2>,...
+  Query used space with smbcquotas command for some users (do nothing else):
+    --smbcquotas-only -i --user <user1>,<user2>,...
+
   
 Setting the user Quota/MailQuota
   set Quota/CloudQuota AND MailQuota
@@ -262,6 +268,43 @@ my %userlist=();
 if ($user ne ""){
     @userlist=split(/,/,$user);
     $userlist{$user}="seen";
+}
+
+
+
+# --smbcquotas-only --user user1,user2 --info
+if ($info==1 and $smbcquotas_only==1 and $user ne ""){
+    my %quota=();
+    foreach my $user (@userlist){
+        foreach my $share ( @{ $sophomorix_config{'LISTS'}{'SHARES'} } ) {
+            ($quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_KiB'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_KiB'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_KiB'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_MiB'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_MiB'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_MiB'},
+             $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SMBCQUOTAS_RETURN_STRING'},
+            )=&AD_smbcquotas_queryuser(
+                $root_dns,
+                $smb_admin_pass,
+                $user,
+                $share,
+	        \%sophomorix_config
+            );
+	}
+    }
+    &json_dump({json => $json,
+                jsoninfo => "QUOTA",
+                jsoncomment => "sophomorix quota",
+                log_level => $Conf::log_level,
+                hash_ref=>\%quota,
+                sophomorix_config=>\%sophomorix_config,
+              });
+    #print Dumper(\%quota);
+    exit;
 }
 
 

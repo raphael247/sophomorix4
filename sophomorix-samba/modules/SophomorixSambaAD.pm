@@ -72,6 +72,7 @@ $Data::Dumper::Terse = 1;
             AD_create_new_mail
             AD_create_new_webui_string
             AD_get_quota
+            AD_smbcquotas_queryuser
             AD_get_users_v
             AD_get_groups_v
             AD_get_shares_v
@@ -6015,7 +6016,8 @@ sub AD_get_quota {
                         $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'USED_MiB'},
                         $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SOFTLIMIT_MiB'},
                         $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'HARDLIMIT_MiB'},
-                   )=&AD_smbcquotas_queryuser(
+                        $quota{'QUOTA'}{'USERS'}{$user}{'SHARES'}{$share}{'smbcquotas'}{'SMBCQUOTAS_RETURN_STRING'},
+                    )=&AD_smbcquotas_queryuser(
                         $root_dns,
                         $smb_admin_pass,
                         $user,
@@ -8639,8 +8641,13 @@ sub AD_smbcquotas_queryuser {
 
     # hide password
     $display_command=~s/$smb_admin_pass/******/;
-    my $string=`$smbcquotas_command`;
-    chomp($string);
+
+    # my $string=`$smbcquotas_command`;
+    my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbcquotas_command,$smb_admin_pass);
+    if (not $return_value==0){
+        return("not available","not available","not available","not available","not available","not available","not available","not available","not available");
+    }
+    my $string=$out_lines[0];
     $string=~s/ //g; # remove whitespace
     my ($userstring,$quota)=split(/:/,$string);
     my ($used,$soft,$hard)=split(/\//,$quota);
@@ -8681,7 +8688,7 @@ sub AD_smbcquotas_queryuser {
         print "   SOFT: <$soft> <$soft_kib>KiB\n";
         print "   HARD: <$hard> <$hard_kib>KiB\n";
     }
-    return($used,$soft,$hard,$used_kib,$soft_kib,$hard_kib,$used_mib,$soft_mib,$hard_mib);
+    return($used,$soft,$hard,$used_kib,$soft_kib,$hard_kib,$used_mib,$soft_mib,$hard_mib,$string);
 }
 
 
