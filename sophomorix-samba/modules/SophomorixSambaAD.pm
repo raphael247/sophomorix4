@@ -6830,6 +6830,8 @@ sub AD_get_users_v {
         $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'S'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'T'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'T'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'M'}=0;
+        $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'M'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'D'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'D'}=0;
         $users{'COUNTER'}{$school}{'status_by_role'}{'student'}{'L'}=0;

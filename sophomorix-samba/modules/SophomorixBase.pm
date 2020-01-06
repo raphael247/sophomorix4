@@ -1198,6 +1198,11 @@ sub _console_print_users_overview {
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'T'},
             "","","","","";
         printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
+            "managed   | M",
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'M'},
+            $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'M'},
+            "","","","","";
+        printf "| %-13s |%5s |%5s |%5s |%5s ||%5s |%5s |%4s |\n",
             "disabled  | D",
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'student'}{'D'},
             $ref_users_v->{'COUNTER'}{$school}{'status_by_role'}{'teacher'}{'D'},
