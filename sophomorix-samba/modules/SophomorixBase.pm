@@ -6046,7 +6046,7 @@ sub get_sharedirectory {
         $smb_rel_path_homes=""; # not needed
         $smb_share="smb://".$root_dns."/".$school_smbshare."/".$smb_rel_path_share;
         $unix_dir="/srv/samba/schools/".$school."/share/projects/".$group;
-    } elsif  ($type eq "adminclass"){
+    } elsif  ($type eq "adminclass" or $type eq "extraclass"){
         my $group_basename=&get_group_basename($group,$school);
         $smb_rel_path_share="share/classes/".$group_basename;
         $smb_rel_path_homes="students/".$group_basename;

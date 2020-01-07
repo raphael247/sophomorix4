@@ -1529,7 +1529,7 @@ sub AD_group_kill {
 
     my ($count,$dn_exist,$cn_exist)=&AD_object_search($ldap,$root_dse,"group",$group);
     if ($count > 0){
-        if ($type eq "adminclass"){
+        if ($type eq "adminclass" or $type eq "extraclass"){
             ### adminclass #####################################
             if ($smb_share ne  "unknown"){
                 my $smbclient_command_rmdir_homes=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.

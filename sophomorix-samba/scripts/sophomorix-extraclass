@@ -45,6 +45,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_unbind_admin
                                  AD_user_create
+                                 AD_user_kill
                                  AD_get_user
                                  AD_group_create
                                  AD_group_kill
@@ -58,6 +59,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_passwd
                                  AD_get_groups_v
                                  AD_get_full_groupdata
+                                 AD_debug_logdump
                                     );
 my @arguments = @ARGV;
 
@@ -196,6 +198,7 @@ my %convert_extension = qw(
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
 
+# --create --extraclass ...
 if (defined $options{'create'} and 
     defined $options{'extraclass'} and
     defined $options{'user-basename'} and
@@ -203,21 +206,16 @@ if (defined $options{'create'} and
     defined $options{'valid-until'}
    ){
 
-    #testing date ?????
+    # testing date
     my ($until_day, $until_month, $until_year)=split(/\./, $options{'valid-until'});
     my $extraclass_enddate_epoch=timelocal(0, 0, 0, $until_day, $until_month-1, $until_year);
     if ($extraclass_enddate_epoch>=$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}){
     } else {
-        print "\nvalid-until is NOT in the future!\n\n";
-#        exit;
+        print "\nWARNING: valid-until is NOT in the future!\n\n";
     }
     my $extraclass_enddate_AD=$until_year.$until_month.$until_day."000000".".0Z";
 
     my $group_token=&AD_get_name_tokened($options{'extraclass'},$options{'school'},$class_type);
-    print "HERE create group $group_token $extraclass_enddate_AD \n";
-
-    # weiter: gruppe anlegen, user anlegen
-
     &AD_school_create({ldap=>$ldap,
                        root_dse=>$root_dse,
                        root_dns=>$root_dns,
@@ -242,8 +240,6 @@ if (defined $options{'create'} and
                       sophomorix_config=>\%sophomorix_config,
                       sophomorix_result=>\%sophomorix_result,
                     });
-
-
 
     my @password_chars=&get_passwd_charlist();
 
@@ -325,6 +321,157 @@ if (defined $options{'create'} and
                        });
     }
 }
+
+
+
+# --kill --extraclass ...
+if (defined $options{'kill'} and
+    defined $options{'extraclass'}
+    ){
+    my %kill=();
+    my $filter="(&(objectClass=group)(sAMAccountName=".
+        $options{'extraclass'}."))";
+    if($Conf::log_level>=2){
+        print "Filter: $filter\n";
+    }
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['sophomorixSchoolname',
+                               'description',
+                               'dn',
+                               'sophomorixStatus',
+                               'sophomorixType',
+                               'member']
+                            );
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+    my $count = $mesg->count;
+    my $entry = $mesg->entry(0);
+    if (not defined $entry){
+        print "\nNo extraclass \"$options{'extraclass'}\" found!\n\n";
+	exit;
+    } else {
+        my $type = $entry->get_value('sophomorixType');
+        my $school = $entry->get_value('sophomorixSchoolname');
+        my $status = $entry->get_value('sophomorixStatus');
+	my @members = $entry->get_value('member');
+        &print_title("extraclass $options{'extraclass'} found!");
+
+        foreach my $user_dn (@members){
+            my $mesg2 = $ldap->search(
+                              base   => $user_dn,
+                              scope => 'base',
+                              filter => '(sophomorixStatus=*)',
+                              attr => ['sophomorixSchoolname',
+                                       'sophomorixComment',
+                                       'dn',
+                                       'sophomorixStatus',
+                                       'sophomorixRole',
+			               'sAMAccountName'
+                                      ]
+                            );
+            &AD_debug_logdump($mesg2,2,(caller(0))[3]);
+
+            my $count = $mesg2->count;
+            my $entry = $mesg2->entry(0);
+            my $sam=$entry->get_value('sAMAccountName');
+            my $role=$entry->get_value('sophomorixRole');
+            my $status=$entry->get_value('sophomorixStatus');
+            my $comment=$entry->get_value('sophomorixComment');
+            my $school=$entry->get_value('sophomorixSchoolname');
+
+            if ($status eq "M"){
+		# KILL
+		push @{ $kill{'LISTS'}{'KILL'} },$sam;
+		$kill{'KILL'}{$sam}{'sophomorixComment'}=$comment;
+		$kill{'KILL'}{$sam}{'sophomorixStatus'}=$status;
+		$kill{'KILL'}{$sam}{'sophomorixRole'}=$role;
+		$kill{'KILL'}{$sam}{'sophomorixSchoolname'}=$school;
+		$kill{'KILL'}{$sam}{'DN'}=$user_dn;
+            } else {
+		# NOT KILL
+		push @{ $kill{'LISTS'}{'NOT_KILL'} },$sam;
+		$kill{'KILL'}{$sam}{'sophomorixComment'}=$comment;
+		$kill{'NOT_KILL'}{$sam}{'sophomorixStatus'}=$status;
+		$kill{'KILL'}{$sam}{'sophomorixRole'}=$role;
+		$kill{'KILL'}{$sam}{'sophomorixSchoolname'}=$school;
+		$kill{'KILL'}{$sam}{'DN'}=$user_dn;
+	    }
+	}
+    }
+
+        #print Dumper(\%kill);
+    if ($#{ $kill{'LISTS'}{'NOT_KILL'} }>0){
+        @{ $kill{'LISTS'}{'NOT_KILL'} } = sort @{ $kill{'LISTS'}{'NOT_KILL'} };
+    }
+    if ($#{ $kill{'LISTS'}{'NOT_KILL'} }>0){
+        @{ $kill{'LISTS'}{'KILL'} } = sort @{ $kill{'LISTS'}{'KILL'} };
+    }
+
+    # kill the users if status M
+    foreach my $user ( @{ $kill{'LISTS'}{'NOT_KILL'}} ){
+	my $status=$kill{'NOT_KILL'}{$user}{'sophomorixStatus'};
+        &print_title("Not Deleting user $user because of status $status");
+    }
+
+    my $kill_count=0;
+    my $kill_count_max=$#{ $kill{'LISTS'}{'KILL'} }+1;
+    foreach my $user ( @{ $kill{'LISTS'}{'KILL'} } ){
+	$kill_count++;
+        my $comment=$kill{'KILL'}{$user}{'sophomorixComment'};
+        &print_title("Deleting user $user ($comment)");
+        &AD_user_kill({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       login=>$user,
+                       user_count=>$kill_count,
+                       max_user_count=>$kill_count_max,
+                       smb_admin_pass=>$smb_admin_pass,
+                       json=>$options{'json'},
+                       sophomorix_config=>\%sophomorix_config,
+                       sophomorix_result=>\%sophomorix_result,
+                     });
+    }
+
+
+    # kill the extraclass if empty and status M
+    # search again
+    my $mesg3 = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['sophomorixSchoolname',
+                               'description',
+                               'dn',
+                               'sophomorixStatus',
+                               'sophomorixType',
+                               'member']
+                            );
+    &AD_debug_logdump($mesg3,2,(caller(0))[3]);
+
+    my $count = $mesg3->count;
+    my $entry = $mesg3->entry(0);
+    my $status = $entry->get_value('sophomorixStatus');
+    my @members = $entry->get_value('member');
+    my $count_members=$#members+1;
+    if ($count_members==0 and $status eq "M"){
+        &print_title("Deleting extraclass $options{'extraclass'} (Status $status, $count_members users)");
+	&AD_group_kill({ldap=>$ldap,
+                        root_dse=>$root_dse,
+                        root_dns=>$root_dns,
+                        group=>$options{'extraclass'},
+                        smb_admin_pass=>$smb_admin_pass,
+                        type=>$sophomorix_config{'INI'}{'EXTRACLASS'}{'GROUP_TYPE'},
+                        sophomorix_config=>\%sophomorix_config,
+                      });
+    } else {
+        &print_title("Not Deleting group $options{'extraclass'} because of status $status or $count_members members");
+    }
+}
+
+
 
 
 ############################################################
