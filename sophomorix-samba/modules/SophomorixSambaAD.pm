@@ -1974,6 +1974,7 @@ sub AD_user_create {
     my $smb_admin_pass = $arg_ref->{smb_admin_pass};
     my $json = $arg_ref->{json};
     my $ref_webui_permissions_calculated = $arg_ref->{webui_permissions_calculated};
+    my $comment = $arg_ref->{comment};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
@@ -2075,6 +2076,10 @@ sub AD_user_create {
         $prefix="---";
     }
 
+    if (not defined $comment or $comment eq "---"){
+        $comment="created by sophomorix";
+    }
+    
     # settingthe dates according to status
     if (defined $status and $status eq "T"){
         $deactivationdate=$DevelConf::default_date;
@@ -2225,7 +2230,7 @@ sub AD_user_create {
         sophomorixCreationDate => $creationdate_ok, 
         sophomorixTolerationDate => $tolerationdate, 
         sophomorixDeactivationDate => $deactivationdate, 
-        sophomorixComment => "created by sophomorix", 
+        sophomorixComment => $comment, 
         sophomorixWebuiDashboard => "---",
         sophomorixExamMode => "---", 
         userAccountControl => $user_account_control,

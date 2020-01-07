@@ -74,7 +74,7 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "comment,".
                                       "password,".
                                       "valid-until,".
-                                      "description,";
+                                      "description,".
                                       "school";
 
 # define which options deliver which object
@@ -144,14 +144,26 @@ Options
 
   -i  / --info
 
-Create an extraclass:
+Create an extraclass with a random password for each user:
   --create
   --extraclass <gruppenname>
   --user-basename <basename>
-  --user-number 30
-  --comment "Für AK Linux"
-  --password "......" (ohne: random??)
-  --valid-until 10.10.2020
+  --user-number <30>
+  --valid-until <10.10.2020>
+
+Optional:
+  Common password for all users created (password must be complex enough):
+    --password \'<password>\'
+  Add a comment to all users:
+    --comment "Für AK Linux"
+
+
+For more changes and option use the command sophomorix-class:
+  Show all extraclasses:
+    # sophomorix-class -i --extraclass
+  Show detailed info for a class:
+    # sophomorix-class -i -c <extraclass>
+  
 
 Please see the sophomorix-extraclass(8) man pages for full documentation
 ');
@@ -201,11 +213,6 @@ if (defined $options{'create'} and
     }
     my $extraclass_enddate_AD=$until_year.$until_month.$until_day."000000".".0Z";
 
-
-
-    # ???????? fix this
-    my $password="Muster!";
-
     my $group_token=&AD_get_name_tokened($options{'extraclass'},$options{'school'},$class_type);
     print "HERE create group $group_token $extraclass_enddate_AD \n";
 
@@ -238,6 +245,8 @@ if (defined $options{'create'} and
 
 
 
+    my @password_chars=&get_passwd_charlist();
+
     my $file;
     if ($options{'school'} eq "---"){
         $file="students.csv";
@@ -245,6 +254,13 @@ if (defined $options{'create'} and
         $file=$options{'school'}.".students.csv";
     }
 
+    my $comment;
+    if (defined $options{'comment'}){
+        $comment=$options{'comment'};
+    } else {
+        $comment="---";
+    }
+    
     for (my $i=1;$i<=$options{'user-number'};$i++){
         my $extension;
         if (exists $convert_extension{$i}){
@@ -253,6 +269,30 @@ if (defined $options{'create'} and
             $extension=$i;
         }
         my $username=$options{'user-basename'}.$extension;
+
+        my $password;
+	my $random_pwd;
+	if (defined $options{'password'}){
+            $random_pwd="FALSE";
+            $password=$options{'password'};
+	} else {
+            $random_pwd="TRUE";
+            my $pwd_length;
+            if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'}){
+                $pwd_length=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'PWD_LENGTH'};
+            } else {
+                $pwd_length=33;
+	    }
+
+            $password=&get_plain_password(
+                      $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_ROLE'},
+                      $file,
+                      $random_pwd, # TRUE/FALSE
+                      $pwd_length, # length of random pwd
+                      \%sophomorix_config,
+                      @password_chars);
+
+	}
 
         &AD_user_create({ldap=>$ldap,
                         root_dse => $root_dse, 
@@ -277,6 +317,7 @@ if (defined $options{'create'} and
                         status => $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_STATUS'},
                         file => $file,
                         smb_admin_pass=>$smb_admin_pass,
+                        comment=>$comment,
                         json=>$options{'json'},
                         webui_permissions_calculated=>$sophomorix_config{'ROLES'}{$options{'school'}}{'student'}{'UI'}{'WEBUI_PERMISSIONS'},
                         sophomorix_config=>\%sophomorix_config,

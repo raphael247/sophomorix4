@@ -30,7 +30,7 @@ Host fleischsalat
 Was ist neu:
   * sophomorix-managementgroups --set-... für alle managementgroups
   * sophomorix-group creates also global groups like epoptes
-
+  * sophomorix-examclass creates examclasses
 
 ############################################################
 Todo:
@@ -45,11 +45,7 @@ gastgroup;gast;12;01.01.2019;Für die Gäste;Muster!;10.10.2010;
 -> tut nicht mehr
 
 
-wiki update
-
-sophomorix-quota --smbcquota-only -j, siehe Arnaud
---> Befehl zeigen
---> egal ob user existiert, keine Zusatzinfo
+sophomorix.wiki update
 
 Vorgehen:
 
@@ -66,6 +62,8 @@ wenn end date überschritten: kill
 
 sophomorix-check soll mit status M umhehen können
 --> noch testen
+   sophomorix-check ignoriert extraclasses
+   config FILES->CLASS_FILE nicht mehr erforderlich 
 
 sophomorix-extraclass --kill <classname>
   - kill all status=M users in this class (should be also possible to kill some extrausers of 7a)
@@ -75,7 +73,6 @@ sophomorix-extraclass --kill <classname>
    kill managed classes automatically
    -> if empty AND status=managed AND type extraclass
 
-fix password Muster!
 
 Enddate ändern
 anzahl ändern
@@ -84,6 +81,8 @@ TESTEN: Kommentar, password mit sophomorix-class???
 --> --help dazu
 
 
+add comments to classes??? use comment in x-extraclass --comment in group
+   
 gastgroup, basename nicht änderbar
 
 bei kill die Gruppe mit löschen
