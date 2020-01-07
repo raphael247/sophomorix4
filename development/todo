@@ -45,6 +45,8 @@ gastgroup;gast;12;01.01.2019;Für die Gäste;Muster!;10.10.2010;
 -> tut nicht mehr
 
 
+wiki update
+
 sophomorix-quota --smbcquota-only -j, siehe Arnaud
 --> Befehl zeigen
 --> egal ob user existiert, keine Zusatzinfo
@@ -63,14 +65,24 @@ sophomorix-check soll nicht mehr das file lesen, aber ignorieren
 wenn end date überschritten: kill
 
 sophomorix-check soll mit status M umhehen können
-grafik aktualisieren user stati
+--> noch testen
 
-kill extraclass users
+sophomorix-extraclass --kill <classname>
+  - kill all status=M users in this class (should be also possible to kill some extrausers of 7a)
+  - finally kill class, if empty AND status=managed AND type extraclass
+
+  -by time automatically -> test needed
+   kill managed classes automatically
+   -> if empty AND status=managed AND type extraclass
+
+fix password Muster!
 
 Enddate ändern
 anzahl ändern
 
-Kommentar, password mit sophomorix-class???
+TESTEN: Kommentar, password mit sophomorix-class???
+--> --help dazu
+
 
 gastgroup, basename nicht änderbar
 

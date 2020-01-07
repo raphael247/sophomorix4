@@ -871,8 +871,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
 
     ##################################################
     # check status update for users in AD
-    &test_UEAS_T_update($sam,\$update,\$new_status);
-    &test_T_DA_update($sam,\$update,\$new_status);
+    &test_UEAS_TM_update($sam,\$update,\$new_status);
+    &test_TM_DA_update($sam,\$update,\$new_status);
     &test_DL_RA_update($sam,\$update,\$new_status);
     &test_R_A_update($sam,\$update,\$new_status);
 
@@ -1115,6 +1115,7 @@ if ($#{ $sophomorix_result{'CHECK_RESULT'}{'ERRORLIST'} }>0){
 
 if (exists $ref_AD_check->{'WARNINGS'}){
     # show warnings
+    print "\nWARNINGS:\n";
     print Dumper ($ref_AD_check->{'WARNINGS'});
 }
 
@@ -1129,7 +1130,7 @@ if (exists $ref_AD_check->{'WARNINGS'}){
 # test status updates
 ################################################################################
 
-sub test_UEAS_T_update{
+sub test_UEAS_TM_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
     my $new_line;
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
@@ -1167,7 +1168,7 @@ sub test_UEAS_T_update{
 
 
 
-sub test_T_DA_update{
+sub test_TM_DA_update{
     my ($sam,$update_ref,$new_status_ref)=@_;
     my $new_line;
     if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
@@ -1176,7 +1177,9 @@ sub test_T_DA_update{
         $new_line="---";
     }
 
-    if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"){
+    if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T" or 
+         $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
+       ){
         if($Conf::log_level>=2){
             print "* Testing $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
                   " TolerationDate: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}\n";

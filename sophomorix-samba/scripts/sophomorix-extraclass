@@ -114,7 +114,6 @@ if (not defined $options{'school'}){
     $options{'school'}="---";
 }
 
-my $class_type="extraclass";
 
 print Dumper (\%options);
 
@@ -124,6 +123,8 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
+
+my $class_type=$sophomorix_config{'INI'}{'EXTRACLASS'}{'GROUP_TYPE'};
 
 
 # --help
@@ -224,9 +225,9 @@ if (defined $options{'create'} and
                       school=>$options{'school'},
                       group=>$group_token,
                       group_basename=>$options{'extraclass'},
-                      description=>"created by sophomorix-extraclass",
+                      description=>$sophomorix_config{'INI'}{'EXTRACLASS'}{'CLASS_DESCRIPTION'},
                       type=>$class_type,
-                      status=>"M",
+                      status=>$sophomorix_config{'INI'}{'EXTRACLASS'}{'GROUP_STATUS'},
 	              sub_ou=>"OU=".$options{'extraclass'}.",".$sophomorix_config{'INI'}{'OU'}{'AD_student_ou'},
                       joinable=>"FALSE",
                       hidden=>"FALSE",
@@ -261,19 +262,19 @@ if (defined $options{'create'} and
                         login => $username,
                         group => $group_token,
                         group_basename => $options{'extraclass'},
-                        firstname_ascii => "Extra",
-                        surname_ascii => "Class User",
-                        firstname_utf8 => "Extra",
-                        surname_utf8 => "Class User",
-                        birthdate => "---",
+                        firstname_ascii => $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_FIRSTNAME_ASCII'},
+                        surname_ascii => $username,
+                        firstname_utf8 => $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_FIRSTNAME_UTF8'},
+                        surname_utf8 => $username,
+                        birthdate => $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_BIRTHDATE'},
                         sophomorix_first_password => $password,
                         unid => "---",
-                        role => "student",
-                        type => "extraclass",
+                        role => $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_ROLE'},
+                        type => $sophomorix_config{'INI'}{'EXTRACLASS'}{'GROUP_TYPE'},
                         school => $options{'school'},
                         tolerationdate => '---',
                         deactivationdate => $extraclass_enddate_AD,
-                        status => "M",
+                        status => $sophomorix_config{'INI'}{'EXTRACLASS'}{'USER_STATUS'},
                         file => $file,
                         smb_admin_pass=>$smb_admin_pass,
                         json=>$options{'json'},
