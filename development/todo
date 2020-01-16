@@ -35,6 +35,41 @@ Was ist neu:
 Todo:
 ############################################################
 
+Bug: /var/lib/sophomorix/tmp_collect/<crypt>
+Zeile 1359
+TMP_COLLECT_DIR
+CLEANUP -> auf 1 setzen
+dann solte sich in tmp_collect nix mehr sammeln
+
+
+Bug: /var/lib/sophomorix/tmp_collect/.../<user>-exam enthält
+     zu viele Daten:
+     ajssajg/user-exam/transfer enthält students/<mehrere Klassen>
+     Einsammelbefehle:
+
+Wahrscheinlich:
+2020-01-15 08:20:43::start::  /usr/sbin/sophomorix-exam-mode --unset --subdir transfer/collected/20200115_07-20-42-B2SK3T-ended-by-wei/exam -j --participants reckorma-exam::19396::
+
+dies ruft auf (vor dem löschen):
+/usr/sbin/sophomorix-transfer --collect-copy-exam reckorma-exam  --subdir transfer/collected/20200115_07-20-42-B2SK3T-ended-by-wei/exam
+
+
+... home ermitteln, falls user nichtexistent: exit
+
+Das sammelt dann ein
+smbclient_mget_recurse
+dort wird nochmals das home ermittelt, aber: kein exit wenn user nichtexistent
+--> sophomorix-transfer, VOR Zeile 1369 sollte rein:
+(vgl. Zeile 496)
+   if ($existing_AD ne "TRUE"){
+        print "\nERROR: $collect_copy_exam does not exist\n\n";
+        exit 88;
+    }
+
+
+
+
+
 Belwue mail: Weiterleitungen anzeigen
 
 1) Dringend: smbstatus, als JSON Objekt
