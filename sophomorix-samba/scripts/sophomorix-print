@@ -634,12 +634,13 @@ sub latex_datablock_from_list {
         my @data=split(/;/,$item);
         # $data[3] is the password ??? convert to latex
         my $password=&string_to_latex($data[3]);
+        my $class=&string_to_latex($data[5]);
         $latex_datablock=$latex_datablock."\\sophomorixdatabox{".$data[0]."}".
                                           "{".$data[1]."}".
                                           "{".$data[2]."}".
                                           "{".$password."}".
                                           "{".$data[4]."}".
-                                          "{".$data[5]."}".
+                                          "{".$class."}".
                                           "{".$data[8]."}".
                                           "{".$data[9]."}".
                                           "{".$data[10]."}%\n";
