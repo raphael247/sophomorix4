@@ -1356,7 +1356,7 @@ sub smbclient_mget_recurse {
     my $to_dir=$ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'TMP_COLLECT_DIR'};
     system("mkdir -p $to_dir");
 
-    my $tmp = tempdir( DIR => $to_dir, CLEANUP =>  0 );
+    my $tmp = tempdir( DIR => $to_dir, CLEANUP =>  1 );
     my $target_dir = $tmp."/".$from_user;
     my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
         $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
@@ -1366,6 +1366,10 @@ sub smbclient_mget_recurse {
                           root_dns=>$root_dns,
                           user=>$from_user,
                         });
+    if ($existing_AD ne "TRUE"){
+        print "\nERROR: $collect_copy_exam does not exist\n\n";
+        return $target_dir;
+    }
     my $smb_dir_home=$home_directory_AD;
     $smb_dir_home=~s/\\/\//g;
     my @file_list = split(/,/,$file_list);

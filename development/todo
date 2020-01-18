@@ -35,6 +35,7 @@ Was ist neu:
 Todo:
 ############################################################
 
+------------------------------------------------------------
 Bug: /var/lib/sophomorix/tmp_collect/<crypt>
 Zeile 1359
 TMP_COLLECT_DIR
@@ -63,9 +64,9 @@ dort wird nochmals das home ermittelt, aber: kein exit wenn user nichtexistent
 (vgl. Zeile 496)
    if ($existing_AD ne "TRUE"){
         print "\nERROR: $collect_copy_exam does not exist\n\n";
-        exit 88;
+        return $target_dir;
     }
-
+------------------------------------------------------------
 
 
 
