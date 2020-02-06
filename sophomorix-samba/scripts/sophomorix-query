@@ -73,7 +73,8 @@ my $testopt=GetOptions(\%options,
                         "comp-minimal",
                         "comp-basic",
                         "comp-full",
-                        "status=s"
+                        "status=s",
+                        "smbstatus"
     );
 
 
@@ -160,6 +161,9 @@ Limit the query for sophomorix groups to a certain sophomorixType:
 --room                (sophomorixType=room)
 --printergroup        (sophomorixType=printer)
 
+Query with smbstatus command:
+--smbstatus
+
 Limit the query to one or more sophomorixStatus:
 --status T            (sophomorixStatus=T)
 --status T,D          (| (sophomorixStatus=T)(sophomorixStatus=D) )
@@ -209,6 +213,106 @@ Please see the sophomorix-query(8) man pages for full documentation
    print "\n";
    exit;
 }
+
+# --smbstatus (works without ldap bind)
+if (defined $options{'smbstatus'}){
+    my %smbstatus=();
+    my $string=`/usr/bin/smbstatus`;
+    #my $string=`cat /root/log1`;
+    my @lines=split("\n",$string);
+print "$string";
+    # first loop: get computers
+    foreach my $entry (@lines){
+        my ($pid)=split(/ /,$entry);
+        if (not defined $pid){
+            # print "$entry\n";
+        }
+        if (not defined $pid){
+            #print "IGNORED(pid not defined): <$entry>\n";
+        } elsif ($pid=~/[0-9]/){
+            if ($entry=~m/\\domain computers /){
+
+               # extract computer name from line
+               $entry=~m/\\(.*)\$\s+/;
+               my $computer=$1;
+
+               # extract ip from line
+               $entry=~m/\\domain computers\s+([0-9.].*)\s+\(/;
+               my $ip=$1;
+
+               # extract ipv4 from line
+               $entry=~m/ipv4:([0-9.].*)\)/;
+               my $ipv4_port=$1;
+               my ($ipv4,$port)=split(/:/,$ipv4_port);
+
+               # Save Data
+               $smbstatus{'COMPUTER'}{$computer}{'SMBSTATUS_LINE'}=$entry;
+               $smbstatus{'COMPUTER'}{$computer}{'PID'}=$pid;
+               $smbstatus{'COMPUTER'}{$computer}{'IP'}=$ip;
+               $smbstatus{'COMPUTER'}{$computer}{'IPV4'}=$ipv4;
+               $smbstatus{'COMPUTER'}{$computer}{'IPV4_PORT'}=$port;
+         
+               $smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip}=$computer;
+            } elsif ($entry=~m/ users /){
+               # do nothing with users
+            }
+        } else {
+            #print "IGNORED: >$pid< $entry\n";
+        }
+    }
+
+
+    # second loop: get users
+    foreach my $entry (@lines){
+        my ($pid)=split(/ /,$entry);
+        if (not defined $pid){
+            #print "$entry\n";
+        }
+        if (not defined $pid){
+            #print "IGNORED(pid not defined): <$entry>\n";
+        } elsif ($pid=~/[0-9]/){
+            if ($entry=~m/\\domain computers /){
+                # do nothing with computers
+            } elsif ($entry=~m/ users /){
+               
+               # extract user name from line
+               $entry=~m/\\(.*)\s+users\s+/;
+               my $user=$1;
+               $user=~s/\s+$//g;# remove trailing whitespace
+
+               # extract ip from line
+               $entry=~m/\s+users\s+([0-9.].*)\s+\(/;
+               my $ip=$1;
+
+               # extract ipv4 from line
+               $entry=~m/ipv4:([0-9.].*)\)/;
+               my $ipv4_port=$1;
+               my ($ipv4,$port)=split(/:/,$ipv4_port);
+
+               # Save Data
+               $smbstatus{'USER'}{$user}{'SMBSTATUS_LINE'}=$entry;
+               $smbstatus{'USER'}{$user}{'IP'}=$ip;
+               $smbstatus{'USER'}{$user}{'IPV4'}=$ipv4;
+               $smbstatus{'USER'}{$user}{'PORT'}=$port;
+
+               # add computer name from LOOKUP
+               if (defined $smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip}){
+                   $smbstatus{'USER'}{$user}{'COMPUTER'}=$smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip};
+                   $smbstatus{'COMPUTER'}{$smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip}}{'USER'}=$user;
+               } else {
+                   $smbstatus{'USER'}{$user}{'COMPUTER'}="NONE";
+                   $smbstatus{'WARNINGS'}{$ip}="Could not find computer entry for ip $ip used by $user";
+               }
+            }
+        } else {
+            #print "IGNORED: >$pid< $entry\n";
+        }
+    }
+
+    &json_printout($options{'json'},\%smbstatus);
+    exit;
+}
+
 
 
 my ($ldap,$root_dse) = &AD_bind_admin();
