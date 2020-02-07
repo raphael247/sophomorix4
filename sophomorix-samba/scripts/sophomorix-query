@@ -214,13 +214,20 @@ Please see the sophomorix-query(8) man pages for full documentation
    exit;
 }
 
+
+if (not defined $options{'json'}){
+    # always use json output
+    $options{'json'}=0;
+}
+
+
 # --smbstatus (works without ldap bind)
 if (defined $options{'smbstatus'}){
     my %smbstatus=();
     my $string=`/usr/bin/smbstatus`;
     #my $string=`cat /root/log1`;
     my @lines=split("\n",$string);
-print "$string";
+    #print "$string";
     # first loop: get computers
     foreach my $entry (@lines){
         my ($pid)=split(/ /,$entry);
@@ -354,10 +361,6 @@ $search{'COUNTERS'}{'COMPUTER'}=0;
 my $max;
 my $mesg;
 
-if (not defined $options{'json'}){
-    # always use json output
-    $options{'json'}=0;
-}
 
 ############################################################
 # set the search base
