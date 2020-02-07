@@ -36,36 +36,35 @@ Todo:
 ############################################################
 
 ------------------------------------------------------------
-Bug: /var/lib/sophomorix/tmp_collect/<crypt>
-Zeile 1359
-TMP_COLLECT_DIR
-CLEANUP -> auf 1 setzen
-dann solte sich in tmp_collect nix mehr sammeln
+sophomorix-query --smbstatus 
+                             --ip u.v.w.x
+                             --room <name>
+                             --user <name>
+                             --userinfo (Vorname, Nachname, ....)
+                               (für die user im Raum <raumname>)
 
+Gives Back:
 
-Bug: /var/lib/sophomorix/tmp_collect/.../<user>-exam enthält
-     zu viele Daten:
-     ajssajg/user-exam/transfer enthält students/<mehrere Klassen>
-     Einsammelbefehle:
+All users in the room (room,ip,user)
 
-Wahrscheinlich:
-2020-01-15 08:20:43::start::  /usr/sbin/sophomorix-exam-mode --unset --subdir transfer/collected/20200115_07-20-42-B2SK3T-ended-by-wei/exam -j --participants reckorma-exam::19396::
+howto sole this:
+- query AD for everything about devices
+  &AD_get_AD_for_device als Vorlage:
+  - nur rooms abfragen
+  room --> <roomname> -> IP1-> dnsName -> <name>
+                            -> mac     -> <mac>
+                            ->
+                      -> IP2
+                      -> ...
+  --> LOOKUP aufbauen
+      (user --> )IP --> room
 
-dies ruft auf (vor dem löschen):
-/usr/sbin/sophomorix-transfer --collect-copy-exam reckorma-exam  --subdir transfer/collected/20200115_07-20-42-B2SK3T-ended-by-wei/exam
+dann Auswerten und Ergebnis-hash schreiben:
 
+room -> <user> -> username -> IP
+                           -> rechner
 
-... home ermitteln, falls user nichtexistent: exit
-
-Das sammelt dann ein
-smbclient_mget_recurse
-dort wird nochmals das home ermittelt, aber: kein exit wenn user nichtexistent
---> sophomorix-transfer, VOR Zeile 1369 sollte rein:
-(vgl. Zeile 496)
-   if ($existing_AD ne "TRUE"){
-        print "\nERROR: $collect_copy_exam does not exist\n\n";
-        return $target_dir;
-    }
+(Schulserver, bzw. devices von der Schule holen)
 ------------------------------------------------------------
 
 
@@ -131,7 +130,10 @@ wenn end date überschritten: kill
 sophomorix-check soll mit status M umgehen können
 --> noch testen
    sophomorix-check ignoriert extraclasses
-   config FILES->CLASS_FILE nicht mehr erforderlich 
+   config FILES->CLASS_FILE nicht mehr erforderlich
+   auch alles mit classfile löschen (name in der school.conf)
+   -> aus school.conf rausnehmen
+      -> warnung: unused section [classfile.extraclasses.csv]
 
 sophomorix-extraclass --kill <classname>
   - kill all status=M users in this class (should be also possible to kill some extrausers of 7a)
