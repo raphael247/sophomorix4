@@ -274,9 +274,6 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-#my @class_filelist=&filelist_fetch({filetype=>"classes",
-#                                    sophomorix_config=>\%sophomorix_config,
-#                                  });
 
 # --help
 if ($help==1) {
@@ -364,9 +361,6 @@ if ($info==1 and $level==0) {
     foreach my $file (@filelist){
         print "   * $file\n";
     }
-#    foreach my $file (@class_filelist){
-#        print "   * $file\n";
-#    }
     exit;
 } elsif ($info==1 and $level==1) {
     # LEVEL 1 ########################################
@@ -421,9 +415,6 @@ if ($list_files==1) {
     foreach my $file (@filelist){
         print "   * $file\n";
     }
-#    foreach my $file (@class_filelist){
-#        print "   * $file\n";
-#    }
     exit;
 }
 
@@ -576,90 +567,6 @@ foreach my $inject (@injectlines){
               "server (skipping this line)\n";
     }
 }
-
-# ============================================================
-# reading extraclasses.csv
-# ============================================================
-#
-# deprecated from 3.74.5-1 on
-#
-# &print_title("Reading class files ...");
-# foreach my $class_file (@class_filelist){
-#     my $count=0; # reset line counter
-#     my $filename = basename($class_file);
-#     # fetching some config data
-#     $school=$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'};
-
-#     #my $enc_used=&get_encoding($filename);
-#     open(CLASSES,"$class_file") || 
-#          die "ERROR: $class_file not found!";  
-#     open(USERSUTF8,">>$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}") || 
-#          die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'} not found!";  
-#     open(REPORT,">$sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}") || 
-#          die "ERROR: $sophomorix_config{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'} not found!"; 
-#     print REPORT "Office Report for: $class_file\n"; 
-#     print REPORT "Date_Time:         $sophomorix_config{'DATE'}{'LOCAL'}{'TIMESTAMP_FILE'}\n";
- 
-#     while(<CLASSES>){
-#         $count++;
-#         chomp();
-#         s/^ //g; # remove spaces oat beginning of line
-#         if(/^\#/){ # ignore commented lines
-#             next;
-# 	}
-#         if($_ eq ""){
-#             next;
-#         }
-  
-#         my ($course,
-#             $course_basename,
-#             $course_count,
-#             $course_date,
-#             $course_comment,
-#             $course_password,
-#             $course_enddate)=split(/;/);
-#         my ($end_day, $end_month, $end_year)=split(/\./, $course_enddate);
-
-#         # exit member number is not a number 
-#         if ($course_count=~/[^0-9]/){
-#             print "\nERROR: Number of users $course_count contains non numbers\n";
-#             print "   LINE: $_\n";
-#             print "   FILE: $class_file\n";
-#             &result_sophomorix_add(\%sophomorix_result,
-#                 "ERROR",
-#                 -1,
-#                 \@arguments,
-#                 "$filename ($_): Usernumber $course_count contains non-numbers");
-#         }
-#         # exit if course is double ???
-#         # what about password ??? 
-
-#         # check if end date is reached
-#         my $course_enddate_epoch=timelocal(0, 0, 0, $end_day, $end_month-1, $end_year);
-#         print "EPOCH now:        $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
-#         print "EPOCH course end: $course_enddate_epoch\n";
-#         if ($course_enddate_epoch>=$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}){
-#             # create lines
-#             for( my $index = 1 ; $index<=$course_count  ; $index++) {
-#                 # create num string
-#                 my $num_string;
-#                 if (exists $convert_day{$index}){
-#                     $num_string=$convert_day{$index};
-#                 } else {
-#                     $num_string=$index;
-#                 }
-#                 my $line=$course.";".$num_string.";".$course_comment.";".$course_date.";".$course_basename.$num_string;
-#                 print "    user $num_string/$course_count: $line\n";
-#                 my $enc_used="UTF8";
-#                 &analyze_user_line($line,$class_file,$filename,$school,$count,$enc_used,"no","CLASS_FILE");
-#             }
-#         }
-#     }
-
-#     close(CLASSES);
-#     close(USERSUTF8);
-#     close(REPORT);
-# }
 
 
 
