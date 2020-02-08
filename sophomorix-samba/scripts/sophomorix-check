@@ -274,9 +274,9 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my @filelist=&filelist_fetch({filetype=>"users",
                               sophomorix_config=>\%sophomorix_config,
                             });
-my @class_filelist=&filelist_fetch({filetype=>"classes",
-                                    sophomorix_config=>\%sophomorix_config,
-                                  });
+#my @class_filelist=&filelist_fetch({filetype=>"classes",
+#                                    sophomorix_config=>\%sophomorix_config,
+#                                  });
 
 # --help
 if ($help==1) {
@@ -364,9 +364,9 @@ if ($info==1 and $level==0) {
     foreach my $file (@filelist){
         print "   * $file\n";
     }
-    foreach my $file (@class_filelist){
-        print "   * $file\n";
-    }
+#    foreach my $file (@class_filelist){
+#        print "   * $file\n";
+#    }
     exit;
 } elsif ($info==1 and $level==1) {
     # LEVEL 1 ########################################
@@ -421,9 +421,9 @@ if ($list_files==1) {
     foreach my $file (@filelist){
         print "   * $file\n";
     }
-    foreach my $file (@class_filelist){
-        print "   * $file\n";
-    }
+#    foreach my $file (@class_filelist){
+#        print "   * $file\n";
+#    }
     exit;
 }
 
