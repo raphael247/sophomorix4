@@ -1110,11 +1110,6 @@ sub test_TM_DA_update{
                   " +  $toleration_time_days days)\n";
             print "    Today:          $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
-#        print "$sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'}\n";
-#        print "  TOL:    $toleration_date_epoch \n";
-#        print "  TOLEND: $toleration_end_epoch \n";
-#        print "  DEA:    $deactivation_date_epoch\n";
-#        print "  TODAY:  $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
 
         if (
                (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
@@ -1122,15 +1117,11 @@ sub test_TM_DA_update{
                ) or (
                 exists $Match{'action_BY_sAMAccountName'}{$sam} and 
                 defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" #and
-#                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch and
-#                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"
+                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
                ) or (
                 exists $Match{'action_BY_sAMAccountName'}{$sam} and 
                 defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" #and
-#                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_date_epoch and
-#                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
+                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
                )
             ){
             # update to D if 
@@ -1139,21 +1130,17 @@ sub test_TM_DA_update{
             if ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_date_epoch and
                 $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
                 ){
-                print "HERE    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+                print "    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
                 ${$new_status_ref}="D";
                 ${$update_ref}++;
             } elsif ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch and
                 $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"
 		){
-                print "HERE    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+                print "    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
                 ${$new_status_ref}="D";
                 ${$update_ref}++;
             } else {
-#            if($Conf::log_level>=2){
-#                print "HERE    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
-#            }
-#                ${$new_status_ref}="D";
-#                ${$update_ref}++;
+                # do nothing
 	    }
 	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and
                  not defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
