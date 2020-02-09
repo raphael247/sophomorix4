@@ -3694,7 +3694,9 @@ sub config_sophomorix_read {
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
             $sophomorix_config{'LOOKUP'}{'ROLES_ALLADMINS'}{$sophomorix_config{'INI'}{$section}{'USER_ROLE'}}=
                 $sophomorix_config{'INI'}{$section}{'USER_SHORT'};
-        } elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./ or $section=~m/^classfile\./){ 
+        } elsif ($section=~m/^classfile\./){
+            # doing nothing ?????
+        } elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
             my ($string,$name,$extension)=split(/\./,$section);
             foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
                 my $filename;
@@ -3703,13 +3705,13 @@ sub config_sophomorix_read {
                 } else {
                     $filename = $school.".".$name.".".$extension;
                 }
-                if ($string eq "userfile" or $string eq "classfile"){
-                    my $file_type;
-                    if ($string eq "userfile"){
-                        $file_type="USER_FILE";
-                    } elsif ($string eq "classfile"){
-                        $file_type="CLASS_FILE";
-                    }
+                if ($string eq "userfile"){
+                    my $file_type="USER_FILE";
+#                    if ($string eq "userfile"){
+#                        $file_type="USER_FILE";
+#                    } elsif ($string eq "classfile"){
+#                        $file_type="CLASS_FILE";
+#                    }
                     # role
                     $sophomorix_config{'FILES'}{$file_type}{$filename}{'sophomorixRole'}=
                         $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
@@ -4251,7 +4253,9 @@ sub load_school_ini {
                     my ($group)=&Sophomorix::SophomorixSambaAD::AD_get_name_tokened($member,$school,"group");
                     push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'SCHOOLGROUP_MEMBERGROUPS'} }, $group;
                 }
-	} elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./ or $section=~m/^classfile\./){ 
+	} elsif ($section=~m/^classfile\./){
+            # doing nothing ?????
+	} elsif ($section=~m/^userfile\./ or $section=~m/^devicefile\./){ 
             ##### file.* section ########################################################################
 	    my ($string,$name,$extension)=split(/\./,$section);
             my $filename;
@@ -4280,13 +4284,13 @@ sub load_school_ini {
             #         $ref_modmaster->{$section}{$parameter};
             # }
 
-            if ($string eq "userfile" or $string eq "classfile"){
-                my $file_type;
-                if ($string eq "userfile"){
-                    $file_type="USER_FILE";
-                } elsif ($string eq "classfile"){
-                    $file_type="CLASS_FILE";
-                }
+            if ($string eq "userfile"){
+                my $file_type="USER_FILE";
+#                if ($string eq "userfile"){
+#                    $file_type="USER_FILE";
+#                } elsif ($string eq "classfile"){
+#                    $file_type="CLASS_FILE";
+#                }
 
                 # load parameters
                 foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
@@ -4340,15 +4344,15 @@ sub load_school_ini {
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
                 push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
-            } elsif ($name eq "extraclasses"){
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'}=$school;
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'OU_TOP'}=$ou_top;
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'FILETYPE'}="classes";
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PREFIX'}=$prefix;
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'POSTFIX'}=$postfix;
-                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
-                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
-                push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
+#            } elsif ($name eq "extraclasses"){
+#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'}=$school;
+#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'OU_TOP'}=$ou_top;
+#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'FILETYPE'}="classes";
+#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PREFIX'}=$prefix;
+#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'POSTFIX'}=$postfix;
+#                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
+#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
+#                push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             }
 
             # test filterscript for userfiles
@@ -4402,7 +4406,7 @@ sub load_school_ini {
                 }
             }
 	} elsif ($section=~m/^classfile\./){ 
-            # classfile
+            # doing nothing ????
 	} elsif ($section=~m/^role\./){ 
             ##### role.* section ########################################################################
 	    my ($string,$name)=split(/\./,$section);
@@ -4746,8 +4750,8 @@ sub filelist_fetch {
 
     if ($filetype eq "devices"){
 	$file_type="DEVICE_FILE";
-    } elsif ($filetype eq "classes"){
-	$file_type="CLASS_FILE";
+#    } elsif ($filetype eq "classes"){
+#	$file_type="CLASS_FILE";
     } elsif ($filetype eq "users"){
 	$file_type="USER_FILE";
     } else {
