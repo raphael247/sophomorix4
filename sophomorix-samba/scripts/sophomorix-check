@@ -776,7 +776,7 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     # }
 
 
-    &test_attic_move($sam,\$old_class,\$new_class,\%sophomorix_config);
+    &test_attic_move($sam,\$old_class,\$new_class,\$old_status,\%sophomorix_config);
     ##################################################
 
     ##################################################
@@ -1096,6 +1096,7 @@ sub test_TM_DA_update{
         }
         my $file=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
         my $toleration_date_epoch=&ymdhms_to_epoch($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'});
+        my $deactivation_date_epoch=&ymdhms_to_epoch($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'});
         my $toleration_time_days;
         if (defined $sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'} ){
             $toleration_time_days=$sophomorix_config{'FILES'}{'USER_FILE'}{$file}{'TOLERATION_TIME'};
@@ -1109,24 +1110,51 @@ sub test_TM_DA_update{
                   " +  $toleration_time_days days)\n";
             print "    Today:          $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
+#        print "$sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'}\n";
+#        print "  TOL:    $toleration_date_epoch \n";
+#        print "  TOLEND: $toleration_end_epoch \n";
+#        print "  DEA:    $deactivation_date_epoch\n";
+#        print "  TODAY:  $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
+
         if (
                (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
                 $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch 
                ) or (
                 exists $Match{'action_BY_sAMAccountName'}{$sam} and 
                 defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" and
-                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch
+                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" #and
+#                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch and
+#                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"
+               ) or (
+                exists $Match{'action_BY_sAMAccountName'}{$sam} and 
+                defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
+                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" #and
+#                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_date_epoch and
+#                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
                )
             ){
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
-            if($Conf::log_level>=2){
-                print "    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
-            }
-            ${$new_status_ref}="D";
-            ${$update_ref}++;
+            if ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_date_epoch and
+                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
+                ){
+                print "HERE    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+                ${$new_status_ref}="D";
+                ${$update_ref}++;
+            } elsif ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch and
+                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"
+		){
+                print "HERE    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+                ${$new_status_ref}="D";
+                ${$update_ref}++;
+            } else {
+#            if($Conf::log_level>=2){
+#                print "HERE    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
+#            }
+#                ${$new_status_ref}="D";
+#                ${$update_ref}++;
+	    }
 	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and
                  not defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
                 ){
@@ -1301,15 +1329,15 @@ sub test_RK_kill{
 # test class movement (moves previously unmoved classes due to a bug prior to 3.71.1)
 ################################################################################
 sub test_attic_move {
-    my ($sam,$old_class_ref,$new_class_ref,$ref_sophomorix_config)=@_;
-
+    my ($sam,$old_class_ref,$new_class_ref,$old_status_ref,$ref_sophomorix_config)=@_;
     # not matched (=not in files anymore), but also not in attic -> move to attic
+    # 3.74.5. do not move status M to attic
     if (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-        ${$old_class_ref} ne $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'}
+        ${$old_class_ref} ne $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'} and
+        not ${$old_status_ref} eq "M"
        ){
         ${$new_class_ref}=$ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'};
         my $new_line=${$new_class_ref}.";".$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}.";---";
-
         $Match{'action_BY_sAMAccountName'}{$sam}=$new_line;
 
         # add ACTION data for moving to 'attic'-group
