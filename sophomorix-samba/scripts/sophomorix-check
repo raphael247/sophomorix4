@@ -1922,7 +1922,7 @@ sub edit_distance {
 ################################################################################
 sub analyze_user_line {
     my ($line,$file_abs,$filename,$school,$count,$enc_used,$injected,$type,$ref_lines_seen) = @_;
-    # $type is USER_FILE or CLASS_FILE
+    # $type is USER_FILE
     if ($line=~m/^#/ or $line=~m/^\s*$/){
         # begins with #
         # or contains only whitespace
@@ -2155,7 +2155,7 @@ sub check_class {
     my $class_valid=1;
     my $error_strg="";
     my ($class,$filename,$type)=@_;
-    # type is USER_FILE OR CLASS_FILE
+    # type is USER_FILE
     $class=&remove_whitespace($class); # remove all whitespace
     # convert to small letters
     $class=~tr/A-Z/a-z/; 

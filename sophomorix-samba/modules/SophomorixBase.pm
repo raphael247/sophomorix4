@@ -3707,11 +3707,6 @@ sub config_sophomorix_read {
                 }
                 if ($string eq "userfile"){
                     my $file_type="USER_FILE";
-#                    if ($string eq "userfile"){
-#                        $file_type="USER_FILE";
-#                    } elsif ($string eq "classfile"){
-#                        $file_type="CLASS_FILE";
-#                    }
                     # role
                     $sophomorix_config{'FILES'}{$file_type}{$filename}{'sophomorixRole'}=
                         $sophomorix_config{'INI'}{$section}{'USER_ROLE'};
@@ -4286,12 +4281,6 @@ sub load_school_ini {
 
             if ($string eq "userfile"){
                 my $file_type="USER_FILE";
-#                if ($string eq "userfile"){
-#                    $file_type="USER_FILE";
-#                } elsif ($string eq "classfile"){
-#                    $file_type="CLASS_FILE";
-#                }
-
                 # load parameters
                 foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
                     if($Conf::log_level>=3){
@@ -4302,7 +4291,6 @@ sub load_school_ini {
                     $ref_modmaster->{$section}{$parameter};
                 }
 
-
                 # add some redundant stuff for convenience
                 $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{'PATH_ABS_UTF8'}=
                     $DevelConf::path_conf_tmp."/".$filename.".utf8";
@@ -4312,16 +4300,6 @@ sub load_school_ini {
                 $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{FILTERSCRIPT_CONFIGURED}=
                     $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{FILTERSCRIPT};
             }
-            # } elsif ($string eq "classfile"){
-            #     # add some redundant stuff for convenience
-            #     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_UTF8'}=
-            #         $DevelConf::path_conf_tmp."/".$filename.".utf8";
-            #     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS_REPORT_OFFICE'}=
-            #         $ref_sophomorix_config->{'INI'}{'PATHS'}{'REPORT_OFFICE'}."/report.office.".$filename;
-            #     # save unchecked filter script for error messages
-            #     $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT_CONFIGURED}=
-            #         $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{FILTERSCRIPT};
-            # }
 
             if ($name eq "students" or
                 $name eq "extrastudents"or
@@ -4344,15 +4322,6 @@ sub load_school_ini {
                 my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
                 $ref_sophomorix_config->{'FILES'}{'DEVICE_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
                 push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
-#            } elsif ($name eq "extraclasses"){
-#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'SCHOOL'}=$school;
-#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'OU_TOP'}=$ou_top;
-#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'FILETYPE'}="classes";
-#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PREFIX'}=$prefix;
-#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'POSTFIX'}=$postfix;
-#                my $path_abs=$DevelConf::path_conf_sophomorix."/".$school."/".$filename;
-#                $ref_sophomorix_config->{'FILES'}{'CLASS_FILE'}{$filename}{'PATH_ABS'}=$path_abs;
-#                push @{ $ref_sophomorix_config->{'SCHOOLS'}{$school}{'FILELIST'} },$path_abs;
             }
 
             # test filterscript for userfiles
@@ -4750,8 +4719,6 @@ sub filelist_fetch {
 
     if ($filetype eq "devices"){
 	$file_type="DEVICE_FILE";
-#    } elsif ($filetype eq "classes"){
-#	$file_type="CLASS_FILE";
     } elsif ($filetype eq "users"){
 	$file_type="USER_FILE";
     } else {
