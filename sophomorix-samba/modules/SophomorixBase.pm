@@ -4288,15 +4288,15 @@ sub load_school_ini {
                     $file_type="CLASS_FILE";
                 }
 
-            # load parameters
-            foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
-                if($Conf::log_level>=3){
-                    print "   * FILE $filename: $parameter ---> <".
-                          $ref_modmaster->{$section}{$parameter}.">\n";
-                }
-                $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=
+                # load parameters
+                foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
+                    if($Conf::log_level>=3){
+                        print "   * FILE $filename: $parameter ---> <".
+                              $ref_modmaster->{$section}{$parameter}.">\n";
+                    }
+                    $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{$parameter}=
                     $ref_modmaster->{$section}{$parameter};
-            }
+                }
 
 
                 # add some redundant stuff for convenience
