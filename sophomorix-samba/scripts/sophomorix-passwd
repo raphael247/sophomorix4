@@ -57,6 +57,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_computer_update
                                  AD_get_user
                                  AD_get_AD_for_check
+                                 AD_get_full_groupdata
                                     );
 
 my @arguments = @ARGV;
@@ -77,7 +78,7 @@ my $user="";
 my $computer="";
 my $clone_from_user="";
 my $clone_to_user="";
-my $classes="";
+my $class="";
 my $projects="";
 my $student=0;
 my $teacher=0;
@@ -126,7 +127,7 @@ my $testopt=GetOptions(
            "computer=s" => \$computer,
            "clone-from-user=s" => \$clone_from_user,
            "clone-to-user=s" => \$clone_to_user,
-#           "class|classes|c=s" => \$classes,
+           "class|c=s" => \$class,
 #           "project|projects=s" => \$projects,
 #           "student|students|s" => \$student,
 #           "teacher|teachers|t" => \$teacher,
@@ -162,33 +163,6 @@ if ($use_smbpasswd==1){
     $use_smbpasswd="TRUE";
 } else {
     $use_smbpasswd="FALSE";
-}
-
-
-# Setting the filters
-
-# school_filter
-my $school_filter="";
-if ($school ne ""){
-    $school_filter="(sophomorixSchoolPrefix=$school)";
-}
-
-
-# user filter
-my $user_filter="";
-if ($user ne ""){
-    my @users=split(",",$user);
-    if ($#users==0){
-	# single user
-        $user_filter="(sAMAccountName=$user)";
-    } else {
-	# multiple users
-	$user_filter="(| ";
-        foreach my $user (@users){
-            $user_filter=$user_filter."(sAMAccountName=$user) ";
-        }
-	$user_filter=$user_filter.")";
-    }
 }
 
 
@@ -239,6 +213,7 @@ Create and set password:
 
 Create userlist:
   -u <user1>,<user2>,...  /  --user  <user1>,<user2>,...
+  -c <class1>,<class2>,... / --class  <class1>,<class2>,... (class members only, not admins)
 Create computerlist
   --computer <computer1>,<computer2>,...
 
@@ -271,7 +246,6 @@ Create userlist:
   -s / --students
   -t / --teachers
   -w / --workstations (ExamAccouts)
-  -c class1,class2,... /  --class class1,class2,... 
   --project project1,project2,... 
   -r room1,room2,...   /  --rooms room1,room2,...
 
@@ -307,6 +281,68 @@ if ($info==1 and $user ne "") {
     exit;
 }
 
+
+
+# Setting the filters
+
+# school_filter
+my $school_filter="";
+if ($school ne ""){
+    $school_filter="(sophomorixSchoolPrefix=$school)";
+}
+
+
+# list of users that are processed
+my @userlist=();
+
+# --user  for userlist
+if ($user ne ""){
+    my @users=split(",",$user);
+    if ($#users==0){
+	# single user
+        push @userlist, $user; 
+    } else {
+	# multiple users
+        foreach my $user (@users){
+            push @userlist, $user; 
+        }
+    }
+}
+
+
+
+# --class  for userlist
+if ($class ne ""){
+    my @classes=split(",",$class);
+    foreach my $class (@classes){
+        print "user of $class\n";
+        my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                               root_dse=>$root_dse,
+                                               root_dns=>$root_dns,
+                                               grouplist=>$class,
+                                               sophomorix_config=>\%sophomorix_config,
+                                             });
+        @userlist=(@userlist,@{ $ref_groups->{'GROUPS'}{$class}{'sophomorixMembers'} });
+    }
+}
+
+
+
+# create user filter
+@userlist=uniq(@userlist);
+@userlist = sort (@userlist);
+my $userlist_count=$#userlist+1;
+my $user_filter="";
+if ($#userlist==0){
+    $user_filter="(sAMAccountName=$user)";
+} else {
+    # multiple users
+    $user_filter="(| ";
+    foreach my $user (@userlist){
+        $user_filter=$user_filter."(sAMAccountName=$user) ";
+    }
+    $user_filter=$user_filter.")";
+}
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
@@ -595,12 +631,6 @@ if ($set_password_noexpiry_all_sophomorix_users==1){
 ############################################################
 # setting passwords from userlist
 ############################################################
-my @userlist=();
-# --user
-if ($user ne ""){
-    @userlist=split(",",$user);
-}
-my $userlist_count=$#userlist+1;
 
 # set a password from userlist
 if ($userlist_count>0 and ($password ne "" or 
