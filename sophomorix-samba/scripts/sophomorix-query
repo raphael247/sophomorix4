@@ -74,7 +74,11 @@ my $testopt=GetOptions(\%options,
                         "comp-basic",
                         "comp-full",
                         "status=s",
-                        "smbstatus"
+                        "smbstatus",
+                        "query-ip=s",
+                        "query-comp=s",
+                        "query-user=s",
+                        "query-room=s"
     );
 
 
@@ -161,8 +165,12 @@ Limit the query for sophomorix groups to a certain sophomorixType:
 --room                (sophomorixType=room)
 --printergroup        (sophomorixType=printer)
 
-Query with smbstatus command:
---smbstatus
+Query room data with smbstatus command:
+--smbstatus                       (show all available room data, for debugging)
+--smbstatus --query-ip <ip>       (show room that contains computer with <ip>)
+--smbstatus --query-comp <comp>   (show room that contains computer <comp>)
+--smbstatus --query-user <user>   (show room where <user> is logged in)
+--smbstatus --query-room <room>   (show room <room>)
 
 Limit the query to one or more sophomorixStatus:
 --status T            (sophomorixStatus=T)
@@ -208,6 +216,9 @@ Examples:
  Search for printergroups (with data and members for listing):
   sophomorix-query --schoolbase <school> --printergroup --group-full --group-members --sam <printername>
 
+ Search for all users in the same room as logged in user <user>:
+  sophomorix-query --smbstatus --query-user <user>
+
 Please see the sophomorix-query(8) man pages for full documentation
 ');
    print "\n";
@@ -221,9 +232,66 @@ if (not defined $options{'json'}){
 }
 
 
-# --smbstatus (works without ldap bind)
+
+my ($ldap,$root_dse) = &AD_bind_admin();
+my $root_dns="";
+if (defined $options{'quota-usage'}){
+    $root_dns=&get_root_dns();
+    use Math::Round;
+}
+############################################################
+
+my $single_attrs;
+my $multi_attrs;
+my $query_attrs;
+
+my $objectclass_filter="";
+
+my $top_key;
+my $top_count_key;
+
+my $attr_filter="";
+my $role_filter="";
+my $type_filter="";
+my $status_filter="";
+
+# the search parameters
+my $filter;
+my $base;
+my $scope="sub";
+my $search_object="all"; # all is the default if nothing is specified
+
+# the search results, displayed as JSON object
+my %search=();
+$search{'COUNTERS'}{'ALL'}=0;
+$search{'COUNTERS'}{'GROUP'}=0;
+$search{'COUNTERS'}{'ROOM'}=0;
+$search{'COUNTERS'}{'USER'}=0;
+$search{'COUNTERS'}{'COMPUTER'}=0;
+
+my $max;
+my $mesg;
+
+
+############################################################
+# set the search base
+############################################################
+if (defined $options{'schoolbase'}){
+    if ($options{'schoolbase'} eq "global"){
+        $base="OU=GLOBAL,".$root_dse;
+    } else {
+        $base="OU=".$options{'schoolbase'}.",OU=SCHOOLS,".$root_dse;
+    }
+} else {
+    $base=$root_dse;
+}
+
+
+
+# --smbstatus
 if (defined $options{'smbstatus'}){
     my %smbstatus=();
+    my %lookup=();
     my $string=`/usr/bin/smbstatus`;
     #my $string=`cat /root/log1`;
     my @lines=split("\n",$string);
@@ -316,64 +384,73 @@ if (defined $options{'smbstatus'}){
         }
     }
 
-    &json_printout($options{'json'},\%smbstatus);
+    my ($ref_AD_rooms) = &AD_get_rooms({ldap=>$ldap,
+                                        root_dse=>$root_dse,
+                                        root_dns=>$root_dns,
+                                      });
+
+    #&json_printout($options{'json'},$ref_AD_rooms);
+    foreach my $room (keys  %{ $ref_AD_rooms->{'room'} }){
+        foreach my $ip (@{ $ref_AD_rooms->{'room'}{$room}{'sophomorixRoomIPs'} }){
+            $lookup{'LOOKUP'}{'room_by_IP'}{$ip}=$room;
+        }
+        foreach my $computer (@{ $ref_AD_rooms->{'room'}{$room}{'sophomorixRoomComputers'} }){
+            $lookup{'LOOKUP'}{'room_by_COMPUTER'}{$computer}=$room;
+        }
+    }
+    foreach my $user (keys  %{ $smbstatus{'USER'} }){
+        my $room=$lookup{'LOOKUP'}{'room_by_IP'}{$smbstatus{'USER'}{$user}{'IP'}};
+
+        if ($room){
+            $lookup{'LOOKUP'}{'room_by_USER'}{$user}=$room;
+            push @{ $lookup{'LISTS'}{'user_by_room'}{$room} },$user;
+
+            # the result
+            $lookup{'LOOKUP'}{'ROOM'}{$room}{$user}{'IP'}=$smbstatus{'USER'}{$user}{'IP'};
+            $lookup{'LOOKUP'}{'ROOM'}{$room}{$user}{'IPV4'}=$smbstatus{'USER'}{$user}{'IPV4'};
+            $lookup{'LOOKUP'}{'ROOM'}{$room}{$user}{'PORT'}=$smbstatus{'USER'}{$user}{'PORT'};
+            $lookup{'LOOKUP'}{'ROOM'}{$room}{$user}{'SMBSTATUS_LINE'}=$smbstatus{'USER'}{$user}{'SMBSTATUS_LINE'};
+            $lookup{'LOOKUP'}{'ROOM'}{$room}{$user}{'COMPUTER'}=$smbstatus{'USER'}{$user}{'COMPUTER'};
+            $lookup{'LOOKUP'}{'ROOM'}{$room}{$user}{'ROOM'}=$room;
+        }
+    }
+
+    # print the result as JSON
+    my %result=();
+    my $ref_lookup=\%lookup;
+    if (defined $options{'query-ip'}){
+        my $room=$lookup{'LOOKUP'}{'room_by_IP'}{$options{'query-ip'}};
+        if (defined $room){
+            &json_printout($options{'json'},$ref_lookup->{'LOOKUP'}{'ROOM'}{$room});
+        } else {
+            print "ip  \"$options{'query-ip'}\" not found in AD/smbstatus\n";
+        }
+    } elsif (defined $options{'query-comp'}){
+        my $room=$lookup{'LOOKUP'}{'room_by_COMPUTER'}{$options{'query-comp'}};
+        if (defined $room){
+            &json_printout($options{'json'},$ref_lookup->{'LOOKUP'}{'ROOM'}{$room});
+        } else {
+            print "computer \"$options{'query-comp'}\" not found in AD/smbstatus\n";
+        }
+    } elsif (defined $options{'query-user'}){
+        my $room=$lookup{'LOOKUP'}{'room_by_USER'}{$options{'query-user'}};
+        if (defined $room){
+            &json_printout($options{'json'},$ref_lookup->{'LOOKUP'}{'ROOM'}{$room});
+        } else {
+            print "user \"$options{'query-user'}\" not found in AD/smbstatus\n";
+        }
+    } elsif (defined $options{'query-room'}){
+
+        &json_printout($options{'json'},$ref_lookup->{'LOOKUP'}{'ROOM'}{$options{'query-room'}});
+
+    } else {
+        &json_printout($options{'json'},\%smbstatus);
+        &json_printout($options{'json'},$ref_AD_rooms);
+        &json_printout($options{'json'},\%lookup);
+    }
     exit;
 }
 
-
-
-my ($ldap,$root_dse) = &AD_bind_admin();
-my $root_dns="";
-if (defined $options{'quota-usage'}){
-    $root_dns=&get_root_dns();
-    use Math::Round;
-}
-############################################################
-
-my $single_attrs;
-my $multi_attrs;
-my $query_attrs;
-
-my $objectclass_filter="";
-
-my $top_key;
-my $top_count_key;
-
-my $attr_filter="";
-my $role_filter="";
-my $type_filter="";
-my $status_filter="";
-
-# the search parameters
-my $filter;
-my $base;
-my $scope="sub";
-my $search_object="all"; # all is the default if nothing is specified
-
-# the search results, displayed as JSON object
-my %search=();
-$search{'COUNTERS'}{'ALL'}=0;
-$search{'COUNTERS'}{'GROUP'}=0;
-$search{'COUNTERS'}{'ROOM'}=0;
-$search{'COUNTERS'}{'USER'}=0;
-$search{'COUNTERS'}{'COMPUTER'}=0;
-
-my $max;
-my $mesg;
-
-
-############################################################
-# set the search base
-############################################################
-if (defined $options{'schoolbase'}){
-    if ($options{'schoolbase'} eq "global"){
-        $base="OU=GLOBAL,".$root_dse;
-    } else {
-        $base="OU=".$options{'schoolbase'}.",OU=SCHOOLS,".$root_dse;
-    }
-} else {
-    $base=$root_dse;
-}
 
 
 
@@ -1214,3 +1291,100 @@ sub get_root_dns {
     $root_dns=~tr/A-Z/a-z/; # make lowercase
     return $root_dns;
 }
+
+
+
+sub AD_get_rooms {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+#    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my %AD=();
+    &Sophomorix::SophomorixBase::print_title("Query AD for rooms (start)");
+    ############################################################
+    # sophomorix rooms/devicegroupes from ldap
+    { # BLOCK group start
+        my $filter="(& (objectClass=group) (| ".
+                   "(sophomorixType=room) ".
+                   "(sophomorixType=devicegroup) ";
+        # add defined host group types from sophomorix.ini
+#        foreach my $type (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'} }) {
+#            $filter=$filter."(sophomorixType=".$type.") ";
+#        }
+        $filter=$filter.") )";
+
+	#print "Filter for device groups: $filter\n";
+        $mesg = $ldap->search( # perform a search
+                       base   => $root_dse,
+                       scope => 'sub',
+                       filter => $filter,
+                       attrs => ['sAMAccountName',
+                                 'sophomorixStatus',
+                                 'sophomorixSchoolname',
+                                 'sophomorixType',
+                                 'description',
+                                 'member',
+                                 'sophomorixRoomIPs',
+                                 'sophomorixRoomMACs',
+                                 'sophomorixRoomComputers',
+                                 'sophomorixRoomDefaults',
+                                ]);
+        my $max_group = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_group sophomorix rooms/devicegroupes found in AD");
+        $AD{'RESULT'}{'group'}{'TOTAL'}{'COUNT'}=$max_group;
+        $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=0;
+#        $AD{'RESULT'}{'group'}{$ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}}{'COUNT'}=0;
+        for( my $index = 0 ; $index < $max_group ; $index++) {
+            my $entry = $mesg->entry($index);
+            my $dn = $entry->dn();
+            my $sam=$entry->get_value('sAMAccountName');
+            my $type=$entry->get_value('sophomorixType');
+            my $stat=$entry->get_value('sophomorixStatus');
+            my $schoolname=$entry->get_value('sophomorixSchoolname');
+            my $description=$entry->get_value('description');
+
+            $AD{$type}{$sam}{'room'}=$sam;
+            $AD{$type}{$sam}{'sophomorixStatus'}=$stat;
+            $AD{$type}{$sam}{'sophomorixType'}=$type;
+            $AD{$type}{$sam}{'description'}=$description;
+            # increase role counter 
+            $AD{'RESULT'}{'group'}{$type}{'COUNT'}++;
+
+            $AD{$type}{$sam}{'sophomorixSchoolname'}=$schoolname;
+            $AD{$type}{$sam}{'DN'}=$dn;
+
+            @{ $AD{$type}{$sam}{'sophomorixRoomIPs'} }=$entry->get_value('sophomorixRoomIPs');
+            @{ $AD{$type}{$sam}{'sophomorixRoomMACs'} }=$entry->get_value('sophomorixRoomMACs');
+            @{ $AD{$type}{$sam}{'sophomorixRoomComputers'} }=$entry->get_value('sophomorixRoomComputers');
+            @{ $AD{$type}{$sam}{'sophomorixRoomDefaults'} }=$entry->get_value('sophomorixRoomDefaults');
+
+            # host groups
+#            if (exists $ref_sophomorix_config->{'LOOKUP'}{'ROLES_DEVICE'}{$type}){
+#                $AD{'host_group'}{$sam}=$type;
+#            }
+
+            # devicegroup memberships
+            if ($type eq "devicegroup"){
+                @{ $AD{$type}{$sam}{'member'} }=$entry->get_value('member');
+                foreach my $dn (@{ $AD{$type}{$sam}{'member'} }){
+                    my @parts=split(",",$dn);
+                    my ($unused,$memsam)=split("=",$parts[0]);
+		    $memsam=~tr/A-Z/a-z/;
+                    $AD{$type}{$sam}{'member_sAMAccountName'}{$memsam}="seen";
+                }
+            }
+
+            # lists
+            if ($type eq "room"){
+                push @{ $AD{'LISTS'}{'ROOM_BY_sophomorixSchoolname'}{$schoolname}{'rooms'} }, $sam;
+            } elsif ($type eq "devicegroup"){
+                push @{ $AD{'LIST_DEVICEGROUPS'} }, $sam;
+            }
+            #push @{ $AD{'LISTS'}{'BY_SCHOOL'}{$schoolname}{'groups_BY_sophomorixType'}{$type} }, $sam; 
+            #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
+        }
+    } # BLOCK group end
+    return(\%AD);
+}
+
