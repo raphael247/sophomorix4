@@ -110,10 +110,10 @@ Logging ist done to:
      *.filtered.utf8  filtered and converted to UTF(this file is installed to /etc)
 
 - New files are deleted after registration
-  (option --filteronly keeps the files)
+  (option --test-only keeps the files)
 - New files and overwritten files are logged
 - a filter is applied if configured
-  (check with --filteronly)
+  (check with --test-only)
 
 Options:
   -h  / --help
@@ -126,7 +126,7 @@ Examples:
     sophomorix-newfile /path/to/students.csv                   (target according to given file)
     sophomorix-newfile /path/somefile.txt --name students.csv  (target according to given name)
 
-    sophomorix-newfile /path/to/students.csv --filter-only     (filtering/utf8 converting to stdout)
+    sophomorix-newfile /path/to/students.csv --test-only     (filtering/utf8 converting to stdout)
   
 Options:
   --test-only               (keeps new file and does not install file to etc)

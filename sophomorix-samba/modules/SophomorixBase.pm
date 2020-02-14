@@ -6796,8 +6796,45 @@ sub analyze_encoding {
             $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
   	    $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="TRUE";
         } else {
-            $ref_encoding_check_results->{$file}{'SURE'}="FALSE";
-  	    $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="FALSE";
+            # more than one encoding has matches
+            #print Dumper ($ref_encoding_check_results);
+            if ($ref_encoding_check_results->{$file}{'RESULT'} eq "UTF8"){
+                # utf8 must be 100% correct
+                $ref_encoding_check_results->{$file}{'SURE'}="FALSE";
+  	        $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="FALSE";
+            } else {
+                # save results in shor name vars
+                $win_1252_first=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'WINDOWS-1252'};
+                $win_1252_first_err=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{'WINDOWS-1252'};
+                $win_1252_last=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'WINDOWS-1252'};
+                $win_1252_last_err=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{'WINDOWS-1252'};
+
+                $iso8859_1_first=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_hits'}{'ISO_8859-1'};
+                $iso8859_1_first_err=$ref_encoding_check_results->{$file}{'FIRSTNAMES'}{'count_errors'}{'ISO_8859-1'};
+                $iso8859_1_last=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_hits'}{'ISO_8859-1'};
+                $iso8859_1_last_err=$ref_encoding_check_results->{$file}{'LASTNAMES'}{'count_errors'}{'ISO_8859-1'};
+
+                # one encoding wins, if it wins/equals in all 4 categories
+                if ($win_1252_first >= $iso8859_1_first and
+                    $win_1252_first_err >= $iso8859_1_first_err and
+                    $win_1252_last >= $iso8859_1_last and
+                    $win_1252_last_err >= $iso8859_1_last_err
+                   ) {
+                       $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
+      	               $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="TRUE";
+                } elsif ($iso8859_1_first >= $win_1252_first and
+                         $iso8859_1_first_err >= $win_1252_first_err and
+                         $iso8859_1_last >= $win_1252_last and
+                         $iso8859_1_last_err >= $win_1252_last_err
+	     	        ){
+                            $ref_encoding_check_results->{$file}{'SURE'}="TRUE";
+      	                    $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="TRUE";
+                } else {
+                    $ref_encoding_check_results->{$file}{'SURE'}="FALSE";
+      	            $ref_sophomorix_result->{'FILES'}{$file}{'SURE'}="FALSE";
+
+	        }
+            }
         }
 
         # save result in config hash
