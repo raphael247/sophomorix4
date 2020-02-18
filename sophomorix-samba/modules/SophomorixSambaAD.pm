@@ -4583,7 +4583,7 @@ sub AD_get_AD_for_check {
     my $unid_warn_count=0;
     my $identifier_warn_count=0;
 
-        # forbidden login names
+    # forbidden login names
     $AD{'FORBIDDEN'}{'root'}="forbidden by Hand";
     $AD{'FORBIDDEN'}{'linbo'}="forbidden by Hand";
     $AD{'FORBIDDEN'}{'opsi'}="forbidden by Hand";
