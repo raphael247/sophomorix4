@@ -60,6 +60,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_groups_v
                                  AD_get_full_groupdata
                                  AD_debug_logdump
+                                 AD_get_AD_for_check
                                     );
 my @arguments = @ARGV;
 
@@ -98,7 +99,7 @@ my $testopt=GetOptions(\%options,
                        "verbose|v+",
                        "create",
                        "kill",
-                       "extraclass=s",
+                       "extraclass|class|c=s",
                        "user-basename=s",
                        "user-number=i",
                        "comment=s",
@@ -145,6 +146,7 @@ Options
   -vv / --verbose --verbose
 
   -i  / --info
+  -i -c <extraclass> / --info --class <extraclass>
 
 Create an extraclass with a random password for each user:
   --create
@@ -162,7 +164,7 @@ Optional:
 
 For more changes and option use the command sophomorix-class:
   Show all extraclasses:
-    # sophomorix-class -i --extraclass
+    # sophomorix-extraclass -i
   Show detailed info for a class:
     # sophomorix-class -i -c <extraclass>
   
@@ -189,6 +191,45 @@ my %convert_extension = qw(
      9     09
 );
 
+# allowed numbers for days
+my %convert_day = qw(
+     1     01          01    01
+     2     02          02    02
+     3     03          03    03
+     4     04          04    04
+     5     05          05    05
+     6     06          06    06
+     7     07          07    07
+     8     08          08    08
+     9     09          09    09
+     10    10          11    11
+     12    12          13    13
+     14    14          15    15
+     16    16          17    17
+     18    18          19    19
+     20    20          21    21
+     22    22          23    23
+     24    24          25    25
+     26    26          27    27
+     28    28
+);
+
+# allowed numbers for months
+my %convert_month = qw(
+     1     01          01    01
+     2     02          02    02
+     3     03          03    03
+     4     04          04    04
+     5     05          05    05
+     6     06          06    06
+     7     07          07    07
+     8     08          08    08
+     9     09          09    09
+     10    10          11    11
+     12    12
+);
+
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$options{'json'});
@@ -196,6 +237,59 @@ my %convert_extension = qw(
 # Start
 ############################################################
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+
+# --info
+# show all class when no specific class is given
+if ($options{'info'}==1 and not defined $options{'extraclass'}){
+    my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   school=>$options{'school'},
+                                   sophomorix_config=>\%sophomorix_config,
+                                 });
+
+    #print Dumper($ref_group_v->{'LISTS'});
+    my $jsoninfo="CLASSES_OVERVIEW";
+    my $jsoncomment="All Groups";
+    &json_dump({json => $options{'json'},
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $options{'school'},
+                type => $class_type,
+                log_level => $options{'verbose'},
+                hash_ref => $ref_group_v,
+                sophomorix_config => \%sophomorix_config,
+               });
+   exit;
+}
+
+
+
+# --info --extraclass <name>
+# list extraclass(es) and exit
+if ($options{'info'}==1 and defined $options{'extraclass'}){
+   my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           grouplist=>$options{'extraclass'},
+                                           sophomorix_config=>\%sophomorix_config,
+                                      });
+    #print Dumper($ref_groups);
+    my $jsoninfo="CLASS";
+    my $jsoncomment="Class";
+    &json_dump({json => $options{'json'},
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $options{'school'},
+                log_level => $options{'verbose'},
+                hash_ref => $ref_groups,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
+}
+
+
+
 
 
 # --create --extraclass ...
@@ -213,6 +307,55 @@ if (defined $options{'create'} and
     } else {
         print "\nWARNING: valid-until is NOT in the future!\n\n";
     }
+
+    # extraclass must be nonexistent
+    my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                     root_dse=>$root_dse,
+                                     root_dns=>$root_dns,
+                                     admins=>"TRUE",
+                                     sophomorix_config=>\%sophomorix_config,
+                                   });
+
+    # extraclassnames must be nonexistent
+    if (exists $ref_AD_check->{'FORBIDDEN'}{$options{'extraclass'}}){
+        &log_script_exit($ref_AD_check->{'FORBIDDEN'}{$options{'extraclass'}},1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
+
+    # create usernames
+    my @usernames=();
+    for (my $i=1;$i<=$options{'user-number'};$i++){
+        my $extension;
+        if (exists $convert_extension{$i}){
+            $extension=$convert_extension{$i};
+        } else {
+            $extension=$i;
+        }
+        my $username=$options{'user-basename'}.$extension;
+        push @usernames, $username;
+        # usernames must be nonexistent
+        if (exists $ref_AD_check->{'FORBIDDEN'}{$username}){
+            &log_script_exit($ref_AD_check->{'FORBIDDEN'}{$username},1,1,0,
+                             \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+        }
+    }
+
+
+    if (exists $convert_day{$until_day}){
+        $until_day=$convert_day{$until_day};
+    } else {
+        &log_script_exit("$until_day is not allowed as day",1,1,0,
+                         \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
+
+    if (exists $convert_month{$until_month}){
+        $until_month=$convert_month{$until_month};
+    } else {
+        &log_script_exit("$until_month is not allowed as month",1,1,0,
+                         \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
+
+
     my $extraclass_enddate_AD=$until_year.$until_month.$until_day."000000".".0Z";
 
     my $group_token=&AD_get_name_tokened($options{'extraclass'},$options{'school'},$class_type);
@@ -256,15 +399,18 @@ if (defined $options{'create'} and
     } else {
         $comment="---";
     }
-    
-    for (my $i=1;$i<=$options{'user-number'};$i++){
-        my $extension;
-        if (exists $convert_extension{$i}){
-            $extension=$convert_extension{$i};
-        } else {
-            $extension=$i;
-        }
-        my $username=$options{'user-basename'}.$extension;
+
+    my $i=0;
+    foreach my $username (@usernames){
+	$i++;
+    #for (my $i=1;$i<=$options{'user-number'};$i++){
+    #    my $extension;
+    #    if (exists $convert_extension{$i}){
+    #        $extension=$convert_extension{$i};
+    #    } else {
+    #        $extension=$i;
+    #    }
+    #    my $username=$options{'user-basename'}.$extension;
 
         my $password;
 	my $random_pwd;
