@@ -1,5 +1,121 @@
 ###########################################################
 Nächstes Entwicklertreffen:
+
+------------------------------------------------------------
+geöffnete Dateien können nicht eingesammelt werden
+--> opslock --> sernet
+falsche id auf linux-clients
+--> mount optionen
+smbstatus:
+--> aktuelle ausgabe,
+  mehrere user pro Rechner möglich
+smbstatus --shares zeigt, welche IP, welches shares gemountet hat
+NUR wenn benutzerzeile UND --sharezeile da, dann Echter Nutzer im Raum.
+Wenn nur benutzerzeile, dann zu WARNING dazu
+------------------------------------------------------------
+sophomorix-query --smbstatus
+- Dauer 6s am BSZ
+- Mithilfe
+- computer ohne Anmeldung auch wichtig?
+--> mit mehrerern usern auf ein
+------------------------------------------------------------
+Info win-1252: Fehler bei latex ausgaben:
+sophomorix-print
+Bitte auf allen Rechnern, die ihr habt nachschauen
+------------------------------------------------------------
+
+teamviewer erst mit Maurice zusammen
+--> opslock auf extra fileserver abschalten, vielleicht geht das?
+
+
+OK: Klassenarbeitsmodus/Unterrichtsmodul
+    Zusammenarbeit Lehrer
+
+
+sophomorix-extraclass wie bisher umgesetzt?
+--> anzeigebefehl:
+   -> eine extraclass pro Zeile
+   -> so wie gesehen:
+--> alte extraclass löschen
+
+------------------------------------------------------------
+tickets abarbeiten
+"urgent" zuerst
+sophomorix-check error output
+
+------------------------------------------------------------
+sophomorix-session -i --supervisor <name>
+--> schaut ALLE sessions an, dauert lange.
+    Abhilfe: nur die sessions bei EINEM user zeigen
+------------------------------------------------------------
+command log:
+
+2020-02-18 15:57:46::start::  /usr/sbin/sophomorix-transfer -jj --scopy --from-user bruce --to-user frayka,imbroghe,ilkesju,genglefe,kruegeri --from-path transfer/LBOOT.EPB --to-path transfer/::28765::
+
+2020-02-18 16:00:22::start::  /usr/sbin/sophomorix-session --session 2020-02-03_15-18-41 -j --participants genglefe,imbroghe,kruegeri,frayka,ilkesju::29229::
+
+2020-02-18 16:00:24::end  ::  /usr/sbin/sophomorix-session --session 2020-02-03_15-18-41 -j --participants genglefe,imbroghe,kruegeri,frayka,ilkesju::29229::
+
+2020-02-18 16:00:24::start::  /usr/sbin/sophomorix-exam-mode --unset --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j --participants genglefe,imbroghe,kruegeri,frayka,ilkesju::29267::
+
+2020-02-18 16:00:26::start::  /usr/sbin/sophomorix-transfer --collect-copy-exam genglefe-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29279::
+
+2020-02-18 16:00:27::end  ::  /usr/sbin/sophomorix-transfer --collect-copy-exam genglefe-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29279::
+
+2020-02-18 16:00:29::start::  /usr/sbin/sophomorix-transfer --collect-copy-exam imbroghe-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29314::
+
+2020-02-18 16:00:30::end  ::  /usr/sbin/sophomorix-transfer --collect-copy-exam imbroghe-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29314::
+
+2020-02-18 16:00:32::start::  /usr/sbin/sophomorix-transfer --collect-copy-exam kruegeri-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29349::
+
+2020-02-18 16:00:33::end  ::  /usr/sbin/sophomorix-transfer --collect-copy-exam kruegeri-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29349::
+
+2020-02-18 16:00:35::start::  /usr/sbin/sophomorix-transfer --collect-copy-exam frayka-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29384::
+
+2020-02-18 16:00:36::end  ::  /usr/sbin/sophomorix-transfer --collect-copy-exam frayka-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29384::
+
+2020-02-18 16:00:38::start::  /usr/sbin/sophomorix-transfer --collect-copy-exam ilkesju-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29419::
+
+2020-02-18 16:00:39::end  ::  /usr/sbin/sophomorix-transfer --collect-copy-exam ilkesju-exam --subdir transfer/collected/20200218_16-00-20-10a-GruppeB/exam -j::29419::
+
+------------------------------------------------------------
+
+
+
+
+
+Performancesteigerung sophomorix/webui
+3 verschiedene JSON objekte:
+  JSON_PRINTOUT = STDERR           # STDERR or STDOUT: json_dump
+  JSON_RESULT = STDERR             # STDERR or STDOUT: result_sophomorix_print
+  JSON_PROGRESS = STDERR           # STDERR or STDOUT: progress in scripts
+--> welches davon?
+Zusätzlich? die von arnaud vorgeschlagene Lösung in ein fixes tmp-file?
+oder das ganze nur für ein script umsetzen (sophomorix-query)?
+Technisch:
+sub json-printout, braucht zusatzparameter "filename" (oft aufgerufen)
+in obigen
+
+
+
+sophomorix-check
+--> Fehler bei JSON
+alle exits in dem result objects.
+--> welche zuerst?
+    --> anfangen mit issue 94
+        -- nutzername gibts schon
+
+
+json dump geht nicht korrekt
+arnaud liefert output
+
+
+Multischool später
+
+
+
+24. März Didacta
+
 -------------------------------
 1) Themen durchgehen.
 2) issues erstellen und taggen (urgent, later, ...)
