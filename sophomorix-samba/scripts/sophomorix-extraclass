@@ -229,6 +229,119 @@ my %convert_month = qw(
      12    12
 );
 
+# allowed numbers for years
+my %convert_year = qw(
+     20      2020          21    2021
+     22      2022          23    2023
+     24      2024          25    2025
+     26      2026          27    2027
+     28      2028          29    2029
+     30      2030          31    2031
+     32      2032          33    2033
+     34      2034          35    2035
+     36      2036          37    2037
+     38      2038          39    2039
+     40      2040          41    2041
+     42      2042          43    2043
+     44      2044          45    2045
+     46      2046          47    2047
+     48      2048          49    2049
+     50      2050          51    2051
+     52      2052          53    2053
+     54      2054          55    2055
+     56      2056          57    2057
+     58      2058          59    2059
+     60      2060          61    2061
+     62      2062          63    2063
+     64      2064          65    2065
+     66      2066          67    2067
+     68      2068          69    2069
+     70      2070          71    2071
+     72      2072          73    2073
+     74      2074          75    2075
+     76      2076          77    2077
+     78      2078          79    2079
+     80      2080          81    2081
+     82      2082          83    2083
+     84      2084          85    2085
+     86      2086          87    2087
+     88      2088          89    2089
+     90      2090          91    2091
+     92      2092          93    2093
+     94      2094          95    2095
+     96      2096          97    2097
+     98      2098          99    2099
+     0       2100
+     1       2101          01    2101
+     2       2102          02    2102
+     3       2103          03    2103
+     4       2104          04    2104
+     5       2105          05    2105
+     6       2106          06    2106
+     7       2107          07    2107
+     8       2108          08    2108
+     9       2109          09    2109
+     10      2110          11    2111
+     12      2112          13    2113
+     14      2114          15    2115
+     16      2116          17    2117
+     18      2118          19    2119
+     2020    2020          2021    2021
+     2022    2022          2023    2023
+     2024    2024          2025    2025
+     2026    2026          2027    2027
+     2028    2028          2029    2029
+     2030    2030          2031    2031
+     2032    2032          2033    2033
+     2034    2034          2035    2035
+     2036    2036          2037    2037
+     2038    2038          2039    2039
+     2040    2040          2041    2041
+     2042    2042          2043    2043
+     2044    2044          2045    2045
+     2046    2046          2047    2047
+     2048    2048          2049    2049
+     2050    2050          2051    2051
+     2052    2052          2053    2053
+     2054    2054          2055    2055
+     2056    2056          2057    2057
+     2058    2058          2059    2059
+     2060    2060          2061    2061
+     2062    2062          2063    2063
+     2064    2064          2065    2065
+     2066    2066          2067    2067
+     2068    2068          2069    2069
+     2070    2070          2071    2071
+     2072    2072          2073    2073
+     2074    2074          2075    2075
+     2076    2076          2077    2077
+     2078    2078          2079    2079
+     2080    2080          2081    2081
+     2082    2082          2083    2083
+     2084    2084          2085    2085
+     2086    2086          2087    2087
+     2088    2088          2089    2089
+     2090    2090          2091    2091
+     2092    2092          2093    2093
+     2094    2094          2095    2095
+     2096    2096          2097    2097
+     2098    2098          2099    2099
+     2100    2100
+     2101    2101          2101    2101
+     2102    2102          2102    2102
+     2103    2103          2103    2103
+     2104    2104          2104    2104
+     2105    2105          2105    2105
+     2106    2106          2106    2106
+     2107    2107          2107    2107
+     2108    2108          2108    2108
+     2109    2109          2109    2109
+     2110    2110          2111    2111
+     2112    2112          2113    2113
+     2114    2114          2115    2115
+     2116    2116          2117    2117
+     2118    2118          2119    2119
+);
 
 
 
@@ -300,13 +413,6 @@ if (defined $options{'create'} and
     defined $options{'valid-until'}
    ){
 
-    # testing date
-    my ($until_day, $until_month, $until_year)=split(/\./, $options{'valid-until'});
-    my $extraclass_enddate_epoch=timelocal(0, 0, 0, $until_day, $until_month-1, $until_year);
-    if ($extraclass_enddate_epoch>=$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}){
-    } else {
-        print "\nWARNING: valid-until is NOT in the future!\n\n";
-    }
 
     # extraclass must be nonexistent
     my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
@@ -341,6 +447,9 @@ if (defined $options{'create'} and
     }
 
 
+    # testing date
+    my ($until_day, $until_month, $until_year)=split(/\./, $options{'valid-until'});
+
     if (exists $convert_day{$until_day}){
         $until_day=$convert_day{$until_day};
     } else {
@@ -355,6 +464,19 @@ if (defined $options{'create'} and
                          \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
     }
 
+    if (exists $convert_year{$until_year}){
+        $until_year=$convert_year{$until_year};
+    } else {
+        &log_script_exit("$until_year is not allowed as year",1,1,0,
+                         \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
+
+    # testing for future
+    my $extraclass_enddate_epoch=timelocal(0, 0, 0, $until_day, $until_month-1, $until_year);
+    if ($extraclass_enddate_epoch>=$sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}){
+    } else {
+        print "\nWARNING: valid-until is NOT in the future!\n\n";
+    }
 
     my $extraclass_enddate_AD=$until_year.$until_month.$until_day."000000".".0Z";
 
@@ -403,15 +525,6 @@ if (defined $options{'create'} and
     my $i=0;
     foreach my $username (@usernames){
 	$i++;
-    #for (my $i=1;$i<=$options{'user-number'};$i++){
-    #    my $extension;
-    #    if (exists $convert_extension{$i}){
-    #        $extension=$convert_extension{$i};
-    #    } else {
-    #        $extension=$i;
-    #    }
-    #    my $username=$options{'user-basename'}.$extension;
-
         my $password;
 	my $random_pwd;
 	if (defined $options{'password'}){
