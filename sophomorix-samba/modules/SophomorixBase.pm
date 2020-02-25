@@ -5424,13 +5424,9 @@ sub create_test_login {
                               "$file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif ($login_char_length<2){
-            print "\n";
-	    print "   ERROR: $login_wish ist to short for a login name!\n";
-	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
-	    print "          ($file LINE $line_num)\n";
-            print "          Minimum characters for login names are 2\n\n";
-# HERE HERE HERE 
-            exit 88;
+	    my $error_message="$login_wish ist to short for a login name! (Minimum characters for login names are 2) ".
+                              "$file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
+            return ("---",$error_message);
         } elsif (not $login_wish=~m/^[a-z]+/){
             print "\n";
 	    print "   ERROR: $login_wish does not begin with a-z\n";
