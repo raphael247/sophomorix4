@@ -1487,17 +1487,13 @@ sub test_user_update {
         # update
         # exit if new group is a user
         if (exists $ref_AD_check->{'sAMAccountName'}{$adminclass}){
-            print "\n";
-  	    print "ERROR: User \"$sam\" is configured be moved from class \"".
+	    my $error_message="User \"$sam\" should be moved from class \"".
                   $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}.
                   "\" to \"".
-                  $adminclass.
-                  "\"\n";
-            print "  BUT: The target class \"$adminclass\" is a user (not a group)\n";
-            print "  You must:\n";
-            print "     A) map the groupname \"$adminclass\" to another name\n";
-            print "     B) Edit the groupname of \"$sam\" in the file ${$new_filename_ref}\n";
-            exit 88;
+	          $adminclass."\" But \"$adminclass\" is a already a user ".
+		"(Solution: Map groupname \"$adminclass\"to another name)";
+	   &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
         ${$update_ref}++;
         # ${$new_class_ref}=$adminclass; # with prefix
