@@ -171,12 +171,15 @@ Please see the sophomorix-session(8) man pages for full documentation
    exit;
 }
 
-if ($session ne ""){
+if ($supervisor ne ""){
+    # get all sessions of user $supervisor 
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all",$supervisor,$smb_admin_pass,\%sophomorix_config);
+} elsif ($session ne ""){
     # get the session $session
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$session,$smb_admin_pass,\%sophomorix_config);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$session,"allsupervisors",$smb_admin_pass,\%sophomorix_config);
 } else {
-    # get all sessions
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all",$smb_admin_pass,\%sophomorix_config);
+    # get all sessions of all supervisors
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all","allsupervisors",$smb_admin_pass,\%sophomorix_config);
 }
 
 

@@ -4163,7 +4163,7 @@ sub AD_object_search {
 
 
 sub AD_get_sessions {
-    my ($ldap,$root_dse,$root_dns,$json,$show_session,$smb_admin_pass,$ref_sophomorix_config)=@_;
+    my ($ldap,$root_dse,$root_dns,$json,$show_session,$show_supervisor,$smb_admin_pass,$ref_sophomorix_config)=@_;
     my %sessions=();
     my %management=();
     my $session_count=0;
@@ -4205,9 +4205,17 @@ sub AD_get_sessions {
     } # end block
 
     # fetching the sessions
-    my $filter="(&(objectClass=user)(sophomorixSessions=*)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
+    my $filter;
+    my $base;
+    if ($show_supervisor eq "allsupervisors"){
+	$base=$root_dse;
+	$filter="(&(objectClass=user)(sophomorixSessions=*)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
+    } else {
+	$base=$root_dse;	
+	$filter="(&(objectClass=user)(sophomorixSessions=*)(sAMAccountName=$show_supervisor)(|(sophomorixRole=student)(sophomorixRole=teacher)))";
+    }	
     my $mesg = $ldap->search( # perform a search
-                   base   => $root_dse,
+                   base   => $base,
                    scope => 'sub',
                    filter => $filter,
                    attrs => ['sAMAccountName',

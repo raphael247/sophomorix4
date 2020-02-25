@@ -18,6 +18,8 @@ Password for 'https://jeffbeck@github.com': ########
 ############################################################
 upload to fleischsalat: scp ../sophomorix*3.42.1-3* fleischsalat:/srv/www/lmn7
 
+   
+
 .ssh/config:
 ###########################
 Host fleischsalat
@@ -25,21 +27,39 @@ Host fleischsalat
  User ruediger
  Port 22
 
-
-Was ist neu:
+------------------------------------------------------------
+Was ist neu 3.75.0::
   * sophomorix-managementgroups --set-... für alle managementgroups
   * sophomorix-group creates also global groups like epoptes
-  * sophomorix-examclass creates examclasses
+  * new command: sophomorix-extraclass (instead of files)
+  * sophomorix-check: exit messages in JSON Objekt for webui
+  * sophomorix-session -i --supervisor <user> -j
+    shows only sessions of <user>
+    please test performance!!!
+  * sophomorix-passwd --class (sets password for a class (only  students))
+    please test!!!
+  * encoding
+    new coding WINDOWS-1252
+    bitte testen auf allen euren Systemen
+  * sophomorix-query --smbstatus (more options to select a room)
+    please test this options
+    sophomorix-query --smbstatus (no more options) 
+       ... delivers all debuggion data (needed, if output is not correct)
+  * option -jjjj and -jjjjj for testing
+------------------------------------------------------------
+
 
 ############################################################
 Todo:
 ############################################################
 
+------------------------------------------------------------
+sophomorix-check:
 create_test_login: was ist mit warning non reusable (erst vor kurzem gelöscht), ...
 WARNNG oder ERROR?
+------------------------------------------------------------
 
-
-parameter scool.conf:
+parameter school.conf:
 
 MAIL_LOCAL_PART_TYPE=      (leer: default ist samaccountname@)
     Alternativen:    

@@ -290,7 +290,6 @@ sub json_dump {
     my $object_name = $arg_ref->{object_name};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     # json 
-    print "HERE $json\n";
     if ($json==0){
         if ($jsoninfo eq "SESSIONS"){
             &_console_print_sessions($hash_ref,$log_level,$ref_sophomorix_config);
