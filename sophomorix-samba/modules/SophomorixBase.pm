@@ -5381,8 +5381,8 @@ sub create_test_login {
         # login creation
         if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
-            print "\n   WARNING: File $file is not configured for auto login creation\n\n";
-            return "---";
+	    my $error_message="File $file is not configured for auto login creation.";
+            return ("---",$error_message);
         }
         # firstname+surname or surname+firstname
         if ( $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_FIRSTNAME_REVERSE'} eq 
@@ -5462,7 +5462,7 @@ sub create_test_login {
 
     # the found loginname is added to the forbidden logins from now on
     $ref_forbidden_logins->{'FORBIDDEN'}{$login_check_ok}="new";
-    return $login_check_ok;
+    return ($login_check_ok,"---");
 }
 
 

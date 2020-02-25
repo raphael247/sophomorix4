@@ -1622,14 +1622,14 @@ sub write_add_file {
     } else {
         $status="U";
     }
-    my $login=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
-                                 $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
-                                 $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
-                                 $ref_AD_check, # forbidden logins
-                                 $ref_login_avoid, # logins to avoid
-                                 $Match{'ACTION'}{$line_new}{'line_count'},
-                                 \%users_file,
-                                 \%sophomorix_config);
+    my ($login,$error_message)=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
+        $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
+        $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
+        $ref_AD_check, # forbidden logins
+        $ref_login_avoid, # logins to avoid
+        $Match{'ACTION'}{$line_new}{'line_count'},
+        \%users_file,
+        \%sophomorix_config);
 
     my $mail=$login."@".
         $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'MAILDOMAIN'};
@@ -1657,7 +1657,7 @@ sub write_add_file {
                  $webui_permissions_string."::".
                  $webui_permissions_string."::".
                  "\n";
-    if ($login ne "---"){
+    if ($login ne "---" and $error_message eq "---"){
         print ADD $add_line;
         # create result
         push @{ $sophomorix_result{'CHECK_RESULT'}{'ADDLIST'} }, $login;
@@ -1671,8 +1671,8 @@ sub write_add_file {
         $sophomorix_result{'CHECK_RESULT'}{'ADD'}{$login}{'identifier_ascii'}=$Match{'ACTION'}{$line_new}{'identifier_ascii'};
         $counters{'ADD'}++;
     } else {
-        print "\n   ERROR: Login for $line_new could no be created\n\n";
-        exit 88;
+        &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
 }
 
