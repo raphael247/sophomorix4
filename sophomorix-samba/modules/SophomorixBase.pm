@@ -5420,18 +5420,16 @@ sub create_test_login {
         $login_char_length = length $login_wish;
         if (not $login_wish=~m/^[a-z0-9-_]+$/){
             # put in result hash ?????
-            print "\n";
-	    print "   ERROR: $login_wish contains invalid characters for a login name!\n"; 
-	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
-	    print "          ($file LINE $line_num)\n";
-            print "          Allowed characters are: a-z0-9-_\n\n";
-            exit 88;
+	    my $error_message="$login_wish contains invalid characters for a login name! (Allowed are: a-z0-9-_) ".
+                              "$file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
+            return ("---",$error_message);
         } elsif ($login_char_length<2){
             print "\n";
 	    print "   ERROR: $login_wish ist to short for a login name!\n";
 	    print "    LINE: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "          ($file LINE $line_num)\n";
             print "          Minimum characters for login names are 2\n\n";
+# HERE HERE HERE 
             exit 88;
         } elsif (not $login_wish=~m/^[a-z]+/){
             print "\n";
