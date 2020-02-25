@@ -5329,7 +5329,7 @@ sub AD_get_quota {
 
     # create userlist for smbcquotas query
     my %smbcquotas_users=();
-    if ($user_opt ne ""){
+    if (defined $user_opt and $user_opt ne ""){
         my @smbcquotas_users=split(/,/,$user_opt);
         foreach my $user (@smbcquotas_users){
             $smbcquotas_users{$user}="query";
