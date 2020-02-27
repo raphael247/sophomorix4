@@ -2120,8 +2120,11 @@ sub update_printer_gpos {
         # create output dir
         system("rm -rf $target_dir");
         system("mkdir -p $target_dir");
-        # write prefix
+
+        # write prefix of Printers.xml
         system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_PRE'} >> $target");
+
+        # write main part of Printers.xml
         my $school_printer_count=0;
         foreach my $device (@{ $ref_devices_file->{'LISTS'}{'devices_by_school'}{$school} }){
             if ($ref_devices_file->{'device'}{$device}{'sophomorixRole'} eq "printer"){
@@ -2149,8 +2152,10 @@ sub update_printer_gpos {
                 system($sed_command);
 	    }
         }
-        # write postfix
+
+        # write postfix of Printers.xml
         system("cat $ref_sophomorix_config->{'INI'}{'PATHS'}{'GPO_PRINTERS_TEMPLATE_POST'} >> $target");
+
         # copy the file if necessary
         printf  "School %-14s:%4s printers found\n",$school,$school_printer_count;
         my $lookup_key="sophomorix:school:".$school;
