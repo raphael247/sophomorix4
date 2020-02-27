@@ -5380,7 +5380,7 @@ sub create_test_login {
         # login creation
         if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'FIRSTNAME_CHARS'}==0 and 
             $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'SURNAME_CHARS'}==0){
-	    my $error_message="File $file is not configured for auto login creation.";
+	    my $error_message="File '".$file."' is not configured for auto login creation.";
             return ("---",$error_message);
         }
         # firstname+surname or surname+firstname
@@ -5418,19 +5418,19 @@ sub create_test_login {
         # check wish login
         $login_char_length = length $login_wish;
         if (not $login_wish=~m/^[a-z0-9-_]+$/){
-	    my $error_message="$login_wish contains invalid characters for a login name! (Allowed are: a-z0-9-_) ".
+	    my $error_message="'".$login_wish."' contains invalid characters for a login name! (Allowed are: a-z0-9-_) ".
                               "| $file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif ($login_char_length<2){
-	    my $error_message="$login_wish ist to short for a login name! (Minimum characters for login names are 2) ".
+	    my $error_message="'".$login_wish."' is to short for a login name! (Minimum number of characters for a login name is 2) ".
                               "| $file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif (not $login_wish=~m/^[a-z]+/){
-	    my $error_message="$login_wish does not begin with a-z ".
+	    my $error_message="'".$login_wish."' does not begin with a-z ".
                               "| $file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
              return ("---",$error_message);
         } elsif (exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}){
-	    my $error_message="Login $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish} ".
+	    my $error_message="Login ".$ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}."' ".
                               "| $file LINE $line_num: $ref_users_file->{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif (exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}){

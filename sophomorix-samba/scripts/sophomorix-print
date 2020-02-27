@@ -402,8 +402,9 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
     &open_output_files($output_file_basename);
     # walk through classes
     if (not exists $ref_AD_printdata->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school}){
-        print "\nERROR: School $school has no printout data\n\n";
-        exit 88;
+        my $error_message="School '".$school."' has no printout data";
+	&log_script_exit($error_message,1,1,0,
+            \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }
     my @classlist = @{ $ref_AD_printdata->{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}{$school} };
     @classlist = sort @classlist;
@@ -437,8 +438,9 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
             push @classlist, $class_item;
             $classes_seen{$class_item}="seen";
         } else {
-            print "\nERROR: Class $class_item has no printout data in school $school\n\n";
-            exit 88;
+            my $error_message="Class '".$class_item."' has no printout data in school '".$school."'";
+	    &log_script_exit($error_message,1,1,0,
+                \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
     }
 
@@ -468,8 +470,9 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
             print "   * $username selected\n";
             push @{ $printdata{'LIST'} }, $ref_AD_printdata->{'LOOKUP_BY_sAMAccountName'}{$username};
         } else {
-            print "\nERROR: User $username has no printout data in school $school\n\n";
-            exit 88;
+	    my $error_message="User '".$username."' has no printout data in school '".$school."'";
+            &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
     }
 
@@ -485,10 +488,14 @@ if ($class eq "" and $user eq "" and not defined $back_in_time){
 
 } elsif (defined $back_in_time) {
     if ($back_in_time > $ref_AD_printdata->{'RESULT'}{'BACK_IN_TIME_MAX'}){
-        print "\n";
-        print "ERROR: I Can only go back to:   --back-in-time $ref_AD_printdata->{'RESULT'}{'BACK_IN_TIME_MAX'}\n";
-        print "  SEE: sophomorix-print -i\n\n";
-        exit 88;
+        my $error_message="I Can only go back to: --back-in-time $ref_AD_printdata->{'RESULT'}{'BACK_IN_TIME_MAX'} (see: sophomorix-print -i)";
+	&log_script_exit($error_message,1,1,0,
+            \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+
+##        print "\n";
+ #       print "ERROR: I Can only go back to:   --back-in-time $ref_AD_printdata->{'RESULT'}{'BACK_IN_TIME_MAX'}\n";
+ #       print "  SEE: sophomorix-print -i\n\n";
+ #       exit 88;
     }
     &open_output_files($output_file_basename);
     # go for back in time stuff, if nothing else ist given

@@ -1487,11 +1487,11 @@ sub test_user_update {
         # update
         # exit if new group is a user
         if (exists $ref_AD_check->{'sAMAccountName'}{$adminclass}){
-	    my $error_message="User \"$sam\" should be moved from class \"".
+	    my $error_message="User '".$sam."' should be moved from class '".
                   $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}.
-                  "\" to \"".
-	          $adminclass."\" But \"$adminclass\" is a already a user ".
-		"(Solution: Map groupname \"$adminclass\"to another name)";
+                  "' to '".
+	          $adminclass."' But '".$adminclass."' is a already a user ".
+		"(Solution: Map groupname '".$adminclass."' to another name)";
 	   &log_script_exit($error_message,1,1,0,
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         }
@@ -2327,7 +2327,7 @@ sub get_encoding {
 
     # misconfigured *.school.conf: exit
     if ($enc eq "ERROR_ENCODING"){
-        &log_script_exit("Misconfigured ENCODING in configuration file, see \"iconv --list\"",1,1,0,
+        &log_script_exit("Misconfigured ENCODING in configuration file, see 'iconv --list'",1,1,0,
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     }   
     if ($enc_force eq "ERROR_ENCODING_FORCE"){
@@ -2338,7 +2338,7 @@ sub get_encoding {
     if ($enc eq "auto"){
         if ($enc_checked eq "unknown"){
             # auto failed
-            &log_script_exit("ENCODING=auto failed: Set ENCODING to the desired value and ENCODING_FORCE to \"True\"",1,1,0,
+            &log_script_exit("ENCODING=auto failed: Set ENCODING to the desired value and ENCODING_FORCE to 'True'",1,1,0,
                      \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
         } else {
             # auto was succesful
@@ -2353,10 +2353,10 @@ sub get_encoding {
                 $enc_used=$enc;
             } else {
                 # configured different than checked
-                print "   * Misconfigured ENCODING in configuration file and ENCODING_CHECKED do not match\n";
-                print "   * Set A) ENCODING_FORCE to \"True\" if you know better than sophomorix\n";
-                print "   *  or B) ENCODING to \"auto\" if you trust sophomorix\n";
-                &log_script_exit("ENCODING configuration failed: see script printout",1,1,0,
+		my $error_message="ENCODING and ENCODING_CHECKED do not match |".
+                                  " A) set ENCODING_FORCE to 'True' if you are smarter than sophomorix |".
+		                  " B) set ENCODING to 'auto' if you trust sophomorix";
+                &log_script_exit($error_message,1,1,0,
                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
             }
         } else {
