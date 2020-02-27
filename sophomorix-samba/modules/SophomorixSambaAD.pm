@@ -4344,8 +4344,8 @@ sub AD_get_sessions {
                     # calculate smb_dir
                     my $smb_dir=$home_directory_AD;
                     $smb_dir=~s/\\/\//g;
-                    my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{'TRANSFER_DIR_HOME_'.
-                                 $ref_sophomorix_config->{'GLOBAL'}{'LANG'}};
+		    my $key="TRANSFER_DIR_HOME_".$ref_sophomorix_config->{'GLOBAL'}{'LANG'};
+                    my $transfer=$ref_sophomorix_config->{'INI'}{'LANG.FILESYSTEM'}{$key};
                     $smb_dir="smb:".$smb_dir."/".$transfer;
 		    #print "SMB: $smb_dir\n";
 

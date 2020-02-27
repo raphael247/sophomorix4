@@ -52,8 +52,11 @@ $Data::Dumper::Terse = 1;
             );
 
 
+ 
 sub AD_test_session_count {
-    my ($ldap,$root_dse,$root_dns,$smb_admin_pass,$should) = @_;
+    my ($ldap,$root_dse,$root_dns,
+        $smb_admin_pass,$should,
+        $ref_sophomorix_config) = @_;
     my %sessions=&Sophomorix::SophomorixSambaAD::AD_get_sessions($ldap,
                                                                  $root_dse,
                                                                  $root_dns,
