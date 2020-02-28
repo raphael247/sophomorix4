@@ -4428,6 +4428,15 @@ sub load_school_ini {
                         $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
                             $ref_modmaster->{$section}{$parameter};
                     }
+                } elsif ($parameter eq "MAIL_LOCAL_PART_MAP"){
+		    if ($ref_modmaster->{$section}{$parameter} ne ""){
+                        my (@values)=split(/,/,$ref_modmaster->{$section}{$parameter});
+  		        foreach my $value (@values){
+			    my ($sam,$mail_local_part_new)=split(/=/,$value);
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}=
+                                $mail_local_part_new;
+   		        }
+		    }
                 } else {
                     $ref_sophomorix_config->{'ROLES'}{$school}{$role}{$parameter}=
                         $ref_modmaster->{$section}{$parameter};
