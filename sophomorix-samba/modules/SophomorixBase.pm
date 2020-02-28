@@ -2064,6 +2064,13 @@ sub _console_print_user_full {
         printf "%30s: %-40s\n","userAccountControl",$ref_users->{'USERS'}{$user}{'userAccountControl'};
         print $line;
         printf "%30s: %-40s\n","mail",$ref_users->{'USERS'}{$user}{'mail'};
+
+        foreach my $item ( @{ $ref_users->{'USERS'}{$user}{'proxyAddresses'} } ){
+            printf "%30s: %-40s\n","proxyAddresses",$item;
+	}
+
+
+	
         printf "%30s: %-40s\n","sophomorixMailQuota",$ref_users->{'USERS'}{$user}{'sophomorixMailQuota'};
         if (defined $ref_users->{'USERS'}{$user}{'sophomorixMailQuotaCalculated'}){
             printf "%30s: %-40s\n","sophomorixMailQuotaCalculated",

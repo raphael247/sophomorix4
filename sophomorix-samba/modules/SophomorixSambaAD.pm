@@ -6329,6 +6329,8 @@ sub AD_get_full_userdata {
         $users{'USERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
         $users{'USERS'}{$sam}{'userAccountControl'}=$entry->get_value('userAccountControl');
         $users{'USERS'}{$sam}{'mail'}=$entry->get_value('mail');
+        @{ $users{'USERS'}{$sam}{'proxyAddresses'} } = 
+             sort $entry->get_value('proxyAddresses');
         $users{'USERS'}{$sam}{'sophomorixSchoolPrefix'}=$entry->get_value('sophomorixSchoolPrefix');
         $users{'USERS'}{$sam}{'sophomorixAdminFile'}=$entry->get_value('sophomorixAdminFile');
         $users{'USERS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
