@@ -4250,6 +4250,7 @@ sub check_config_ini {
 
 
 
+
 sub load_school_ini {
     my ($root_dse,$school,$conf_school,$ref_modmaster,$ref_sophomorix_config,$ref_result)=@_;
     my $root_dns=&Sophomorix::SophomorixSambaAD::AD_dns_get($root_dse);
@@ -4433,8 +4434,11 @@ sub load_school_ini {
                         my (@values)=split(/,/,$ref_modmaster->{$section}{$parameter});
   		        foreach my $value (@values){
 			    my ($sam,$mail_local_part_new)=split(/=/,$value);
-                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}=
+			    $sam=&remove_embracing_whitespace($sam);
+			    $mail_local_part_new=&remove_embracing_whitespace($mail_local_part_new);
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'MAIL_LOCAL_PART'}=
                                 $mail_local_part_new;
+                            $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'USED'}="FALSE";
    		        }
 		    }
                 } else {

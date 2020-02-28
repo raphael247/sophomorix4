@@ -5294,7 +5294,12 @@ sub AD_create_new_mail {
                          $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
 
     }
-
+    # override MAIL_LOCAL_PART by MAIL_LOCAL_PART_MAP, if there
+    if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'MAIL_LOCAL_PART'}){
+        $mail_local_part=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'MAIL_LOCAL_PART'};
+        $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'USED'}="TRUE";
+    }
+    
     # MAILDOMAIN part
     if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} eq "NONE"){
         $mail="NONE";

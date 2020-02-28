@@ -28,11 +28,12 @@ Host fleischsalat
  Port 22
 
 ------------------------------------------------------------
-Was ist neu 3.75.0::
+Was ist neu 3.75.0:
   * sophomorix-managementgroups --set-... für alle managementgroups
   * sophomorix-group creates also global groups like epoptes
   * new command: sophomorix-extraclass (instead of files)
-  * sophomorix-check: exit messages in JSON Objekt for webui
+  * sophomorix-check und sophomorix-print: 
+    exit messages in JSON Objekt for webui
   * sophomorix-session -i --supervisor <user> -j
     shows only sessions of <user>
     please test performance!!!
@@ -53,6 +54,9 @@ Was ist neu 3.75.0::
 Todo:
 ############################################################
 
+Test 
+
+
 ------------------------------------------------------------
 sophomorix-check:
 create_test_login: was ist mit warning non reusable (erst vor kurzem gelöscht), ...
@@ -61,15 +65,18 @@ WARNNG oder ERROR?
 
 parameter school.conf:
 
-MAIL_LOCAL_PART_TYPE=      (leer: default ist samaccountname@)
+OK: MAIL_LOCAL_PART_SCHEME=      (leer: default ist samaccountname@)
     Alternativen:    
       firstname.lastname
       lastname.firstname 
       firstname_lastname
       lastname_firstname 
-MAIL_LOCAL_PART_MAP=mueller=k.mueller,maier=kpmaier  (mueller,maier
+OK: MAIL_LOCAL_PART_MAP=mueller=k.mueller,maier=kpmaier  (mueller,maier
    sind samaccountname)
-
+TODO:
+auswerten: 
+  wurden die keys benutzt oder nicht USED=FALSE  (WARNING)
+  gabs doppelte mailadressen (gesamt?/pro Schule? oder wie?)? Warnung
 
 
 sophomorix-passwd --class  ....
