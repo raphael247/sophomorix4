@@ -1644,11 +1644,19 @@ sub write_add_file {
         \%users_file,
         \%sophomorix_config);
 
-    my $mail_local_part;
-    $mail_local_part=$login;
-    
-    my $mail=$mail_local_part."@".
-        $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'MAILDOMAIN'};
+    my $mail=&AD_create_new_mail($login,
+                                 \@arguments,
+                                 \%sophomorix_config,
+         		         \%sophomorix_result,
+				 $json,
+                                 $Match{'ACTION'}{$line_new}{'role'},
+                                 $Match{'ACTION'}{$line_new}{'school'},
+                                 "---",
+                                 $Match{'ACTION'}{$line_new}{'firstname_ascii'},
+                                 "---",
+				 $Match{'ACTION'}{$line_new}{'surname_ascii'}
+                                );
+
     my $webui_permissions_string=join(",",
         @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
     my $add_line=$Match{'ACTION'}{$line_new}{'filename'}."::".
