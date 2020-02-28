@@ -792,7 +792,9 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
 			  \%sophomorix_config,
                           \$update,
                           \$new_unid,
+                          \$old_surname_ascii,
                           \$new_surname_ascii,
+                          \$old_firstname_ascii,
                           \$new_firstname_ascii,
                           \$new_birthdate,
                           \$new_surname_utf8,
@@ -1365,7 +1367,9 @@ sub test_user_update {
 	$ref_sophomorix_config,
         $update_ref,
         $new_unid_ref,
+        $old_surname_ascii_ref,
         $new_surname_ascii_ref,
+        $old_firstname_ascii_ref,
         $new_firstname_ascii_ref,
         $new_birthdate_ref,
         $new_surname_utf8_ref,
@@ -1569,9 +1573,18 @@ sub test_user_update {
     my $school=$Match{'ACTION'}{$line_new}{'school'};
     my $role=$Match{'ACTION'}{$line_new}{'role'};
 
-
     # mail
-    (${$new_mail_ref})=&AD_create_new_mail($sam,\%sophomorix_config,$role,$school);
+    (${$new_mail_ref})=&AD_create_new_mail($sam,
+					   \@arguments,
+                                           \%sophomorix_config,
+					   \%sophomorix_result,
+					   $json,
+                                           $role,
+                                           $school,
+                                           ${$old_firstname_ascii_ref},
+                                           ${$new_firstname_ascii_ref},
+                                           ${$old_surname_ascii_ref},
+                                           ${$new_surname_ascii_ref});
     # test for update
     if ( ${$new_mail_ref} eq  ${$old_mail_ref} ){
         # no update
@@ -1631,7 +1644,10 @@ sub write_add_file {
         \%users_file,
         \%sophomorix_config);
 
-    my $mail=$login."@".
+    my $mail_local_part;
+    $mail_local_part=$login;
+    
+    my $mail=$mail_local_part."@".
         $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'MAILDOMAIN'};
     my $webui_permissions_string=join(",",
         @{ $sophomorix_config{'ROLES'}{$Match{'ACTION'}{$line_new}{'school'}}{$Match{'ACTION'}{$line_new}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });

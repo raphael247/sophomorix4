@@ -5243,7 +5243,27 @@ sub AD_check_ui {
 
 
 sub AD_create_new_mail {
-    my ($sam,$ref_sophomorix_config,$role_file,$school_file) = @_;
+    my ($sam,$ref_arguments,$ref_sophomorix_config,$ref_sophomorix_result,$json,$role_file,$school_file,
+        $firstname_old,$firstname_new,$lastname_old,$lastname_new) = @_;
+
+    my $firstname;
+    if ($firstname_new ne "---"){
+        $firstname=$firstname_new;
+    } else {
+        $firstname=$firstname_old;
+    }
+    $firstname=~tr/A-Z/a-z/;
+    $firstname=~s/\s+/_/g;
+    
+    my $lastname;
+    if ($lastname_new ne "---"){
+        $lastname=$lastname_new;
+    } else {
+        $lastname=$lastname_old;
+    }
+    $lastname=~tr/A-Z/a-z/;
+    $lastname=~s/\s+/_/g;
+    
     if (not defined $role_file){
         # existing user
         $role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
@@ -5255,10 +5275,31 @@ sub AD_create_new_mail {
         $school=$school_file;
     }
     my $mail;
+
+    # MAIL_LOCAL_PART part
+    my $mail_local_part;
+    $mail_local_part=$sam; # default
+    if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_SCHEME'} eq "firstname"){
+	$mail_local_part=$firstname;
+    } elsif ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_SCHEME'} eq "lastname"){
+	$mail_local_part=$lastname;
+    } elsif ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_SCHEME'} eq "firstname.lastname"){
+	$mail_local_part=$firstname.".".$lastname;
+    } elsif ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_SCHEME'} eq "lastname.firstname"){
+	$mail_local_part=$lastname.".".$firstname;
+    } elsif ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_SCHEME'} ne ""){
+        my $error_message="$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_SCHEME'} not allowed as 'MAIL_LOCAL_PART_SCHEME' in school '".$school_file.
+                          "' | Allowed: firstname|lastname|firstname.lastname|lastname.firstname";
+        &Sophomorix::SophomorixBase::log_script_exit($error_message,1,1,0,
+                         $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+
+    }
+
+    # MAILDOMAIN part
     if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} eq "NONE"){
         $mail="NONE";
     } else {
-        $mail=$sam."@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+        $mail=$mail_local_part."@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
     }
     return $mail;
 }
