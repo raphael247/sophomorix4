@@ -2515,6 +2515,7 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
     # changing OTHER multi-value attributes
+    my $multi_value_set = $arg_ref->{multi_value_set};
     my $multi_value_add = $arg_ref->{multi_value_add};
     my $multi_value_remove = $arg_ref->{multi_value_remove};
     my $multi_value_entry = $arg_ref->{multi_value_entry};
@@ -2956,6 +2957,15 @@ sub AD_user_update {
     }
 
     # other multi-value attributes
+    if (defined $multi_value_set and defined $multi_value_entry){
+        my @multi_value_entry=split(/,/,$multi_value_entry);
+        @multi_value_entry = reverse @multi_value_entry;
+        print "   * Setting $multi_value_set to: @multi_value_entry\n";
+        my $multi_value_entry_string=join("|",@multi_value_entry);
+        $update_log_string=$update_log_string."\"".$multi_value_set."=".$multi_value_entry_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {$multi_value_set => \@multi_value_entry }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
     if (defined $multi_value_add and defined $multi_value_entry){
         my @multi_value_entry=split(/,/,$multi_value_entry);
         @multi_value_entry = reverse @multi_value_entry;
