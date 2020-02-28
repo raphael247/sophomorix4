@@ -47,6 +47,8 @@ Was ist neu 3.75.0:
     sophomorix-query --smbstatus (no more options) 
        ... delivers all debuggion data (needed, if output is not correct)
   * option -jjjj and -jjjjj for testing
+  * MAIL_LOCAL_PART_MAP MAIL_LOCAL_PART_SCHEME
+
 ------------------------------------------------------------
 
 
@@ -54,7 +56,25 @@ Was ist neu 3.75.0:
 Todo:
 ############################################################
 
-Test 
+
+Die Möglichkeit Parameter ins LDAP zu schreiben und zu lesen. Der fürs erste wichtige Punkt umfasst hierbei das Attribut
+
+
+proxyAddresses beim user befüllen: 
+  smtp:alias1@testdomain.de
+  smtp:alias2@testdomain.de
+
+sophomorix-user -user ab --set-attribute <single value> --entry <whats inside>
+
+
+OK: sophomorix-user -user ab --add-multi-value-attribute <mvattr> --entry <1>
+
+TODO: ???????? Weiter hier:
+sophomorix-user -user ab --set-multi-value-attribute <mvattr> --entry <1,2>
+sophomorix-user -user ab --remove-multi-value-attribute <mvattr> --entry <1>
+
+
+auflisten? wie? json?
 
 
 ------------------------------------------------------------
@@ -67,10 +87,7 @@ parameter school.conf:
 
 OK: MAIL_LOCAL_PART_SCHEME=      (leer: default ist samaccountname@)
     Alternativen:    
-      firstname.lastname
-      lastname.firstname 
-      firstname_lastname
-      lastname_firstname 
+      firstname.lastname, lastname.firstname, firstname_lastname, lastname_firstname 
 OK: MAIL_LOCAL_PART_MAP=mueller=k.mueller,maier=kpmaier  (mueller,maier
    sind samaccountname)
 TODO:
@@ -90,31 +107,8 @@ sophomorix-query --smbstatus
                              --userinfo (Vorname, Nachname, ....)
                                (für die user im Raum <raumname>)
 
-Gives Back:
-
-All users in the room (room,ip,user)
-
-howto sole this:
-- query AD for everything about devices
-  &AD_get_AD_for_device als Vorlage:
-  - nur rooms abfragen
-  room --> <roomname> -> IP1-> dnsName -> <name>
-                            -> mac     -> <mac>
-                            ->
-                      -> IP2
-                      -> ...
-  --> LOOKUP aufbauen
-      (user --> )IP --> room
-
-dann Auswerten und Ergebnis-hash schreiben:
-
-room -> <user> -> username -> IP
-                           -> rechner
-
-(Schulserver, bzw. devices von der Schule holen)
+Gives Back: All users in the room (room,ip,user)
 ------------------------------------------------------------
-
-
 
 
 Belwue mail: Weiterleitungen anzeigen

@@ -85,6 +85,9 @@ my $add_webui_permissions;
 my $remove_webui_permissions;
 
 my $comment;
+my $add_multi_value_attribute;
+my $entry;
+
 my $custom_1;
 my $custom_2;
 my $custom_3;
@@ -167,6 +170,8 @@ my $testopt=GetOptions(
        "school=s" => \$school,
        "u|user=s" => \$user,
        "comment=s" => \$comment,
+       "add-multi-value-attribute=s" => \$add_multi_value_attribute,
+       "entry=s" => \$entry,
        "custom1=s" => \$custom_1,
        "custom2=s" => \$custom_2,
        "custom3=s" => \$custom_3,
@@ -324,6 +329,8 @@ Updating sophomorixIntrinsicMulti1 - sophomorixIntrinsicMulti5: (Warning! This i
   --user <user> --add-intrinsic-multi<n> "Added entry in sophomorixIntrinsicMulti<n>"
   --user <user> --remove-intrinsic-multi<n> "Removed entry from sophomorixIntrinsicMulti<n>"
 
+
+
 Updating WebuiDashboard of a user:
   --user <user> --webui-dashboard "Webui Dashboard String"
   --user <user> --webui-permissions permission1,permission2,permission3, ... 
@@ -331,6 +338,11 @@ Updating WebuiDashboard of a user:
   --user <user> --remove-webui-permissions permission1,permission2,permission3, ...
 
   permissions1, ... must have the systax:  <ui>:<module>:<TRUE/FALSE>
+
+Updating OTHER multi value attribute:
+  --user <user> --add-multi-value-attribute <attributeName> --entry <data1,data2, ...>
+
+
 
 -> continue here
   --list-teachers-by-year
@@ -1245,6 +1257,29 @@ if (defined $custom_multi_5 and $user ne ""){
                      sophomorix_result=>\%sophomorix_result,
                     });
 }
+
+
+
+# --add-multi-value-attribute <mvattr> --entry <entry>
+if ($user ne "" and defined $add_multi_value_attribute and defined $entry ){
+    my @add=split(/,/,$entry);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,$add_multi_value_attribute);
+    my @multi_value_entry = uniq(@old,@add); 
+    my $multi_value_entry=join(",",@multi_value_entry);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     multi_value_add=>$add_multi_value_attribute,
+                     multi_value_entry=>$multi_value_entry,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
 
 # --add-custom-multi1(-5) "Test for custom-multi1(-5)"
 if (defined $add_custom_multi_1 and $user ne ""){

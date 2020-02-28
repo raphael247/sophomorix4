@@ -2514,6 +2514,9 @@ sub AD_user_update {
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
+    # changing OTHER multi-value attributes
+    my $multi_value_add = $arg_ref->{multi_value_add};
+    my $multi_value_entry = $arg_ref->{multi_value_entry};
     # custom attributes
     my $custom_1 = $arg_ref->{custom_1};
     my $custom_2 = $arg_ref->{custom_2};
@@ -2951,6 +2954,18 @@ sub AD_user_update {
         print "   sophomorixCustom5:          $custom_5\n";
     }
 
+    # other multi-value attributes
+    if (defined $multi_value_add and defined $multi_value_entry){
+        my @multi_value_entry=split(/,/,$multi_value_entry);
+        @multi_value_entry = reverse @multi_value_entry;
+        print "   * Setting $multi_value_add to: @multi_value_entry\n";
+        my $multi_value_entry_string=join("|",@multi_value_entry);
+        $update_log_string=$update_log_string."\"".$multi_value_add."=".$multi_value_entry_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {$multi_value_add => \@multi_value_entry }); 
+#        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    
+    
     # custom attributes (multiValue)
     if (defined $custom_multi_1){
         my @custom_multi_1=split(/,/,$custom_multi_1);
