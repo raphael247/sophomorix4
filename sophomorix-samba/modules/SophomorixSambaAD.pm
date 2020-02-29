@@ -2514,6 +2514,9 @@ sub AD_user_update {
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
+    # changing OTHER single-value attributes
+    my $single_value_set = $arg_ref->{single_value_set};
+    my $single_value_entry = $arg_ref->{single_value_entry};
     # changing OTHER multi-value attributes
     my $multi_value_set = $arg_ref->{multi_value_set};
     my $multi_value_add = $arg_ref->{multi_value_add};
@@ -2956,7 +2959,19 @@ sub AD_user_update {
         print "   sophomorixCustom5:          $custom_5\n";
     }
 
-    # other multi-value attributes
+    # OTHER single-value attributes
+    if (defined $single_value_set and defined $single_value_entry){
+        if ($single_value_entry eq ""){
+            # delete attr if empty
+            push @delete, $single_value_set;
+            print "   $single_value_set:      DELETE\n";
+        } else {
+            $replace{$single_value_set}=$single_value_entry;
+            print "   $single_value_set:      $single_value_entry\n";
+        }
+    }
+
+    # OTHER multi-value attributes
     if (defined $multi_value_set and defined $multi_value_entry){
         my @multi_value_entry=split(/,/,$multi_value_entry);
         @multi_value_entry = reverse @multi_value_entry;
@@ -3199,6 +3214,16 @@ sub AD_user_update {
                          );
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
+
+    #print Dumper(\@delete);
+    if ($#delete > -1){
+        # delete
+        my $mesg = $ldap->modify( $dn,
+                          delete => ( @delete )
+                         );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+
 
     # set password with smbpasswd
     if ($smbpasswd eq "TRUE"){

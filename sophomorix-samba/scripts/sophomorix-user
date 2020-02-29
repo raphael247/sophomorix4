@@ -85,6 +85,7 @@ my $add_webui_permissions;
 my $remove_webui_permissions;
 
 my $comment;
+my $set_single_value_attribute;
 my $set_multi_value_attribute;
 my $add_multi_value_attribute;
 my $remove_multi_value_attribute;
@@ -172,6 +173,7 @@ my $testopt=GetOptions(
        "school=s" => \$school,
        "u|user=s" => \$user,
        "comment=s" => \$comment,
+       "set-single-value-attribute=s" => \$set_single_value_attribute,
        "set-multi-value-attribute=s" => \$set_multi_value_attribute,
        "add-multi-value-attribute=s" => \$add_multi_value_attribute,
        "remove-multi-value-attribute=s" => \$remove_multi_value_attribute,
@@ -334,7 +336,6 @@ Updating sophomorixIntrinsicMulti1 - sophomorixIntrinsicMulti5: (Warning! This i
   --user <user> --remove-intrinsic-multi<n> "Removed entry from sophomorixIntrinsicMulti<n>"
 
 
-
 Updating WebuiDashboard of a user:
   --user <user> --webui-dashboard "Webui Dashboard String"
   --user <user> --webui-permissions permission1,permission2,permission3, ... 
@@ -343,14 +344,20 @@ Updating WebuiDashboard of a user:
 
   permissions1, ... must have the systax:  <ui>:<module>:<TRUE/FALSE>
 
+Updating OTHER single value attribute:
+  Set <attributeName> from <user> to <data>
+    --user <user> --set-single_value-attribute <attributeName> --entry <data>
+  Remove <attributeName> from <user>
+    --user <user> --set-single_value-attribute <attributeName> --entry ""
+
 Updating OTHER multi value attribute:
-  Set <attributeName> to <data1,data2, ...>
+  Set <attributeName> of <user> to <data1,data2, ...>
     --user <user> --set-multi-value-attribute <attributeName> --entry <data1,data2, ...>
-  Remove all entries from <attributeName>
+  Remove all entries from <attributeName> of <user>
     --user <user> --set-multi-value-attribute <attributeName> --entry ""
-  Add <data1,data2,...> to <attributeName>
+  Add <data1,data2,...> to <attributeName> of <user>
     --user <user> --add-multi-value-attribute <attributeName> --entry <data1,data2, ...>
-  Remove <data1,data2,...> from <attributeName>
+  Remove <data1,data2,...> from <attributeName> of <user>
     --user <user> --remove-multi-value-attribute <attributeName> --entry <data1,data2, ...>
 
 -> continue here
@@ -1267,7 +1274,21 @@ if (defined $custom_multi_5 and $user ne ""){
                     });
 }
 
-
+# --set-single-value-attribute <attribute> --entry <entry>
+if ($user ne "" and defined $set_single_value_attribute and defined $entry ){
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                   single_value_set=>$set_single_value_attribute,
+                   single_value_entry=>$entry,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
 
 # --set-multi-value-attribute <mvattr> --entry <entry>
 if ($user ne "" and defined $set_multi_value_attribute and defined $entry ){
