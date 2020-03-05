@@ -3227,9 +3227,9 @@ sub AD_user_update {
 
     # set password with smbpasswd
     if ($smbpasswd eq "TRUE"){
-	my $smbpasswd_command = "(echo \"$sophomorix_first_password\"; echo \"$sophomorix_first_password\")".
+	my $smbpasswd_command = "(echo '$sophomorix_first_password'; echo '$sophomorix_first_password')".
                                 " | $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBPASSWD'} -U $user -s";
-	my $smbpasswd_display = "(echo \"******\"; echo \"******\")".
+	my $smbpasswd_display = "(echo '******'; echo '******')".
                                 " | $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBPASSWD'} -U $user -s";
 	if ($hide_pwd==1){
 	    print "Executing (password omitted by --hide):\n"; 
