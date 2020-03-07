@@ -336,6 +336,10 @@ if (defined $options{'smbstatus'}){
         }
     }
 
+    my ($ref_AD_rooms) = &AD_get_rooms({ldap=>$ldap,
+                                        root_dse=>$root_dse,
+                                        root_dns=>$root_dns,
+                                      });
 
     # second loop: get users
     foreach my $entry (@lines){
@@ -372,10 +376,13 @@ if (defined $options{'smbstatus'}){
 
                # add computer name from LOOKUP
                if (defined $smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip}){
+                   $smbstatus{'USER'}{$user}{'SMBSTATUS_COMPUTER_LINE'}="TRUE";
                    $smbstatus{'USER'}{$user}{'COMPUTER'}=$smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip};
                    $smbstatus{'COMPUTER'}{$smbstatus{'LOOKUP'}{'computer_by_ip'}{$ip}}{'USER'}=$user;
                } else {
-                   $smbstatus{'USER'}{$user}{'COMPUTER'}="NONE";
+                   $smbstatus{'USER'}{$user}{'SMBSTATUS_COMPUTER_LINE'}="NONE";
+		   my $computer=$ref_AD_rooms->{'LOOKUP'}{$ip};
+		   $smbstatus{'USER'}{$user}{'COMPUTER'}=$computer;
                    $smbstatus{'WARNINGS'}{$ip}="Could not find computer entry for ip $ip used by $user";
                }
             }
@@ -384,12 +391,9 @@ if (defined $options{'smbstatus'}){
         }
     }
 
-    my ($ref_AD_rooms) = &AD_get_rooms({ldap=>$ldap,
-                                        root_dse=>$root_dse,
-                                        root_dns=>$root_dns,
-                                      });
 
-    #&json_printout($options{'json'},$ref_AD_rooms);
+    &json_printout($options{'json'},$ref_AD_rooms);
+
     foreach my $room (keys  %{ $ref_AD_rooms->{'room'} }){
         foreach my $ip (@{ $ref_AD_rooms->{'room'}{$room}{'sophomorixRoomIPs'} }){
             $lookup{'LOOKUP'}{'room_by_IP'}{$ip}=$room;
@@ -1299,7 +1303,6 @@ sub AD_get_rooms {
     my $ldap = $arg_ref->{ldap};
     my $root_dse = $arg_ref->{root_dse};
     my $root_dns = $arg_ref->{root_dns};
-#    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my %AD=();
     &Sophomorix::SophomorixBase::print_title("Query AD for rooms (start)");
     ############################################################
@@ -1308,10 +1311,6 @@ sub AD_get_rooms {
         my $filter="(& (objectClass=group) (| ".
                    "(sophomorixType=room) ".
                    "(sophomorixType=devicegroup) ";
-        # add defined host group types from sophomorix.ini
-#        foreach my $type (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'HOST_GROUP_TYPE'} }) {
-#            $filter=$filter."(sophomorixType=".$type.") ";
-#        }
         $filter=$filter.") )";
 
 	#print "Filter for device groups: $filter\n";
@@ -1334,7 +1333,6 @@ sub AD_get_rooms {
         &Sophomorix::SophomorixBase::print_title("$max_group sophomorix rooms/devicegroupes found in AD");
         $AD{'RESULT'}{'group'}{'TOTAL'}{'COUNT'}=$max_group;
         $AD{'RESULT'}{'group'}{'room'}{'COUNT'}=0;
-#        $AD{'RESULT'}{'group'}{$ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}}{'COUNT'}=0;
         for( my $index = 0 ; $index < $max_group ; $index++) {
             my $entry = $mesg->entry($index);
             my $dn = $entry->dn();
@@ -1385,6 +1383,27 @@ sub AD_get_rooms {
             #$AD{'LOOKUP'}{'sophomorixType_BY_sophomorixAdminClass'}{$sam}=$type;
         }
     } # BLOCK group end
+    { # BLOCK computer start
+        ### create filter
+        # finds all computer with any string as sophomorixRole
+        my $filter="(& (objectClass=computer) (sophomorixRole=*) )";
+        # print "Filter:  $filter\n";
+        my $mesg = $ldap->search( # perform a search
+                          base   => $root_dse,
+                          scope => 'sub',
+                          filter => $filter,
+                          attrs => ['sAMAccountName',
+                                    'sophomorixDnsNodename',
+                                    'sophomorixComputerIP',
+                                   ]);
+        my $max_computer = $mesg->count; 
+        &Sophomorix::SophomorixBase::print_title("$max_computer Computers found in AD");
+        for( my $index = 0 ; $index < $max_computer ; $index++) {
+            my $entry = $mesg->entry($index);
+            $AD{'LOOKUP'}{$entry->get_value('sophomorixComputerIP')}=$entry->get_value('sophomorixDnsNodename');
+        }
+    }  # BLOCK computer end
+
     return(\%AD);
 }
 
