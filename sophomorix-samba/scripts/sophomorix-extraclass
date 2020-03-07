@@ -113,7 +113,9 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-extraclass");
 # Prüfen, ob Optionen erkannt wurden
 &check_options($testopt,\%sophomorix_result,$options{'json'},\%options);
 
-if (not defined $options{'school'}){
+if (not defined $options{'school'} or 
+    $options{'school'} eq $DevelConf::name_default_school
+   ){
     $options{'school'}="---";
 }
 
