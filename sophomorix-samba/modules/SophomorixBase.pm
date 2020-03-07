@@ -6101,7 +6101,10 @@ sub check_options{
     # get effective/real userID
     $ref_options->{'RUNTIME'}{'EFFECTIVE_UID'}=$<;
     $ref_options->{'RUNTIME'}{'REAL_UID'}=$>;
-    $ref_options->{'SCRIPTNAME'}=$0;
+    $ref_options->{'RUNTIME'}{'SUDO_USER'}=$ENV{'SUDO_USER'};
+    if (not defined $ref_options->{'RUNTIME'}{'SUDO_USER'}){
+        $ref_options->{'RUNTIME'}{'SUDO_USER'}="root";
+    }
 
 
     print "Command line::\n";
