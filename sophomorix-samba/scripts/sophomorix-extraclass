@@ -593,7 +593,7 @@ if (defined $options{'kill'} and
     if($Conf::log_level>=2){
         print "Filter: $filter\n";
     }
-    my $mesg = $ldap->search(
+    my $mesg1 = $ldap->search(
                       base   => $root_dse,
                       scope => 'sub',
                       filter => $filter,
@@ -604,18 +604,18 @@ if (defined $options{'kill'} and
                                'sophomorixType',
                                'member']
                             );
-    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    &AD_debug_logdump($mesg1,2,(caller(0))[3]);
 
-    my $count = $mesg->count;
-    my $entry = $mesg->entry(0);
-    if (not defined $entry){
+    my $count1 = $mesg1->count;
+    my $entry1 = $mesg1->entry(0);
+    if (not defined $entry1){
         print "\nNo extraclass \"$options{'extraclass'}\" found!\n\n";
 	exit;
     } else {
-        my $type = $entry->get_value('sophomorixType');
-        my $school = $entry->get_value('sophomorixSchoolname');
-        my $status = $entry->get_value('sophomorixStatus');
-	my @members = $entry->get_value('member');
+        my $type = $entry1->get_value('sophomorixType');
+        my $school = $entry1->get_value('sophomorixSchoolname');
+        my $status = $entry1->get_value('sophomorixStatus');
+	my @members = $entry1->get_value('member');
         &print_title("extraclass $options{'extraclass'} found!");
 
         foreach my $user_dn (@members){
@@ -633,13 +633,13 @@ if (defined $options{'kill'} and
                             );
             &AD_debug_logdump($mesg2,2,(caller(0))[3]);
 
-            my $count = $mesg2->count;
-            my $entry = $mesg2->entry(0);
-            my $sam=$entry->get_value('sAMAccountName');
-            my $role=$entry->get_value('sophomorixRole');
-            my $status=$entry->get_value('sophomorixStatus');
-            my $comment=$entry->get_value('sophomorixComment');
-            my $school=$entry->get_value('sophomorixSchoolname');
+            my $count2 = $mesg2->count;
+            my $entry2 = $mesg2->entry(0);
+            my $sam=$entry2->get_value('sAMAccountName');
+            my $role=$entry2->get_value('sophomorixRole');
+            my $status=$entry2->get_value('sophomorixStatus');
+            my $comment=$entry2->get_value('sophomorixComment');
+            my $school=$entry2->get_value('sophomorixSchoolname');
 
             if ($status eq "M"){
 		# KILL
@@ -710,10 +710,10 @@ if (defined $options{'kill'} and
                             );
     &AD_debug_logdump($mesg3,2,(caller(0))[3]);
 
-    my $count = $mesg3->count;
-    my $entry = $mesg3->entry(0);
-    my $status = $entry->get_value('sophomorixStatus');
-    my @members = $entry->get_value('member');
+    my $count3 = $mesg3->count;
+    my $entry3 = $mesg3->entry(0);
+    my $status = $entry3->get_value('sophomorixStatus');
+    my @members = $entry3->get_value('member');
     my $count_members=$#members+1;
     if ($count_members==0 and $status eq "M"){
         &print_title("Deleting extraclass $options{'extraclass'} (Status $status, $count_members users)");
