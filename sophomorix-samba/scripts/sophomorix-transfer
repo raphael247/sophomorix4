@@ -1437,6 +1437,7 @@ sub smbclient_mget_recurse {
                     $lcd_path=$lcd_path."/".$filename;
 		}
                 system("mkdir -p $lcd_path");
+
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".
