@@ -101,6 +101,8 @@ my $from_user="";
 my $file_list="";
 
 my $collect_copy_exam="";
+my $clear_account=0;
+
 
 my $clean_transfer_dir="";
 my $clean_home_dir="";
@@ -126,6 +128,7 @@ my $testopt=GetOptions(
            "collect-copy" => \$collect_copy,
            "collect-move" => \$collect_move,
            "collect-copy-exam=s" => \$collect_copy_exam,
+           "clear-account" => \$clear_account,
            "clean-transfer-dir=s" => \$clean_transfer_dir,
            "clean-home-dir=s" => \$clean_home_dir,
            "list-home-dir=s" => \$list_home_dir,

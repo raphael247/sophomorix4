@@ -233,7 +233,8 @@ if ($set_exam_mode==1){
             }
         }
     }
-    exit;
+    &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
@@ -258,9 +259,9 @@ if ($unset_exam_mode==1){
             my $examuser=$participant.$sophomorix_config{'INI'}{'EXAMMODE'}{'USER_POSTFIX'};
             my $command;
             if (defined $subdir){
-                $command="/usr/sbin/sophomorix-transfer --collect-copy-exam ".$examuser." --subdir ".$subdir;
+                $command="/usr/sbin/sophomorix-transfer --clear-account --collect-copy-exam ".$examuser." --subdir ".$subdir;
             } else {
-                $command="/usr/sbin/sophomorix-transfer --collect-copy-exam ".$examuser;
+                $command="/usr/sbin/sophomorix-transfer --clear-account --collect-copy-exam ".$examuser;
 
             }
             &call_sophomorix_command($Conf::log_level,$json,$command);
@@ -291,12 +292,11 @@ if ($unset_exam_mode==1){
                              });
         }
     }
-    exit;
+    &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
-&AD_unbind_admin($ldap);
-&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 
 ################################################################################
 # Sub
