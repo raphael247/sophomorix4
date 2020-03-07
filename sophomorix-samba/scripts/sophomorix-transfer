@@ -101,8 +101,7 @@ my $from_user="";
 my $file_list="";
 
 my $collect_copy_exam="";
-my $clear_account=0;
-
+my $copy_account_data=0;
 
 my $clean_transfer_dir="";
 my $clean_home_dir="";
@@ -128,7 +127,7 @@ my $testopt=GetOptions(
            "collect-copy" => \$collect_copy,
            "collect-move" => \$collect_move,
            "collect-copy-exam=s" => \$collect_copy_exam,
-           "clear-account" => \$clear_account,
+           "copy-account-data" => \$copy_account_data,
            "clean-transfer-dir=s" => \$clean_transfer_dir,
            "clean-home-dir=s" => \$clean_home_dir,
            "list-home-dir=s" => \$list_home_dir,
@@ -445,6 +444,7 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
                                              type=>"copy",
                                              from_user=>$from_user,
                                              file_list=>$file_list,
+                                             copy_account_data=>$copy_account_data,
                                              json=>$json,
                                              sophomorix_config=>\%sophomorix_config,
                                              sophomorix_result=>\%sophomorix_result,
@@ -457,6 +457,7 @@ if ( ($collect_copy==1 or $collect_move==1) and $from_user ne "" and $to_user ne
                                              type=>"move",
                                              from_user=>$from_user,
                                              file_list=>$file_list,
+                                             copy_account_data=>$copy_account_data,
                                              json=>$json,
                                              sophomorix_config=>\%sophomorix_config,
                                              sophomorix_result=>\%sophomorix_result,
@@ -560,6 +561,7 @@ if ($collect_copy_exam){
                                             smb_admin_pass=>$smb_admin_pass,
                                             type=>"copy",
                                             from_user=>$collect_copy_exam,
+                                            copy_account_data=>$copy_account_data,
                                             file_list=>$transfer,
                                             json=>$json,
                                             sophomorix_config=>\%sophomorix_config,
@@ -1351,6 +1353,7 @@ sub smbclient_mget_recurse {
     my $from_user = $arg_ref->{from_user};
     my $file_list = $arg_ref->{file_list};
     my $json = $arg_ref->{json};
+    my $copy_account_data = $arg_ref->{copy_account_data};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
 
@@ -1421,13 +1424,19 @@ sub smbclient_mget_recurse {
                 }
                 last;
             } elsif ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
-                # dir
                 print "   * $filename is a directory ($file_path)\n";
-		$cd_path=$cd_path."/".$filename;
-
-                # prepare local unix path
-                $lcd_path=$lcd_path."/".$filename;
-                system("mkdir $lcd_path");
+                if ($copy_account_data==1){
+                    # dir
+                    $cd_path=$cd_path;
+                    # prepare local unix path
+                    $lcd_path=$lcd_path;
+		} else {
+                    # dir
+                    $cd_path=$cd_path."/".$filename;
+                    # prepare local unix path
+                    $lcd_path=$lcd_path."/".$filename;
+		}
+                system("mkdir -p $lcd_path");
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".
