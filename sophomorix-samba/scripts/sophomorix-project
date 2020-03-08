@@ -165,7 +165,8 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 
-if (defined $options{'project'} and not defined $options{'create'} and not defined $options{'kill'}){
+#if (defined $options{'project'} and not defined $options{'create'} and not defined $options{'kill'}){
+if (defined $options{'project'}){
     # append p_ if omitted
     unless ($options{'project'} =~ m/^p\_/) { 
         $options{'project'}="p_".$options{'project'};
@@ -347,6 +348,28 @@ if (defined $options{'update-maildomain'}){
 # --create --project <name>
 ############################################################
 if (defined $options{'create'} and defined $options{'project'}){
+    # abort if project exits already
+    my %existing_projects=();
+    my $filter="(&(objectClass=group)(sophomorixType=project))";
+    my $mesg = $ldap->search( # perform a search
+                   base   => $root_dse,
+                   scope => 'sub',
+                   filter => $filter,
+                         );
+    my $max_pro = $mesg->count;
+    for( my $index = 0 ; $index < $max_pro ; $index++) {
+        my $entry = $mesg->entry($index);
+	my $sam=$entry->get_value('sAMAccountName');
+        $existing_projects{$sam}="exists";
+    }
+
+    #print Dumper(\%existing_projects);
+
+    if (exists $existing_projects{$options{'project'}}){
+        &log_script_exit("Project $options{'project'} exists already | Cannot be used with option --create",1,1,0,
+                         \@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+    }
+
     # --gidnumber-migrate
     ############################################################
     if (defined $options{'gidnumber-migrate'}){
