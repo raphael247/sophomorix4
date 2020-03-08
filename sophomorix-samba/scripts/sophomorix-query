@@ -392,7 +392,7 @@ if (defined $options{'smbstatus'}){
     }
 
 
-    &json_printout($options{'json'},$ref_AD_rooms);
+    #&json_printout($options{'json'},$ref_AD_rooms);
 
     foreach my $room (keys  %{ $ref_AD_rooms->{'room'} }){
         foreach my $ip (@{ $ref_AD_rooms->{'room'}{$room}{'sophomorixRoomIPs'} }){
