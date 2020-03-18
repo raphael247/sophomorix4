@@ -718,26 +718,85 @@ sub latex_from_template_and_datablock {
             $schoolstring=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")");
         }
 
+        # URLSTART_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLSTART_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLSTART_PRINT'} ne ""
+           ){
+            my $urlstart_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLSTART_PRINT'});
+            if ($urlstart_print eq "NONE"){
+		$urlstart_print=" ";
+            }
+            $line=~s/\\textcolor\{red\}\{URLSTART\\_PRINT\}/$urlstart_print/;
+        }
+        # URLSTART_COMMENT_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLSTART_COMMENT_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLSTART_COMMENT_PRINT'} ne ""
+           ){
+            my $urlstart_comment_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLSTART_COMMENT_PRINT'});
+            if ($urlstart_comment_print eq "NONE"){
+		$urlstart_comment_print=" ";
+            }
+            $line=~s/\\textcolor\{red\}\{URLSTART\\_COMMENT\\_PRINT\}/$urlstart_comment_print/;
+        }
         # URLSCHUKO_PRINT
         if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_PRINT'} and
             $sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_PRINT'} ne ""
            ){
             my $urlschuko_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_PRINT'});
+            if ($urlschuko_print eq "NONE"){
+		$urlschuko_print=" ";
+            }
             $line=~s/\\textcolor\{red\}\{URLSCHUKO\\_PRINT\}/$urlschuko_print/;
+        }
+        # URLSCHUKO_COMMENT_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_COMMENT_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_COMMENT_PRINT'} ne ""
+           ){
+            my $urlschuko_comment_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_COMMENT_PRINT'});
+            if ($urlschuko_comment_print eq "NONE"){
+		$urlschuko_comment_print=" ";
+            }
+            $line=~s/\\textcolor\{red\}\{URLSCHUKO\\_COMMENT\\_PRINT\}/$urlschuko_comment_print/;
         }
         # URLMAIL_PRINT
         if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_PRINT'} and
             $sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_PRINT'} ne ""
            ){
             my $urlmail_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_PRINT'});
+            if ($urlmail_print eq "NONE"){
+		$urlmail_print=" ";
+            }
             $line=~s/\\textcolor\{red\}\{URLMAIL\\_PRINT\}/$urlmail_print/;
+        }
+        # URLMAIL_COMMENT_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_COMMENT_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_COMMENT_PRINT'} ne ""
+           ){
+            my $urlmail_comment_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_COMMENT_PRINT'});
+            if ($urlmail_comment_print eq "NONE"){
+		$urlmail_comment_print=" ";
+            }
+            $line=~s/\\textcolor\{red\}\{URLMAIL\\_COMMENT\\_PRINT\}/$urlmail_comment_print/;
         }
         # URLMOODLE_PRINT
         if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_PRINT'} and
             $sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_PRINT'} ne ""
            ){
             my $urlmoodle_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_PRINT'});
+            if ($urlmoodle_print eq "NONE"){
+		$urlmoodle_print=" ";
+            }
             $line=~s/\\textcolor\{red\}\{URLMOODLE\\_PRINT\}/$urlmoodle_print/;
+        }
+        # URLMOODLE_COMMENT_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_COMMENT_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_COMMENT_PRINT'} ne ""
+           ){
+            my $urlmoodle_comment_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_COMMENT_PRINT'});
+            if ($urlmoodle_comment_print eq "NONE"){
+		$urlmoodle_comment_print=" ";
+            }
+            $line=~s/\\textcolor\{red\}\{URLMOODLE\\_COMMENT\\_PRINT\}/$urlmoodle_comment_print/;
         }
  
         # (use hyphen here for template)
