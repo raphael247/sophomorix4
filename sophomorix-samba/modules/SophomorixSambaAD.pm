@@ -7205,7 +7205,7 @@ sub AD_get_printdata {
                      $entry->get_value('sophomorixSurnameASCII').";".
                      $entry->get_value('sophomorixFirstnameASCII').";".
                      $entry->get_value('sophomorixRole').";".
-                     $entry->get_value('sophomorixCreationDate').";;";
+                     $entry->get_value('sophomorixCreationDate').";";
             if (not exists $seen_classes{$entry->get_value('sophomorixAdminClass')}){
                 push @{ $AD_printdata{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
 		                      {$entry->get_value('sophomorixSchoolname')} },$entry->get_value('sophomorixAdminClass');

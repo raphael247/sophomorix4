@@ -374,6 +374,7 @@ my $ref_AD_printdata=&AD_get_printdata({ldap=>$ldap,
                                       sophomorix_config=>\%sophomorix_config,
              });
 
+
 # --info
 if ($info==1){
     my $jsoninfo="PRINTDATA";
@@ -650,7 +651,7 @@ sub latex_datablock_from_list {
                                           "{".$class."}".
                                           "{".$data[8]."}".
                                           "{".$data[9]."}".
-                                          "{".$data[10]."}%\n";
+                                          "{".$data[6].", ".$data[7]."}%\n";
         # decide if dataline_count must be reset (page completely full)
 	if ($dataline_count==$dataline_max){
             $dataline_count=0;
@@ -694,7 +695,7 @@ sub create_csv_files {
         my $csv=$data[1]." ".$data[0].";".$data[5].";".$data[2].";".$data[3].";";
         print CSV $csv."\l\r";
         print UNIXCSV $csv."\n";
-        my $webuntis=$data[5].";".$data[0].";".$data[1].";".$data[2].";".$data[10].";";
+        my $webuntis=$data[5].";".$data[0].";".$data[1].";".$data[2].";".$data[6].", ".$data[7].";";
         print WEBUNIXCSV $webuntis."\n";
         print WEBCSV $webuntis."\l\r";
     }
@@ -716,10 +717,34 @@ sub latex_from_template_and_datablock {
         } else {
             $schoolstring=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'SCHOOL_LONGNAME'}."(".$school.")");
         }
+
+        # URLSCHUKO_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_PRINT'} ne ""
+           ){
+            my $urlschuko_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLSCHUKO_PRINT'});
+            $line=~s/\\textcolor\{red\}\{URLSCHUKO\\_PRINT\}/$urlschuko_print/;
+        }
+        # URLMAIL_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_PRINT'} ne ""
+           ){
+            my $urlmail_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLMAIL_PRINT'});
+            $line=~s/\\textcolor\{red\}\{URLMAIL\\_PRINT\}/$urlmail_print/;
+        }
+        # URLMOODLE_PRINT
+        if (exists $sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_PRINT'} and
+            $sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_PRINT'} ne ""
+           ){
+            my $urlmoodle_print=&string_to_latex($sophomorix_config{'SCHOOLS'}{$school}{'URLMOODLE_PRINT'});
+            $line=~s/\\textcolor\{red\}\{URLMOODLE\\_PRINT\}/$urlmoodle_print/;
+        }
+ 
         # (use hyphen here for template)
         $line=~s/\\textcolor\{red\}\{SCHOOL-LONGNAME\}/$schoolstring/;
         $line=~s/\\textcolor\{red\}\{FILENAME\}/$output_file_basename/;
         $line=~s/\\textcolor\{red\}\{ADMINS-PRINT\}/$admins_print/;
+
 
         if ($line=~m/DATABLOCK START/){
             $datablockmode="TRUE";
