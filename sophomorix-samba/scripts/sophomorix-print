@@ -651,7 +651,7 @@ sub latex_datablock_from_list {
                                           "{".$class."}".
                                           "{".$data[8]."}".
                                           "{".$data[9]."}".
-                                          "{".$data[6].", ".$data[7]."}%\n";
+                                          "{".$sophomorix_config{'samba'}{'smb.conf'}{'global'}{'workgroup'}."}%\n";
         # decide if dataline_count must be reset (page completely full)
 	if ($dataline_count==$dataline_max){
             $dataline_count=0;
