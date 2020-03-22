@@ -27,6 +27,40 @@ Host fleischsalat
  User ruediger
  Port 22
 
+Todo:
+------------------------------------------------------------
+Neu für Nextcloud:
+Konfiguration: 
+   MANAGED_CLASS_SUBGROUPS=TRUE/FALSE je schule
+   MANAGED_PROJECT_SUBGROUPS=TRUE/FALSE je schule
+
+&AD_update_managed_class_subgroups('Klasse=...')
+&AD_update_managed_class_subgroups('school=....')
+
+Funktion um aus einer Klasse 2 managementgruppen zu machen
+  - status M
+  - hidden=TRUE
+  - type=managedsubgroup
+Klasse (m2kk3t) und Mitglieder durchgehen.
+         dann
+         m2kk3t-teachers
+         m2kk3t-students
+sophomorix-managementgroup --update-managed-class-subgroups --school ...
+sophomorix-managementgroup --update-managed-project-subgroups --school ...
+  -> geht alle klassen durch (adminclass und extraclass)
+  -> legt die managed subgroups an (MANAGED_CLASS_SUBGROUPS=TRUE)
+     -> füllt sie mit usern
+  -> löscht die managed subgroups (MANAGED_CLASS_SUBGROUPS=FALSE)
+und um sie anzuzeiugen (das sind zu viele, um sie mit internet usw anzuzeigen):
+
+sophomorix-managementgroup --show-managed-class-subgroups --school ...
+sophomorix-managementgroup --show-managed-project-subgroups --school ...
+
+Triggern von obigen funktionen:
+sophomorix-check/sophomorix-update
+sophomorix-class --members/addmembers/removemembers
+------------------------------------------------------------
+
 ------------------------------------------------------------
 Was ist neu in 3.78.0:
   * Neue Variablem für die loginkarten in school.conf:
