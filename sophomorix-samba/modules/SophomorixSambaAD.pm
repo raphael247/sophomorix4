@@ -2203,6 +2203,7 @@ sub AD_user_create {
         unicodePwd => $uni_password,
         homeDrive => "H:",
         homeDirectory => $homedirectory,
+        sophomorixIntrinsic2 => $smb_rel_path,
         unixHomeDirectory => $unix_home,
         sophomorixExitAdminClass => "unknown", 
         sophomorixUnid => $unid,
