@@ -735,6 +735,13 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     my $old_homedirectory=$ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'};;
     my $new_homedirectory="---";
     
+    ############################################################
+    # This might be temporary
+    my $old_homedirectory_rel=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'};;
+    my $new_homedirectory_rel="---";
+    
+    ############################################################
+
     my $old_mail=$ref_AD_check->{'sAMAccountName'}{$sam}{'mail'};
     my $new_mail="---";
     
@@ -811,6 +818,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                           \$new_webui_string,
 #                          \$old_homedirectory,
                           \$new_homedirectory,
+#                          \$old_homedirectory_rel,
+                          \$new_homedirectory_rel,
                          );
     }
 
@@ -849,6 +858,8 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
                         $new_webui_string."::".
                         $old_homedirectory."::".
                         $new_homedirectory."::".
+                        $old_homedirectory_rel."::".
+                        $new_homedirectory_rel."::".
                         "\n";
         print UPDATE $update_line;
         # create result
@@ -1386,6 +1397,7 @@ sub test_user_update {
         $new_webui_string_ref,
 #        $old_homedirectory_ref,
         $new_homedirectory_ref,
+        $new_homedirectory_rel_ref,
        )=@_;
     my $line_new=$Match{'action_BY_sAMAccountName'}{$sam};
    
@@ -1533,7 +1545,6 @@ sub test_user_update {
                                                    $sam,
                                                    $role_for_homedirectory,
                                                    $ref_sophomorix_config);
-
     if ( $homedirectory_new eq $ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'} ){
         # no update
         ${$new_homedirectory_ref}="---";
@@ -1542,6 +1553,18 @@ sub test_user_update {
         # homeDirectory
         ${$update_ref}++;
         ${$new_homedirectory_ref}=$homedirectory_new;
+    }
+
+    if ( defined $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'} 
+         and
+         $smb_rel_path eq $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'} ){
+        # no update
+        ${$new_homedirectory_rel_ref}="---";
+    } else {
+        # update
+        # homeDirectory
+        ${$update_ref}++;
+        ${$new_homedirectory_rel_ref}=$smb_rel_path;
     }
     
     # unid

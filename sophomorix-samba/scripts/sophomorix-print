@@ -608,7 +608,7 @@ sub build_results {
     if ($command eq "pdflatex"){
         &pdflatex;
     } elsif ($command eq "latex"){
-        # hoehere Qualitaet
+        # higher quality
         &latex;
     } else {
         print "\nI do not know how to process the file ($command ?)\n\n";
@@ -636,7 +636,7 @@ sub latex_datablock_from_list {
     foreach my $item (@list){
         $dataline_count++;
         if ($dataline_count==1){
-            # first sophomorixdatabox mus be preceeded by sophomorixnewpage
+            # first sophomorixdatabox must be preceeded by sophomorixnewpage
             $latex_datablock=$latex_datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
         }
         my @data=split(/;/,$item);

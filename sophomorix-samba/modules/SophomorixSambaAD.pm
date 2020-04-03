@@ -2514,6 +2514,7 @@ sub AD_user_update {
     my $status = $arg_ref->{status};
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
+    my $homedirectory_rel = $arg_ref->{homedirectory_rel};
     # changing OTHER single-value attributes
     my $single_value_set = $arg_ref->{single_value_set};
     my $single_value_entry = $arg_ref->{single_value_entry};
@@ -2910,6 +2911,12 @@ sub AD_user_update {
     if (defined $homedirectory and $homedirectory ne "---"){
         $replace{'homeDirectory'}=$homedirectory;
         print "   homeDirectory:       $homedirectory\n";
+    }
+
+    # homedirectory_rel
+    if (defined $homedirectory_rel and $homedirectory_rel ne "---"){
+        $replace{'sophomorixIntrinsic2'}=$homedirectory_rel;
+        print "   sophomorixIntrinsic2:       $homedirectory_rel\n";
     }
 
     # custom attributes
@@ -4692,6 +4699,11 @@ sub AD_get_AD_for_check {
                                 'SophomorixWebuiPermissions',
                                 'SophomorixWebuiPermissionsCalculated',
                                 'objectClass',
+                                'sophomorixIntrinsic1',
+                                'sophomorixIntrinsic2',
+                                'sophomorixIntrinsic3',
+                                'sophomorixIntrinsic4',
+                                'sophomorixIntrinsic5',
                                ]);
     my $max = $mesg->count;
     for( my $index = 0 ; $index < $max ; $index++) {
@@ -4795,6 +4807,23 @@ sub AD_get_AD_for_check {
                        sort $entry->get_value('sophomorixWebuiPermissions');
                    @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } =
                        sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
+
+                   # save intrinsic stuff
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic1'}=$entry->get_value('sophomorixIntrinsic1');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'}=$entry->get_value('sophomorixIntrinsic2');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic3'}=$entry->get_value('sophomorixIntrinsic3');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic4'}=$entry->get_value('sophomorixIntrinsic4');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic5'}=$entry->get_value('sophomorixIntrinsic5');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti1'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti1');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti2'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti2');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti3'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti3');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti4'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti4');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti5'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti5');
 
                    # LOOKUP
                    $AD{'LOOKUP'}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;

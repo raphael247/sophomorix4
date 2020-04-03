@@ -287,6 +287,8 @@ while(<USERUPDATE>){
            $webui_string_new,          
            $homedirectory_old,
            $homedirectory_new,          
+           $homedirectory_old_rel,
+           $homedirectory_new_rel,          
           )=split(/::/);
 
 
@@ -353,7 +355,8 @@ while(<USERUPDATE>){
         $status_new ne "---" or
         $mail_new ne "---" or
         $webui_string_new ne "---" or 
-        $homedirectory_new ne "---" 
+        $homedirectory_new ne "---" or
+        $homedirectory_new_rel ne "---" 
        ){
         # do NOT update move stuff: class,role,school 
         # leave it to AD_user_move
@@ -380,6 +383,7 @@ while(<USERUPDATE>){
                          webui_permissions_calculated=>\@webui_calclist,
                          unid=>$unid_new,
                          homedirectory=>$homedirectory_new,
+                         homedirectory_rel=>$homedirectory_new_rel,
                          user_count=>$user_count,
                          max_user_count=>$max_user_count,
                          json=>$json,
