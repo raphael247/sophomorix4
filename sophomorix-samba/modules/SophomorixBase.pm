@@ -1092,7 +1092,9 @@ sub _console_print_updatefile {
                                                               " --> ".
                                                               $ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW'}; 
             }
-            if ($ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW_REL'} ne "---"){
+            if (defined $ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW_REL'} and
+                $ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW_REL'} ne "---"
+               ){
                 printf " %27s: %-53s\n","sophomorixIntrinsic2",$ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_OLD_REL'}.
                                                               " --> ".
                                                               $ref_updatefile->{'USER'}{$sam}{'HOMEDIRECTORY_NEW_REL'}; 
