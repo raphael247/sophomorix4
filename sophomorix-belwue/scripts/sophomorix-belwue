@@ -148,8 +148,16 @@ if ($dump_belwue_data==1){
     ############################################################
     # ldap address book
     ############################################################ 
-    print "Accessing Belwue addressbook via ldap\n";
+    print "\n";
+    print "============================================================\n";
+    print "Accessing belwue addressbook:\n";
     my ($ldap) = &bind_admin();
+    if($Conf::log_level>=2){
+        print "  Searching for data in Belwue addressbook via ldap\n";
+        print "    SEARCHBASE: $config{'connect'}{BASE}\n";
+        print "    SCOPE: $config{'connect'}{SCOPE}\n";
+        print "    FILTER: $config{'connect'}{FILTER}\n";
+    }
     my $mesg = $ldap->search(
                    base   => $config{'connect'}{BASE},
                    scope => $config{'connect'}{SCOPE},
@@ -172,7 +180,7 @@ if ($dump_belwue_data==1){
         if (not defined $given){
             $given="";
         }
-        if($Conf::log_level>=2){
+        if($Conf::log_level>=3){
 	    print "$num) dn: $dn\n";
 	    print "   * cn:          $cn\n";
 	    print "   * givenName:   $given\n";
@@ -196,7 +204,13 @@ if ($dump_belwue_data==1){
         $belwue{'objects'}{$uid}{'mail'}=$mail;
         $belwue{'objects'}{$uid}{'sn'}=$sn;
         $belwue{'objects'}{$uid}{'uid'}=$uid;
+
+
     }
+        #print Dumper(%belwue);
+
+    print "$max entries found via ldaps\n";
+    print "============================================================\n";
     &unbind_admin($ldap); 
     ############################################################
     # downloading
@@ -208,13 +222,15 @@ if ($dump_belwue_data==1){
     my $download_objects_command="wget -q --http-user=admin ".
          "--http-password=$config{'connect'}{PASSWORD} ".
          "--output-document=$belwue_downloads/objects.html ".
-         "\"$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
+         "\"https://$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
 
    if($Conf::log_level>=2){
        print "\nWGET: $download_objects_command\n\n";
     }
     my $return=system($download_objects_command);
     &wget_return($return,"Objects");
+
+    exit;
 
     ############################################################
     # parsing
@@ -413,16 +429,12 @@ if($Conf::log_level>=2){
 ############################################################
 
 sub bind_admin {
-    # check connection 
-    if($Conf::log_level>=3){
-        print "   Checking Belwue connection ...\n";
-    }
-
     # bind
-    if($Conf::log_level>=3){
-        print "HOST:      $config{'connect'}{HOST} \n";
-        print "ADMINUSER: $config{'connect'}{ADMINUSER} \n";
-        print "PASS:      $config{'connect'}{PASSWORD}\n";
+    if($Conf::log_level>=2){
+        print "  Connecting to Belwue via ldaps\n";
+        print "    HOST:      $config{'connect'}{HOST} \n";
+        print "    BIND-DN:   $config{'connect'}{ADMINUSER} \n";
+        print "    PASSWORD:  $config{'connect'}{PASSWORD}\n";
     }
     my $ldap = Net::LDAP->new($config{'connect'}{HOST});
 
@@ -447,21 +459,21 @@ sub unbind_admin {
 
 ######################################################################
 # error, when options are not given correctly
-sub  check_options{
-   my ($parse_ergebnis) = @_;
-   if (not $parse_ergebnis==1){
-      my @list = split(/\//,$0);
-      my $scriptname = pop @list;
-      print "\nYou have made a mistake, when specifying options.\n"; 
-      print "See error message above. \n\n";
-      print "... $scriptname is terminating.\n\n";
-      exit;
-   } else {
-      if($Conf::log_level>=3){
-         print "All options  were recognized.\n";
-      }
-   }
-}
+#sub  check_options{
+#   my ($parse_ergebnis) = @_;
+#   if (not $parse_ergebnis==1){
+#      my @list = split(/\//,$0);
+#      my $scriptname = pop @list;
+#      print "\nYou have made a mistake, when specifying options.\n"; 
+#      print "See error message above. \n\n";
+#      print "... $scriptname is terminating.\n\n";
+#      exit;
+#   } else {
+#      if($Conf::log_level>=3){
+#         print "All options  were recognized.\n";
+#      }
+#   }
+#}
 
 
 
@@ -485,6 +497,9 @@ sub read_config {
     if (-e $file) {
         open (SECRET, $file);
         while(<SECRET>){
+            if(/^\#/){
+                next;
+            }
             my ($key,$value)=split(/=/);
             $key=~s/^\s+//g;# remove leading whitespace
             $key=~s/\s+$//g;# remove trailing whitespace
@@ -495,9 +510,11 @@ sub read_config {
         close(SECRET);
     } else {
         print "Config File $file must be created with:\n";
+        print "  # PASSWORD of the user admin\n";
         print "  PASSWORD=xyz\n";
-        print "  ADMINUSER=admin\@mail.bszleo.de\n";
+        print "  ADMINUSER=admin\@mail.bszleoq.de\n";
         print "  ADMINURL=admin\@mail.bszleo.de\n";
+        print "  # SERVER sould be mbox1.belwue.de for everybody\n";
         print "  SERVER=mbox1.belwue.de\n";
         print "  BASE=mail.bszleo.de\n";
         print "  PORT=636\n";
