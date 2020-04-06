@@ -56,6 +56,7 @@ my $no_ldap_fetch=0;
 my $copy_to_teachershare=0;
 my $create_login_data="";
 my $dump_belwue_data=0;
+my $parse_belwue_data=0;
 
 my $config_file="/etc/linuxmuster/sophomorix/belwue-mail/belwue.conf";
 my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
@@ -76,6 +77,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "dump-belwue-data" => \$dump_belwue_data,
+           "parse-belwue-data" => \$parse_belwue_data,
            "create-login-data=s" => \$create_login_data,
            "copy-to-teachershare" => \$copy_to_teachershare,
           );
@@ -121,7 +123,8 @@ Options
   -v  / --verbose
   -vv / --verbose --verbose
 
-  --dump-belwue-data
+  --dump-belwue-data (download and parse)
+  --parse-belwue-data (parse already downloaded data)
   --create-login-data /path/to/file
   --copy-to-teachershare
 
@@ -144,16 +147,16 @@ if ($info==1) {
 ##################################################
 
 # --dump-belwue-data
-if ($dump_belwue_data==1){
+if ($dump_belwue_data==1 or $parse_belwue_data){
     ############################################################
     # ldap address book
     ############################################################ 
     print "\n";
     print "============================================================\n";
-    print "Accessing belwue addressbook:\n";
+    print "Accessing belwue address book:\n";
     my ($ldap) = &bind_admin();
     if($Conf::log_level>=2){
-        print "  Searching for data in Belwue addressbook via ldap\n";
+        print "  Searching for data in Belwue address book via ldap\n";
         print "    SEARCHBASE: $config{'connect'}{BASE}\n";
         print "    SCOPE: $config{'connect'}{SCOPE}\n";
         print "    FILTER: $config{'connect'}{FILTER}\n";
@@ -215,22 +218,25 @@ if ($dump_belwue_data==1){
     ############################################################
     # downloading
     ############################################################ 
-    print "Downloading and parsing html files:\n";
-    system("mkdir -p $belwue_downloads");
+    if ($parse_belwue_data==0){
+      print "Downloading and parsing html files:\n";
+      system("mkdir -p $belwue_downloads");
 
-    # object list
-    my $download_objects_command="wget -q --http-user=admin ".
-         "--http-password=$config{'connect'}{PASSWORD} ".
-         "--output-document=$belwue_downloads/objects.html ".
-         "\"https://$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
+      # object list
+      my $download_objects_command="wget ".
+          "$config{'config'}{WGET_OPTIONS} ".
+          "-q --http-user=admin ".
+          "--http-password=$config{'connect'}{PASSWORD} ".
+          "--output-document=$belwue_downloads/objects.html ".
+          "\"https://$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}".
+          "/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
 
-   if($Conf::log_level>=2){
-       print "\nWGET: $download_objects_command\n\n";
+      if($Conf::log_level>=2){
+          print "\nWGET: $download_objects_command\n\n";
+      }
+      my $return=system($download_objects_command);
+      &wget_return($return,"Objects","$belwue_downloads/objects.html");
     }
-    my $return=system($download_objects_command);
-    &wget_return($return,"Objects");
-
-    exit;
 
     ############################################################
     # parsing
@@ -238,7 +244,7 @@ if ($dump_belwue_data==1){
 
     # file to parse
     my $html_doc = "$belwue_downloads/objects.html";
-    print "   * Parsing $html_doc\n";
+    print "   * Parsing $html_doc:\n\n";
 
     # list of headers
     my $table_headers = [ 'Objekt', 'Typ','Speicher','Letzter Zugriff' ];
@@ -251,9 +257,13 @@ if ($dump_belwue_data==1){
 
     foreach my $row ($table->rows) {
         my ($object,$type,$storage,$access)=@$row;
+        if (not defined $storage){
+            $storage="none";
+        }
         if (not defined $access){
             $access="never";
         }
+	print "   * Extracted row: $object  $type  $storage  $access\n";
         # add to types
         if ($type eq "Mailingliste"){
             $belwue{'maillist'}{$object}{'type'}=$type;
@@ -261,15 +271,22 @@ if ($dump_belwue_data==1){
             ############################################################
             # downloading maillist data
             ############################################################
-            my $download_list_command="wget -q --http-user=admin ".
-                "--http-password=$config{'connect'}{PASSWORD} ".
-                "--output-document=$belwue_downloads/$object.html ".
-                "\"$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}/Subscribers.html?InCluster=1&domainName=$config{'connect'}{BASESIMPLE}&&listName=$object\"";
-            if($Conf::log_level>=2){
-                print "\nWGET: $download_list_command\n\n";
-            }
-            my $return=system($download_list_command);
-            &wget_return($return,$object);
+            if ($parse_belwue_data==0){
+                my $download_list_command="wget ".
+                    "$config{'config'}{WGET_OPTIONS} ".
+                    "-q --http-user=admin ".
+                    "--http-password=$config{'connect'}{PASSWORD} ".
+                    "--output-document=$belwue_downloads/$object.html ".
+                    "\"https://$config{'connect'}{ADMINURL}/".
+                    "$config{'connect'}{BASESIMPLE}".
+                    "/Subscribers.html?InCluster=1&domainName=".
+                    "$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+                if($Conf::log_level>=2){
+                    print "\nWGET: $download_list_command\n\n";
+                }
+                my $return=system($download_list_command);
+                &wget_return($return,$object,"$belwue_downloads/$object.html");
+	    }
 
             ############################################################
             # parsing maillist data
@@ -287,14 +304,25 @@ if ($dump_belwue_data==1){
             $table_extract->utf8_mode(1);
             $table_extract->parse_file($html_doc);
             my ($table) = $table_extract->tables;
+	    my $row_count=0;
+            my $empty_row=0;
             foreach my $row ($table->rows) {
+		$row_count++;
                 my ($member_email,$type,$time,$bounced,$displayname)=@$row;
-                #print "$object: $member_email  $type  $time\n";
+		if (not defined $member_email){
+		    $empty_row=1;
+                    next;
+		}
                 if ($type ne "Abonnement aufheben"){
                     $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
                     push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
                 }
             }
+	    if ($empty_row==0){
+		print "   * $row_count rows parsed\n";
+	    } else {
+		print "   * $row_count empty row parsed\n";
+	    }
             # sort the memberlist if not empty
             if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
                  @{ $belwue{'maillist'}{$object}{'memberlist'} } = sort @{ $belwue{'maillist'}{$object}{'memberlist'}  };
@@ -313,6 +341,7 @@ if ($dump_belwue_data==1){
         } else {
             print "Unknown object $type\n";
         }
+	print "\n";
     }
     ############################################################
     # printout data/write data into files
@@ -347,7 +376,7 @@ if ($dump_belwue_data==1){
     }
 
     @aliases = sort @aliases;
-    print "\nMail Aliase:\n";
+    print "\nMail aliases:\n";
     my $num=1;
     foreach my $alias (@aliases){
         print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
@@ -436,7 +465,9 @@ sub bind_admin {
         print "    BIND-DN:   $config{'connect'}{ADMINUSER} \n";
         print "    PASSWORD:  $config{'connect'}{PASSWORD}\n";
     }
-    my $ldap = Net::LDAP->new($config{'connect'}{HOST});
+    my $ldap = Net::LDAP->new($config{'connect'}{HOST}) or
+        die "\nERROR: Connection to $config{'connect'}{HOST} failed!\n",
+            " USER: $config{'connect'}{ADMINUSER}, PASSWORD: $config{'connect'}{PASSWORD})\n\n";
 
     my $mesg = $ldap->bind($config{'connect'}{ADMINUSER}, 
                       password => $config{'connect'}{PASSWORD});
@@ -479,9 +510,9 @@ sub unbind_admin {
 
 ######################################################################
 sub wget_return {
-    my ($return,$object)=@_;
+    my ($return,$object,$file)=@_;
     if ($return==0){
-        print "   * Succesfully downloded html page for $object\n";
+        print "   * Succesfully downloded html page for $object: $file\n";
     } else {
         print "   * ERROR downloading $object: wget returned error code $return\n";
         exit;
@@ -509,16 +540,19 @@ sub read_config {
         }
         close(SECRET);
     } else {
-        print "Config File $file must be created with:\n";
-        print "  # PASSWORD of the user admin\n";
-        print "  PASSWORD=xyz\n";
-        print "  ADMINUSER=admin\@mail.bszleoq.de\n";
-        print "  ADMINURL=admin\@mail.bszleo.de\n";
-        print "  # SERVER sould be mbox1.belwue.de for everybody\n";
-        print "  SERVER=mbox1.belwue.de\n";
-        print "  BASE=mail.bszleo.de\n";
-        print "  PORT=636\n";
-        print "  PROTOCOL=ldaps\n";
+        print "Config File $file must be created with:\n\n";
+        print "# PASSWORD of the user admin\n";
+        print "PASSWORD=xyz\n";
+        print "ADMINUSER=admin\@mail.bszleo.de\n";
+        print "ADMINURL=admin\@mail.bszleo.de\n";
+        print "# SERVER should be mbox1.belwue.de for everybody\n";
+        print "SERVER=mbox1.belwue.de\n";
+        print "BASE=mail.bszleo.de\n";
+        print "# ldap connection:\n";
+        print "PORT=636\n";
+        print "PROTOCOL=ldaps\n";
+        print "WGET_OPTIONS=--no-check-certificate\n";
+	print "\n";
         exit;
     }
     return %config;
