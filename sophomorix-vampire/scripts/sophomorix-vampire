@@ -1589,7 +1589,9 @@ sub devices_rewrite {
         }
 
         # modify pxe to 0, if empty
-        if ($items[10] eq ""){
+        if ($items[10] eq "22"){
+            $items[10]="1";
+        } elsif ($items[10] eq ""){
             $items[10]="0";
         }
         my $sophomorix_type;
