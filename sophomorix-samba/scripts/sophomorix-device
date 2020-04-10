@@ -1698,14 +1698,16 @@ sub analyze_device_line {
         $devices_file{'device'}{$dnsnode_name}{'FIELD_14'}=$field_14;
         $devices_file{'device'}{$dnsnode_name}{'sophomorixComment'}=$sophomorix_comment; # 15
 
-        # dnsZone
-        my @octets=split(/\./,$ip);
-        my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
-        $devices_file{'dnsZone'}{$dns_zone}{'FILENAME'}=$filename;
-        $devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'}=$school;
+        if ($ip ne "DHCP"){
+            # dnsZone
+            my @octets=split(/\./,$ip);
+            my $dns_zone=$octets[2].".".$octets[1].".".$octets[0].".in-addr.arpa";
+            $devices_file{'dnsZone'}{$dns_zone}{'FILENAME'}=$filename;
+            $devices_file{'dnsZone'}{$dns_zone}{'SCHOOL'}=$school;
+            # dnsNode
+            $devices_file{'dnsNode'}{$dnsnode_name}=$ip;
+        }
 
-        # dnsNode
-        $devices_file{'dnsNode'}{$dnsnode_name}=$ip;
 
         # decide if host group is needed 
         if ($host_group eq "TRUE"){
@@ -1844,6 +1846,9 @@ sub check_ip {
     my ($ip,$line,$filename,$device_file,$device_line_count) = @_;
     if($Conf::log_level>=3){
         print "   IP:      $ip";
+    }
+    if ($ip eq "DHCP"){
+        return $ip;
     }
     # check for 3 .
     my $dots_in_string=$ip=~tr/\.//;
