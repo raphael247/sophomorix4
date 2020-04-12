@@ -293,7 +293,7 @@ install-belwue-mail:
 	@install -oroot -groot --mode=0744 sophomorix-belwue/scripts/sophomorix-belwue $(DESTDIR)/usr/sbin
 	@install -d $(DEVELBELVUECONF)
 	@install -d $(DEVELBELVUECONF)/config-templates
-	@install -oroot -groot --mode=0644 sophomorix-belwue/config-template/belwue-mail.template.ini $(DEVELBELVUECONF)/config-templates
+	@install -oroot -groot --mode=0644 sophomorix-belwue/config-template/belwue-mail.conf.template.ini $(DEVELBELVUECONF)/config-templates
 
 
 install-developer:
