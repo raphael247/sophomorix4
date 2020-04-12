@@ -92,7 +92,7 @@ if ($school eq "default-school"){
     $config_file=$config_path."/".$school."/".$school.".".$config_basename;
 }
 
-my %config=&read_config($config_file);
+my %conf=&read_config($config_file);
 my %belwue=();
 my @accounts_short=();
 
@@ -102,35 +102,31 @@ my @maillists=();
 my @groups=();
 
 # calculate connect data
-$config{'connect'}{BASE}="CN=".$config{'config'}{'BASE'};
-$config{'connect'}{BASESIMPLE}=$config{'config'}{'BASE'};
-$config{'connect'}{SCOPE}="sub";
-$config{'connect'}{FILTER}="(cn=*)";
-$config{'connect'}{HOST}=$config{'config'}{PROTOCOL}."://".
-                         $config{'config'}{SERVER}.":".
-                         $config{'config'}{PORT};
-$config{'connect'}{ADMINUSER}=$config{'config'}{ADMINUSER};
-$config{'connect'}{ADMINURL}=$config{'config'}{ADMINURL};
-$config{'connect'}{PASSWORD}=$config{'config'}{PASSWORD};
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'}="CN=".$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'};
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'};
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'}="sub";
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'}="(cn=*)";
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'HOST'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'PROTOCOL'}."://".
+                                          $conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'SERVER'}.":".
+                                          $conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'PORT'};
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'ADMINUSER'};
 
-my ($adminuser,$maildomain)=split(/\@/,$config{'config'}{ADMINUSER});
-$config{'connect'}{MAILDOMAIN}=$maildomain;
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'ADMINURL'};
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'PASSWORD'};
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'SERVER'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'SERVER'};
 
+my ($adminuser,$maildomain)=split(/\@/,$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'ADMINUSER'});
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'MAILDOMAIN'}=$maildomain;
+
+$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'WGET'}{'WGET_OPTIONS'};
 
 # calculate paths
-$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}="/var/lib/sophomorix/belwue/".$school."/downloads";
-$config{SCHOOL}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/belwue.multimailboxes";
-$config{SCHOOL}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}="/var/lib/sophomorix/belwue/".$school."/belwue.maillists";
-$config{SCHOOL}{$school}{'PATHS'}{'UPLOAD_ALIASES'}="/var/lib/sophomorix/belwue/".$school."/belwue.aliases";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}="/var/lib/sophomorix/belwue/".$school."/downloads";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/belwue.multimailboxes";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}="/var/lib/sophomorix/belwue/".$school."/belwue.maillists";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}="/var/lib/sophomorix/belwue/".$school."/belwue.aliases";
 
-my $belwue_downloads="/var/lib/sophomorix/belwue/downloads";
-my $belwue_mailboxes="/var/lib/sophomorix/belwue/belwue.multimailboxes";
-my $belwue_maillist="/var/lib/sophomorix/belwue/belwue.maillists";
-my $belwue_aliases="/var/lib/sophomorix/belwue/belwue.aliases";
-
-
-
-print Dumper(%config);
+#print Dumper(%conf);
 #exit;
 
 # --help
@@ -184,14 +180,14 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     my ($ldap) = &bind_admin();
     if($Conf::log_level>=2){
         print "  Searching for data in Belwue address book via ldap\n";
-        print "    SEARCHBASE: $config{'connect'}{BASE}\n";
-        print "    SCOPE: $config{'connect'}{SCOPE}\n";
-        print "    FILTER: $config{'connect'}{FILTER}\n";
+        print "    SEARCHBASE: $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'}\n";
+        print "    SCOPE: $conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'}\n";
+        print "    FILTER: $conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'}\n";
     }
     my $mesg = $ldap->search(
-                   base   => $config{'connect'}{BASE},
-                   scope => $config{'connect'}{SCOPE},
-                   filter => $config{'connect'}{FILTER},
+                   base   => $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'},
+                   scope => $conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'},
+                   filter => $conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'},
                         );
 
     my $max = $mesg->count; 
@@ -240,16 +236,16 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     ############################################################ 
     if ($parse_belwue_data==0){
         print "Downloading and parsing html files:\n";
-        system("mkdir -p $config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}");
+        system("mkdir -p $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}");
 
         # object list
         my $download_objects_command="wget ".
-           "$config{'config'}{WGET_OPTIONS} ".
+           "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
            "-q --http-user=admin ".
-           "--http-password=$config{'connect'}{PASSWORD} ".
-           "--output-document=".$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}."/objects.html ".
-           "\"https://$config{'connect'}{ADMINURL}/$config{'connect'}{BASESIMPLE}".
-           "/ObjectList.html?domainName=$config{'connect'}{BASESIMPLE}\"";
+           "--http-password=$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'} ".
+           "--output-document=".$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/objects.html ".
+           "\"https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}/$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}".
+           "/ObjectList.html?domainName=$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\"";
 
         if($Conf::log_level>=2){
             print "\nWGET: $download_objects_command\n\n";
@@ -258,7 +254,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
         &wget_return($download_objects_command,
                      $return,
                      "Objects",
-                     "$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}/objects.html");
+                     "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/objects.html");
     }
 
     ############################################################
@@ -266,7 +262,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     ############################################################
 
     # file to parse
-    my $html_doc = $config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}."/objects.html";
+    my $html_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/objects.html";
     print "   * Parsing $html_doc:\n\n";
 
     # list of headers
@@ -313,14 +309,14 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             ############################################################
             if ($parse_belwue_data==0){
                 my $download_list_command="wget ".
-                    "$config{'config'}{WGET_OPTIONS} ".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
                     "-q --http-user=admin ".
-                    "--http-password=$config{'connect'}{PASSWORD} ".
-                    "--output-document=".$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html ".
-                    "\"https://$config{'connect'}{ADMINURL}/".
-                    "$config{'connect'}{BASESIMPLE}".
+                    "--http-password=$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'} ".
+                    "--output-document=".$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html ".
+                    "\"https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}/".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}".
                     "/Subscribers.html?InCluster=1&domainName=".
-                    "$config{'connect'}{BASESIMPLE}&&listName=$object\"";
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}&&listName=$object\"";
                 if($Conf::log_level>=2){
                     print "\nWGET: $download_list_command\n\n";
                 }
@@ -328,13 +324,13 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                 &wget_return($download_list_command,
                              $return,
                              $object,
-                             "$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
+                             "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
 	    }
 
             ############################################################
             # parsing maillist data
             ############################################################
-            my $html_doc = $config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html";
+            my $html_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html";
             print "   * Parsing $html_doc\n";
 
             # list of headers
@@ -361,7 +357,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 
                 if ($type ne "Abonnement aufheben"){
                     $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
-                    if ($domain eq $config{'connect'}{MAILDOMAIN}){
+                    if ($domain eq $conf{'SCHOOL'}{$school}{'CONNECT'}{'MAILDOMAIN'}){
 			$belwue{'objects'}{$uid}{'maillist_membership'}{$object}=$type;
 			$belwue{'objects'}{$object}{'members'}{$uid}=$type;
 		    } else {
@@ -391,14 +387,14 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             ############################################################
             if ($parse_belwue_data==0){
                 my $download_list_command="wget ".
-                    "$config{'config'}{WGET_OPTIONS} ".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
                     "-q --http-user=admin ".
-                    "--http-password=$config{'connect'}{PASSWORD} ".
-                    "--output-document=".$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html ".
-                    "\"https://$config{'connect'}{ADMINURL}/".
-                    "$config{'connect'}{BASESIMPLE}".
+                    "--http-password=$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'} ".
+                    "--output-document=".$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html ".
+                    "\"https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}/".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}".
                     "/Group.html?&domainName=".
-                    "$config{'connect'}{BASESIMPLE}&&groupName=$object\"";
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}&&groupName=$object\"";
                 if($Conf::log_level>=2){
                     print "\nWGET: $download_list_command\n\n";
                 }
@@ -406,13 +402,13 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                 &wget_return($download_list_command,
                              $return,
                              $object,
-                             "$config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
+                             "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
 	    }
 
             ############################################################
             # parsing group data
             ############################################################
-            my $html_doc = $config{SCHOOL}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html";
+            my $html_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html";
             print "   * Parsing $html_doc\n";
 
             my $string=`cat $html_doc | grep input | grep Members | grep value`;
@@ -425,7 +421,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 		if ($member_mail ne ""){
                     my ($uid,$domain)=split(/\@/,$member_mail);
 		    if (not defined $domain or
-                        $domain eq $config{'connect'}{MAILDOMAIN}
+                        $domain eq $conf{'SCHOOL'}{$school}{'CONNECT'}{'MAILDOMAIN'}
                        ){
                         $belwue{'objects'}{$uid}{'group_membership'}{$object}=$type;
                         $belwue{'objects'}{$object}{'members'}{$uid}="member";
@@ -453,9 +449,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     ############################################################
     # printout data/write data into files
     ############################################################
-    open (BOX, ">$belwue_mailboxes");
-    open (ALIAS, ">$belwue_aliases");
-    open (LIST, ">$belwue_maillist");
+    open (BOX, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}");
+    open (ALIAS, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}");
+    open (LIST, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}");
 
     @multi_mailboxes = sort @multi_mailboxes;
     print "\nMultiMailboxen:\n";
@@ -523,11 +519,11 @@ if($create_login_data ne ""){
         open(USER,">$targetdir/${uid}/${uid}-mail-login.txt") || 
               die "ERROR: $targetdir not found!";
         print USER "\n";
-        print USER "Zugangsdaten für die Emailadresse: ${uid}\@$config{'config'}{BASE}\n";
-        print USER "                            Alias: $alias\@$config{'config'}{BASE}\n";
+        print USER "Zugangsdaten für die Emailadresse: ${uid}\@$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\n";
+        print USER "                            Alias: $alias\@$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\n";
         print USER "\n";
-        #print USER "Belwue-Mail-URL:  https://$config{'config'}{SERVER}\n";
-        print USER "Benutzername:     ${uid}\@$config{'config'}{BASE}\n";
+        print USER "Belwue-Mail-URL:  https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'SERVER'}\n";
+        print USER "Benutzername:     ${uid}\@$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\n";
         print USER "Erst-Password:    $pass\n";
         print USER "Erst-Mailquota:   $storage\n";
         print USER "Mailbox-Typ:      $type\n";
@@ -547,16 +543,16 @@ if($create_login_data ne ""){
 # --copy-to-teachershare
 if($copy_to_teachershare){
 	my $copy_command="rsync -av ${targetdir}/ ".
-          "$config{'config'}{TEACHERUSER}\@".
-          "$config{'config'}{TEACHERSERVER}:".
-          "$config{'config'}{TEACHERSERVERDIR}";
+          "$conf{'config'}{TEACHERUSER}\@".
+          "$conf{'config'}{TEACHERSERVER}:".
+          "$conf{'config'}{TEACHERSERVERDIR}";
     print "$copy_command\n";
-    system($copy_command);
+    #system($copy_command);
 }
 
 
 if($Conf::log_level>=2){
-    print Dumper(%config);
+    print Dumper(%conf);
 }
 
 
@@ -569,16 +565,16 @@ sub bind_admin {
     # bind
     if($Conf::log_level>=2){
         print "  Connecting to Belwue via ldaps\n";
-        print "    HOST:      $config{'connect'}{HOST} \n";
-        print "    BIND-DN:   $config{'connect'}{ADMINUSER} \n";
-        print "    PASSWORD:  $config{'connect'}{PASSWORD}\n";
+        print "    HOST:      $conf{'SCHOOL'}{$school}{'CONNECT'}{HOST} \n";
+        print "    BIND-DN:   $conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'} \n";
+        print "    PASSWORD:  $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'}\n";
     }
-    my $ldap = Net::LDAP->new($config{'connect'}{HOST}) or
-        die "\nERROR: Connection to $config{'connect'}{HOST} failed!\n",
-            " USER: $config{'connect'}{ADMINUSER}, PASSWORD: $config{'connect'}{PASSWORD})\n\n";
+    my $ldap = Net::LDAP->new($conf{'SCHOOL'}{$school}{'CONNECT'}{HOST}) or
+        die "\nERROR: Connection to $conf{'SCHOOL'}{$school}{'CONNECT'}{HOST} failed!\n",
+            " USER: $conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}, PASSWORD: $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'})\n\n";
 
-    my $mesg = $ldap->bind($config{'connect'}{ADMINUSER}, 
-                      password => $config{'connect'}{PASSWORD});
+    my $mesg = $ldap->bind($conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}, 
+                      password => $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'});
     # show errors from bind
     $mesg->code && die $mesg->error;
     return ($ldap);
@@ -632,38 +628,20 @@ sub wget_return {
 
 ######################################################################
 sub read_config {
-    my %config=();
     my ($file) = @_;
+    my %conf=();
+    my $ref_conf=\%conf;
     if (-e $file) {
-        open (SECRET, $file);
-        while(<SECRET>){
-            if(/^\#/){
-                next;
-            }
-            my ($key,$value)=split(/=/);
-            $key=~s/^\s+//g;# remove leading whitespace
-            $key=~s/\s+$//g;# remove trailing whitespace
-            $value=~s/^\s+//g;# remove leading whitespace
-            $value=~s/\s+$//g;# remove trailing whitespace
-            $config{'config'}{$key}=$value;
-        }
-        close(SECRET);
+        tie %{ $ref_conf->{'SCHOOL'}{$school}{'belwue-mail.conf'} }, 'Config::IniFiles',
+            ( -file => $file, 
+              -handle_trailing_comment => 1,
+            );
     } else {
-        print "Config File $file must be created with:\n\n";
-        print "# PASSWORD of the user admin\n";
-        print "PASSWORD=xyz\n";
-        print "ADMINUSER=admin\@bszleo.de\n";
-        print "ADMINURL=mbox1.belwue.de:9010/DomainAdmin\n";
-        print "# SERVER should be mbox1.belwue.de for everybody\n";
-        print "SERVER=mbox1.belwue.de\n";
-        print "# ldap connection:\n";
-        print "BASE=bszleo.de\n";
-        print "PORT=636\n";
-        print "PROTOCOL=ldaps\n";
-        print "WGET_OPTIONS=--no-check-certificate\n";
-	print "\n";
+        print "\n\nConfig file $file must be created with:\n\n";
+
+        system ("cat /usr/share/sophomorix-belwue/config-templates/belwue-mail.conf.template.ini");
         exit;
     }
-    return %config;
+    return %conf;
 }
 
