@@ -46,6 +46,7 @@ SCHEMA=$(DESTDIR)/usr/share/sophomorix/schema
 
 # Developer configs
 DEVELCONF=$(DESTDIR)/usr/share/sophomorix
+DEVELBELVUECONF=$(DESTDIR)/usr/share/sophomorix-belwue
 
 # Migration conf
 DUMPCONF=$(DESTDIR)/usr/share/sophomorix-dump
@@ -177,7 +178,6 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/sophomorix.conf.template.ini $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/school.conf.template.ini $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/devices.csv.template $(DEVELCONF)/config-templates
-	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/belwue.template.ini $(DEVELCONF)/config-templates
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/WEBUI.template.ini $(DEVELCONF)/config-templates
 #	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/ANOTHER_UI.template.ini $(DEVELCONF)/config-templates
 	@install -oroot -groot --mode=0644 sophomorix-samba/config-template/test-ui-perm.ini $(DEVELCONF)/config-templates
@@ -291,8 +291,9 @@ install-belwue-mail:
 	### install-belwue-mail
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-belwue/scripts/sophomorix-belwue $(DESTDIR)/usr/sbin
-
-
+	@install -d $(DEVELBELVUECONF)
+	@install -d $(DEVELBELVUECONF)/config-templates
+	@install -oroot -groot --mode=0644 sophomorix-belwue/config-template/belwue-mail.template.ini $(DEVELBELVUECONF)/config-templates
 
 
 install-developer:
