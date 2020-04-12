@@ -58,6 +58,7 @@ my $create_login_data="";
 my $dump_belwue_data=0;
 my $parse_belwue_data=0;
 my $school="default-school";
+my $show_object="";
 
 my $config_path="/etc/linuxmuster/sophomorix";
 my $config_basename="belwue-mail.conf";
@@ -77,6 +78,7 @@ my $testopt=GetOptions(
            "dump-belwue-data" => \$dump_belwue_data,
            "parse-belwue-data" => \$parse_belwue_data,
            "create-login-data=s" => \$create_login_data,
+           "show-object=s" => \$show_object,
            "copy-to-teachershare" => \$copy_to_teachershare,
            "school=s" => \$school,
           );
@@ -110,14 +112,11 @@ $conf{'SCHOOL'}{$school}{'CONNECT'}{'HOST'}=$conf{'SCHOOL'}{$school}{'belwue-mai
                                           $conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'SERVER'}.":".
                                           $conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'PORT'};
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'ADMINUSER'};
-
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'ADMINURL'};
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'PASSWORD'};
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'SERVER'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'SERVER'};
-
 my ($adminuser,$maildomain)=split(/\@/,$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'BELWUE_ACCOUNT'}{'ADMINUSER'});
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'MAILDOMAIN'}=$maildomain;
-
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'}=$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'WGET'}{'WGET_OPTIONS'};
 
 # calculate paths
@@ -148,8 +147,27 @@ Options
 
   --dump-belwue-data (download and parse)
   --parse-belwue-data (parse already downloaded data)
+  -- show-object <object_name>
+
+  Todo:
   --create-login-data /path/to/file
   --copy-to-teachershare
+
+Quick introduction:
+  1) Run: 
+     sophomorix-belwue / sophomorix-belwue --school <schoolname>
+     to see what config file you need.
+  2) Create configfile and change password (other config stuff should be OK)
+  3) Run:
+     sophomorix-belwue --school <schoolname> --dump-belwue-data
+     This downloads data from belwue: 
+        A) The ldap adressbook at belwue 
+        B) Downloads html pages from the CommuniGate admin webinterface
+  4) You can analyze and access the downloaded data offline with:
+     sophomorix-belwue --school <schoolname> --parse-belwue-data -- show-object <object_name>
+  5) Todo:
+     Show nonsynchonized data, create files to create accounts, ...
+
 
 Please see the sophomorix-belwue(8) man pages for full documentation
 ');
@@ -169,7 +187,7 @@ if ($info==1) {
 # Script starts here
 ##################################################
 
-# --dump-belwue-data
+# --dump-belwue-data / --parse-belwue-data
 if ($dump_belwue_data==1 or $parse_belwue_data){
     ############################################################
     # ldap address book
@@ -494,6 +512,13 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     if($Conf::log_level>=2){
         print Dumper(\%belwue);
         my $ref_belwue=\%belwue;
+    }
+    if ($show_object ne ""){
+        #print Dumper($belwue{'objects'}{$show_object});
+        # pretty output
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_pretty_printed = $json_obj->pretty->encode( $belwue{'objects'}{$show_object} );
+        print "$utf8_pretty_printed\n";
     }
 } 
 
