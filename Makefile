@@ -303,6 +303,7 @@ install-developer:
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-supertest $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-*[0-9] $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-workflow $(DESTDIR)/usr/sbin
+	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-workflow-schoolisolation $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-errorfiles $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-infoscripts $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-developer/scripts/sophomorix-test-exammode $(DESTDIR)/usr/sbin
@@ -387,7 +388,6 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/classrooms-5 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.devices.csv-5 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.classrooms-5 $(TESTDATA)
-
 	@install -d $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.daytime.conf.default-school $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.nighttime.conf.default-school $(TESTDATA)/managementgroup-testdata
@@ -395,7 +395,13 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.daytime.conf.bsz $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.nighttime.conf.bsz $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.all.conf.bsz $(TESTDATA)/managementgroup-testdata
-
+# schoolisolation testdata
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-1.8859_1 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-1.8859_1 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-2.utf8 $(TESTDATA)
+# transfer testdata
 	@install -d $(TESTDATA)/transfer-testdata
 	@install -d $(TESTDATA)/transfer-testdata/subdir1-level1
 	@install -d $(TESTDATA)/transfer-testdata/subdir2-level1
