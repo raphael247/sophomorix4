@@ -163,6 +163,10 @@ Step by step Test:
       sophomorix-test-workflow-schoolisolation --modify-1-check
       sophomorix-test-workflow-schoolisolation --modify-1-do
 
+
+  Test if users are killed:
+      sophomorix-test-workflow-schoolisolation --kill-user-test
+
 ');
    print "\n";
    exit;
@@ -1177,6 +1181,298 @@ if ($modify_2_do==1){
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
+}
+
+
+
+if ($kill_user_do==1){
+    #kill users
+    &run_command("sophomorix-kill $all_options --killuser stefanol");
+    &run_command("sophomorix-kill $all_options --killuser muelleju");
+    &run_command("sophomorix-kill $all_options --killuser perezhu");
+    &run_command("sophomorix-kill $all_options --killuser maieran");
+    &run_command("sophomorix-kill $all_options --killuser muelleju1");
+    &run_command("sophomorix-kill $all_options --killuser perezhu1");
+    &run_command("sophomorix-kill $all_options --killuser maieran1");
+}
+
+
+if ($kill_user_test==1){
+    &AD_object_nonexist($ldap,$root_dse,"user","stefanol");
+    &AD_object_nonexist($ldap,$root_dse,"user","muelleju");
+    &AD_object_nonexist($ldap,$root_dse,"user","perezhu");
+    &AD_object_nonexist($ldap,$root_dse,"user","maieran");
+
+    &AD_object_nonexist($ldap,$root_dse,"user","muelleju1");
+    &AD_object_nonexist($ldap,$root_dse,"user","perezhu1");
+    &AD_object_nonexist($ldap,$root_dse,"user","maieran1");
+
+    ##### Testing the users ou-teachers group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=teachers,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   mail => "teachers@".$root_dns,
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "s_default-school|all-teachers",
+                   member => "global-teachers",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-teachers,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-teachers",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"teacherclass",
+                   mail => "bsz-teachers@"."teacherclass.net",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "s_bsz|all-teachers",
+                   member => "global-teachers",
+                  });
+# ????? 
+   # &AD_test_object({ldap=>$ldap,
+   #                 dn=>"CN=uni-teachers,OU=Teachers,OU=uni,OU=SCHOOLS,".$root_dse,
+   #                 sAMAccountname=>"uni-teachers",
+   #                 sophomorixCreationDate => "exists",
+   #                 sophomorixStatus=>"P",
+   #                 sophomorixType=>"teacherclass",
+   #                 mail => "uni-teachers@".$root_dns,
+   #                 sophomorixMembers=>"",
+   #                 sophomorixAdmins=>"",
+   #                 sophomorixHidden=>"FALSE",
+   #                 sophomorixSchoolname => "uni",
+   #                 memberOf => "s_uni|all-teachers",
+   #                 member => "global-teachers",
+   #                });
+
+    ##### Testing the users class
+    ##### default-school
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=7a,OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"7a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "7a@".$root_dns,
+                   description=>"7a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=8a,OU=8a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"8a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "8a@".$root_dns,
+                   description=>"8a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=10a,OU=10a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"10a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "10a@".$root_dns,
+                   description=>"10a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+    ##### Testing attic
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=attic,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"attic",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "attic@".$root_dns,
+                   description=>"attic",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"default-school:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "students",
+                   member => "",
+                  });
+    
+    #exit;
+    ##### bsz
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-7a,OU=7a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-7a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "bsz-7a@"."adminclass.net",
+                   description=>"bsz-7a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"bsz:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-8a,OU=8a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-8a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "bsz-8a@"."adminclass.net",
+                   description=>"bsz-8a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"bsz:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-10a,OU=10a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-10a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "bsz-10a@"."adminclass.net",
+                   description=>"bsz-10a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"bsz:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-12a,OU=12a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-12a",
+                   sophomorixCreationDate => "exists",
+                   sophomorixType=>"adminclass",
+                   mail => "bsz-12a@"."adminclass.net",
+                   description=>"bsz-12a",
+                   sophomorixAddQuota=>"---",
+                   sophomorixAddMailQuota=>"---",
+                   sophomorixQuota=>"bsz:---:---:|linuxmuster-global:---:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailAlias=>"FALSE",
+                   sophomorixMailList=>"FALSE",
+                   sophomorixStatus=>"P",
+                   sophomorixJoinable=>"TRUE",
+                   sophomorixMembers=>"",
+                   sophomorixAdmins=>"",
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "bsz-students",
+                   member => "",
+                  });
+
+    ##### Testing the users ou-students group
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=students,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"students",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   mail => "students@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "default-school",
+                   memberOf => "s_default-school|all-students",
+                   member => "attic|7a|8a|10a|global-students",
+                  });
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bsz-students,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   sAMAccountname=>"bsz-students",
+                   sophomorixCreationDate => "exists",
+                   sophomorixStatus=>"P",
+                   sophomorixType=>"ouclass",
+                   mail => "bsz-students@".$root_dns,
+                   sophomorixHidden=>"FALSE",
+                   sophomorixSchoolname => "bsz",
+                   memberOf => "s_bsz|all-students",
+                   member => "bsz-7a|bsz-8a|bsz-10a|bsz-12a|global-students",
+                  });
+    # ???
+    # &AD_test_object({ldap=>$ldap,
+    #                dn=>"CN=uni-students,OU=Students,OU=uni,OU=SCHOOLS,".$root_dse,
+    #                sAMAccountname=>"uni-students",
+    #                sophomorixCreationDate => "exists",
+    #                sophomorixStatus=>"P",
+    #                sophomorixType=>"ouclass",
+    #                mail => "uni-students@".$root_dns,
+    #                sophomorixHidden=>"FALSE",
+    #                sophomorixSchoolname => "uni",
+    #                memberOf => "s_uni|all-students",
+    #                member => "uni-attic|uni-12b|global-students",
+    #               });
 }
 
 
