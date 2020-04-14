@@ -212,25 +212,34 @@ if ($full==1){
 
 
 ############################################################
-# Adding users --add
+# Adding users
 ############################################################
 if ($add_check==1){
-    my $command_newfile_1="sophomorix-newfile $all_options --name students.csv ".
+    my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name students.csv ".
                           "/usr/share/sophomorix-developer/testdata/students.csv-workflow-schoolisolation-1.utf8";
-    my $command_newfile_2="sophomorix-newfile $all_options --name bsz.students.csv ".
+    my $command_newfile_2="sophomorix-newfile $all_options --keep-file --name bsz.students.csv ".
                           "/usr/share/sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-1.utf8";
+
+    my $command_newfile_3="sophomorix-newfile $all_options --keep-file --name teachers.csv ".
+                          "/usr/share/sophomorix-developer/testdata/teachers.csv-workflow-schoolisolation-1.utf8";
+    my $command_newfile_4="sophomorix-newfile $all_options --keep-file --name bsz.teachers.csv ".
+                          "/usr/share/sophomorix-developer/testdata/bsz.teachers.csv-workflow-schoolisolation-1.utf8";
     &run_command($command_newfile_1);
     &run_command($command_newfile_2);
+    &run_command($command_newfile_3);
+    &run_command($command_newfile_4);
 
     my $command_add="sophomorix-check $all_options ";
     &run_command($command_add);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",11);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 }
+
+
 ############################################################
 if ($add_do==1){
     &run_command("sophomorix-add $all_options");
@@ -238,9 +247,113 @@ if ($add_do==1){
     &run_command("sophomorix-kill $all_options");
 
     # bsz, default-school (alphabetically ordered when creating accounts)
-    # i.E.: Hugo Peréz of bsz gets perezhu and Hugo Peréz of default-school gets perezhu1
+    # i.E.: 
+    #  Hugo Peréz of bsz gets perezhu 
+    #  Hugo Peréz of default-school gets perezhu1
 
-    # bsz stefanol
+
+
+    # bsz teacher b-oe42
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-oe24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Gökhan Ömür",
+                   givenName=>"Gökhan",
+                   name=>"b-oe24",
+                   sAMAccountname=>"b-oe24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-oe24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-oe24",
+                   sn=>"Ömür",
+                   userPrincipalName => "b-oe24@".$root_dns,
+                   mail => "b-oe24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Goekhan",
+                   sophomorixSurnameASCII  => "Oemuer",
+                   sophomorixFirstnameInitial => "G.",
+                   sophomorixSurnameInitial  => "Ö.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "15.09.1976",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-wu24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-wu24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Désirée Würth",
+                   givenName=>"Désirée",
+                   name=>"b-wu24",
+                   sAMAccountname=>"b-wu24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-wu24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-wu24",
+                   sn=>"Würth",
+                   userPrincipalName => "b-wu24@".$root_dns,
+                   mail => "b-wu24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Desiree",
+                   sophomorixSurnameASCII  => "Wuerth",
+                   sophomorixFirstnameInitial => "D.",
+                   sophomorixSurnameInitial  => "W.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "23.12.1972",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+
+
+
+
+
+
+
+
+
+
+    # bsz student stefanol
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=stefanol,OU=12a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
@@ -278,11 +391,12 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-12a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-    # bsz muelleju
+    # bsz student muelleju
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=muelleju,OU=7a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
@@ -320,11 +434,12 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-7a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-    # bsz perezhu
+    # bsz student perezhu
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=perezhu,OU=10a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
@@ -362,11 +477,12 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-    # bsz maieran
+    # bsz student maieran
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maieran,OU=8a,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
                    #####
@@ -404,12 +520,13 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
 
-    # default-school muelleju1
+    # default-school student muelleju1
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=muelleju1,OU=7a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    #####
@@ -447,11 +564,12 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
 
-    # default-school perezhu1
+    # default-school student perezhu1
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=perezhu1,OU=10a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    #####
@@ -489,11 +607,12 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
 
-    # default-school maieran1
+    # default-school student maieran1
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=maieran1,OU=8a,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
                    #####
@@ -531,6 +650,7 @@ if ($add_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
@@ -603,6 +723,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-12a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -645,6 +766,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-7a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -687,6 +809,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -729,6 +852,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -772,6 +896,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
@@ -814,6 +939,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
@@ -856,6 +982,7 @@ if ($modify_1_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
@@ -925,6 +1052,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-12a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -967,6 +1095,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-7a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -1009,6 +1138,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -1051,6 +1181,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
@@ -1094,6 +1225,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "7a|wifi|internet|webfilter|intranet|printing",
                   });
@@ -1136,6 +1268,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
@@ -1178,6 +1311,7 @@ if ($modify_2_do==1){
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
                    sophomorixUnid => "---",
+                   accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
