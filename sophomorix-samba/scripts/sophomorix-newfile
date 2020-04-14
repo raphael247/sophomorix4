@@ -68,6 +68,7 @@ my $help=0;
 my $info=0;
 my $json=0;
 my $test_only=0;
+my $keep_file=0;
 my $name="";
 my $show_special_char_lines=0;
 my $non_umlaut=0;
@@ -82,6 +83,7 @@ my $testopt=GetOptions(
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
            "test-only" => \$test_only,
+           "keep-file" => \$keep_file,
           );
 
 
@@ -129,7 +131,8 @@ Examples:
     sophomorix-newfile /path/to/students.csv --test-only     (filtering/utf8 converting to stdout)
   
 Options:
-  --test-only               (keeps new file and does not install file to etc)
+  --test-only               (keeps new file and does not install file to /etc)
+  --keep-file               (keeps new file in its original location, installs file to /etc)
   --show-special-char-lines (show lines with special characters)
  
 Please see the sophomorix-newfile(8) man pages for full documentation
@@ -386,10 +389,15 @@ system($command_5);
 
 
 # 6) delete newfile
-my $command_6="rm $newfile_abs";
-print "6) Deleting newfile:\n";
-print "   $command_6\n";
-system($command_6);
+if ($keep_file==0){
+    my $command_6="rm $newfile_abs";
+    print "6) Deleting newfile:\n";
+    print "   $command_6\n";
+    system($command_6);
+} else {
+    print "6) NOT deleting newfile because of option --keep-file:\n";
+    print "   $newfile_abs\n";
+}
 
 print "\n";
 
