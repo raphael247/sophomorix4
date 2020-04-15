@@ -667,7 +667,7 @@ if ($dump_login_avoid==1){
 
 
 # ============================================================
-# Find Matches: Walk thhrough all files and identifiers in %users_file
+# Find Matches: Walk through all files and identifiers in %users_file
 # ============================================================
 
 # AD data is in: $ref_AD_check
@@ -680,8 +680,8 @@ if ($dump_login_avoid==1){
 # and populated from AD by subs (AD identifiers): 
 # $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
 
-print Dumper (\%Match);
-print Dumper (\%Match2);
+
+#exit;
 
 # no migration
 #&populate_ad_dynamic_identifiers_utf8();
@@ -689,6 +689,10 @@ print Dumper (\%Match2);
 # migration
 &populate_ad_dynamic_identifiers_ascii();
 
+print Dumper (\%Match);
+print Dumper (\%Match2);
+
+#exit;
 # find exact matches
 &print_title("Finding exact user matches ...");
 &find_migration_unid_matches();
@@ -2059,67 +2063,145 @@ sub find_migration_unid_matches {
     print "\n";
     &print_title("unidMatching lines to accounts:");
     &show_dynamic_identifiers_ascii();
+    # total counters
     my $line_count=0;
     my $matched_count=0;
     my $no_unid_count=0;
     my $not_matched_count=0;
-    foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
-        my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-        $line_count++;
-        if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
-            # finding a unid match 
-            if ( exists $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} and
-                 $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
-               ){
-                # MATCH
-                my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
-                my $role=$ref_AD_check->{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam};
-                # fetch the identifier from AD with same unid
-                my $identifier_ascii_from_AD=
-		    $ref_AD_check->{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
-                if($Conf::log_level>=2){
-                    print " $filename:",
-                          "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                          "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                          "$identifier_ascii\n";
-	            print "  --> unidMATCH: $sam --> ",
-                          "$identifier_ascii_from_AD\n";
+    # file counters
+    my $line_count_file=0;
+    my $matched_count_file=0;
+    my $no_unid_count_file=0;
+    my $not_matched_count_file=0;
+
+    # test all files
+    foreach my $filename (keys %{$Match2{'file_dynamic_identifiers_ascii'}} ) {
+        # reset file counters
+        $line_count_file=0;
+        $matched_count_file=0;
+        $no_unid_count_file=0;
+        $not_matched_count_file=0;
+        foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
+	    print "HERE-NEW0: $filename $identifier_ascii\n";
+            $line_count++;
+            $line_count_file++;
+            if ($users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
+                # finding a unid match 
+                if ( exists $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}} and
+                    $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
+                   ){
+                    # MATCH
+                    my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}};
+                    my $role=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixRole_BY_sAMAccountName'}{$sam};
+                    # fetch the identifier from AD with same unid
+                    my $identifier_ascii_from_AD=
+		        $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'identifier_ascii_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}};
+#                    if($Conf::log_level>=2){
+                        print "HERE-NEW1 $filename:",
+                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                              "$identifier_ascii\n";
+	                print "  --> unidMATCH: $sam --> ",
+                              "$identifier_ascii_from_AD\n";
+#                    }
+                    $matched_count++;
+                    $matched_count_file++;
+                    # remove from dynamic hashes
+                    delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii_from_AD};
+                    delete $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+
+                    # save to write later
+                    my $sub=(caller(0))[3];
+                    $Match2{'file'}{$filename}{$identifier_ascii}=$sam;
+                    my $line_new=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                    $Match2{'ACTION'}{$filename}{$line_new}{'sAMAccountName'}=$sam;
+                    $Match2{'ACTION'}{$filename}{$line_new}{'MATCH_SUB'}="$sub";
+                    $Match2{'ACTION'}{$filename}{$line_new}{'status'}=
+                        $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    # reverse action_BY_sAMAccountName
+                    $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new;
+                } else {
+                    # NO MATCH
+                    $Match2{'find_migration_unid_matches'}{$filename}{$identifier_ascii}="no unid match";
+                    $not_matched_count++;
+                    $not_matched_count_file++;
+#                    if($Conf::log_level>=2){
+                        print "HERE-NEW2 $filename:",
+                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                              "$identifier_ascii\n";
+                        print "   --> Unid $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}",
+                              " not found in AD\n";
+#                    }
                 }
-                $matched_count++;
-                # remove from dynamic hashes
-                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_from_AD};
-                delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
-
-                # save to write later
-                my $sub=(caller(0))[3];
-                $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-                my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-                $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-                $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
-                $Match{'ACTION'}{$line_new}{'status'}=
-                    $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-                # reverse action_BY_sAMAccountName
-                $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
-
             } else {
-                # NO MATCH
-                $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
-                $not_matched_count++;
-                if($Conf::log_level>=2){
-                    print " $filename:",
-                          "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                          "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                          "$identifier_ascii\n";
-                    print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
-                          " not found in AD\n";
-                }
+                $no_unid_count++;
+                $no_unid_count_file++;
+                $Match2{'find_migration_unid_matches'}{$filename}{$identifier_ascii}="no unid, no match possible";
             }
-        } else {
-            $no_unid_count++;
-            $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid, no match possible";
         }
+        &print_title("unidMatching $line_count_file lines in $filename: $matched_count_file matched, $not_matched_count_file not matched, $no_unid_count_file without unid");
     }
-    &print_title("unidMatching $line_count lines: $matched_count matched, $not_matched_count unmatched, $no_unid_count without unid");
+
+    print "\n";
+    # foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
+    #     my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+    # 	print "HERE OLD: $filename $identifier_ascii\n";
+    #     $line_count++;
+    #     if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
+    #         # finding a unid match 
+    #         if ( exists $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} and
+    #              $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
+    #            ){
+    #             # MATCH
+    #             my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
+    #             my $role=$ref_AD_check->{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam};
+    #             # fetch the identifier from AD with same unid
+    #             my $identifier_ascii_from_AD=
+    # 		    $ref_AD_check->{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
+    #             if($Conf::log_level>=2){
+    #                 print " $filename:",
+    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+    #                       "$identifier_ascii\n";
+    # 	            print "  --> unidMATCH: $sam --> ",
+    #                       "$identifier_ascii_from_AD\n";
+    #             }
+    #             $matched_count++;
+    #             # remove from dynamic hashes
+    #             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_from_AD};
+    #             delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+
+    #             # save to write later
+    #             my $sub=(caller(0))[3];
+    #             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
+    #             my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+    #             $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
+    #             $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
+    #             $Match{'ACTION'}{$line_new}{'status'}=
+    #                 $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+    #             # reverse action_BY_sAMAccountName
+    #             $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
+
+    #         } else {
+    #             # NO MATCH
+    #             $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
+    #             $not_matched_count++;
+    #             if($Conf::log_level>=2){
+    #                 print " $filename:",
+    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+    #                       "$identifier_ascii\n";
+    #                 print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
+    #                       " not found in AD\n";
+    #             }
+    #         }
+    #     } else {
+    #         $no_unid_count++;
+    #         $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid, no match possible";
+    #     }
+    # }
+    &print_title("unidMatching $line_count lines total: $matched_count matched, $not_matched_count not matched, $no_unid_count without unid");
 }
 
 
@@ -2411,6 +2493,7 @@ sub analyze_user_line {
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
 	$Match2{'ACTION'}{$filename}{$line_new}{'birthdate'}=$birthdate;
 	$Match2{'ACTION'}{$filename}{$line_new}{'class'}=$class;
+	$Match2{'ACTION'}{$filename}{$line_new}{'class_type'}=$type;
 	$Match2{'ACTION'}{$filename}{$line_new}{'filename'}=$filename;
 	$Match2{'ACTION'}{$filename}{$line_new}{'firstname_ascii'}=$first_ascii;
 	$Match2{'ACTION'}{$filename}{$line_new}{'surname_ascii'}=$last_ascii;

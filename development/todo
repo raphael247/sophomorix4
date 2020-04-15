@@ -63,15 +63,31 @@ sophomorix-class --members/addmembers/removemembers
 
 ------------------------------------------------------------
 school isolation tests
+
+
 WEITER: 
   sophomorix-check auf den neuen Hash Match2 umstellen
+  find_migration_unid_matches versagt bei identischen Einträgen in verschiedenen schulen (unid verschieden)
+  (verschiedene user tun aber)
+  test_attic_move spricht an??? Nein
+    --> erst mit verschiedener unid testen, dann mit derselben
+
+    --> wenns tut, test anpassen: 2 user mit derselben/verschiedenen/überkreuzten unid anlegen
+
+
   Bugfix: 
     sophomorix-test-workflow-schoolisolation --modify-1-check
       - OK: user in default-school werden updedated
       - BUG: user aus bsz sollen in defalult-school
 
-- was ist wenn in 2 verschiedenen Schulen gleiche kürzel stehen?
+wenn nur noch match2 da ist:
+code cleanup sophomorix-check
+-> funktion2 umbenenen in funktion, vorher funktion löschen
+-> umbennen in Match
+&find_migration_unid_matches();
 
+- was ist wenn in 2 verschiedenen Schulen gleiche kürzel stehen?
+- was ist wenn in 2 verschiedenen Schulen gleiche unid stehen?
 ------------------------------------------------------------
 
 
