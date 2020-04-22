@@ -423,7 +423,7 @@ if ($add_do==1){
                    sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
-                   sophomorixUnid => "---",
+                   sophomorixUnid => "unid1234",
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-7a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
@@ -511,7 +511,7 @@ if ($add_do==1){
                    sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
-                   sophomorixUnid => "---",
+                   sophomorixUnid => "unid2345",
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
@@ -793,9 +793,14 @@ if ($add_do==1){
 ############################################################
 if ($modify_1_check==1){
     # changes students.csv:
-    #   Andre correct spelling: Andrè -> André
-    #   Perez correct spelling: Peréz -> Pérez
-    #   Stefanson bithdate 1977 -> 1973
+    #   Andre correct spelling: Andrè -> André (approx match)
+    #   Perez correct spelling: Peréz -> Pérez (approx match)
+    #   Stefanson bithdate 1977 -> 1975 (approx match)
+
+    # changes bsz.students.csv:
+    #   Andre correct spelling: Andrè -> André (matched my unid)
+    #   Perez correct spelling: Peréz -> Pérez (approx match)
+    #   Stefanson bithdate 1977 -> 1973 (approx match)
 
     my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name students.csv ".
                           "/usr/share/sophomorix-developer/testdata/students.csv-workflow-schoolisolation-2.utf8";
@@ -804,12 +809,25 @@ if ($modify_1_check==1){
     &run_command($command_newfile_1);
     &run_command($command_newfile_2);
 
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
 
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",6);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",6);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",6);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",6);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+
+
 }
 ############################################################
 if ($modify_1_do==1){
@@ -931,7 +949,7 @@ if ($modify_1_do==1){
                    sophomorixSurnameInitial  => "S.",
                    sophomorixCloudQuotaCalculated => "---",
                    sophomorixUserToken => "---",
-                   sophomorixBirthdate  => "03.07.1977",
+                   sophomorixBirthdate  => "03.07.1973",
                    sophomorixRole => "student",
                    sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
                    sophomorixSchoolPrefix => "bsz",
@@ -990,7 +1008,7 @@ if ($modify_1_do==1){
                    sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
-                   sophomorixUnid => "---",
+                   sophomorixUnid => "unid1234",
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-7a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
@@ -1078,7 +1096,7 @@ if ($modify_1_do==1){
                    sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
                    sophomorixExamMode => "---",
                    sophomorixStatus => "U",
-                   sophomorixUnid => "---",
+                   sophomorixUnid => "unid2345",
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
@@ -1197,7 +1215,7 @@ if ($modify_1_do==1){
                    sophomorixSurnameInitial  => "S.",
                    sophomorixCloudQuotaCalculated => "---",
                    sophomorixUserToken => "---",
-                   sophomorixBirthdate  => "03.07.1977",
+                   sophomorixBirthdate  => "03.07.1975",
                    sophomorixRole => "student",
                    sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
                    sophomorixSchoolPrefix => "---",

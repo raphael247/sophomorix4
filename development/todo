@@ -67,6 +67,43 @@ school isolation tests
 
 WEITER: 
   sophomorix-check auf den neuen Hash Match2 umstellen
+
+  OLD: $Match{'ACTION'}{$line_new}{'login'}
+  NEU: $Match2{'ACTION'}{$filename}{$line_add}{'login'}
+  (line_add/line_new sind gleich, {$filename} kommt dazwischen)
+
+  OLD: $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}
+  NEW: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}
+  ({$filename} kommt dazwischen)
+
+  Dies ersetzen in 
+  OK: &test_attic_move
+  OK: &test_UEAS_TM_update
+  OK: &test_TM_DA_update
+  OK: &test_DL_RA_update
+  OK: &test_R_A_update
+  OK: &test_RK_kill
+  OK: &test_user_update
+  OK: find_migration_ascii_matches_old auskommentiert
+  OK: find_migration_ascii_matches2
+  OK: show_dynamic_identifiers_ascii
+  OK: populate_ad_dynamic_identifiers_ascii
+      nur noch Match2
+      fileliste evtl. ändern
+  OK: find_migration_ascii_approx_matches
+  OK: analyze_user_line
+  OK: populate_ad_dynamic_identifiers_utf8 -> wird nicht aufgerufen, Match2
+
+
+
+
+
+
+
+
+
+
+
   find_migration_unid_matches versagt bei identischen Einträgen in verschiedenen schulen (unid verschieden)
   (verschiedene user tun aber)
   test_attic_move spricht an??? Nein
