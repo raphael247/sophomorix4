@@ -749,67 +749,61 @@ print Dumper ($ref_AD_check2);
 print "------------------------------------------------------------\n";
 
 foreach my $filename ( keys %{$ref_AD_check2->{'LOOKUP_by_filename'}} ) {
-   print "HERESSS: $filename\n";
+    foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) { 
+        # test all users in AD
+        my $update=0; # if > 0 write to sophomorix.update
+        my $kill=0; # if > 0 write to sophomorix.kill
+        my $old_unid=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'};
+        my $new_unid="---";
+        my $old_surname_ascii=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
+        my $new_surname_ascii="---";
+        my $old_firstname_ascii=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'};
+        my $new_firstname_ascii="---";
+        my $old_birthdate=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'};
+        my $new_birthdate="---";
+        my $old_surname_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'sn'};
+        my $new_surname_utf8="---";
+        my $old_firstname_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'};
+        my $new_firstname_utf8="---";
 
+        my $old_surname_initial_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'};
+        my $new_surname_initial_utf8="---";
+        my $old_firstname_initial_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'};
+        my $new_firstname_initial_utf8="---";
 
-#exit;
+        my $old_filename=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
+        my $new_filename="---";
+        my $old_status=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'};
+        my $new_status="---";
+        my $old_role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
+        my $new_role="---";
 
+        my $old_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
+        my $new_school="---";
 
-foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) { 
-    # test all users in AD
-    my $update=0; # if > 0 write to sophomorix.update
-    my $kill=0; # if > 0 write to sophomorix.kill
-    my $old_unid=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'};
-    my $new_unid="---";
-    my $old_surname_ascii=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
-    my $new_surname_ascii="---";
-    my $old_firstname_ascii=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'};
-    my $new_firstname_ascii="---";
-    my $old_birthdate=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'};
-    my $new_birthdate="---";
-    my $old_surname_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'sn'};
-    my $new_surname_utf8="---";
-    my $old_firstname_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'};
-    my $new_firstname_utf8="---";
+        # dirty fix to have class without school
+        my $old_class=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+        $old_class=~s/^$old_school-//;
+        my $old_class_with_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+        my $new_class="---";
 
-    my $old_surname_initial_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'};
-    my $new_surname_initial_utf8="---";
-    my $old_firstname_initial_utf8=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'};
-    my $new_firstname_initial_utf8="---";
-
-    my $old_filename=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
-    my $new_filename="---";
-    my $old_status=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'};
-    my $new_status="---";
-    my $old_role=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixRole'};
-    my $new_role="---";
-
-    my $old_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
-    my $new_school="---";
-
-    # dirty fix to have class without school
-    my $old_class=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
-    $old_class=~s/^$old_school-//;
-    my $old_class_with_school=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
-    my $new_class="---";
-
-    my $old_homedirectory=$ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'};;
-    my $new_homedirectory="---";
+        my $old_homedirectory=$ref_AD_check->{'sAMAccountName'}{$sam}{'homeDirectory'};;
+        my $new_homedirectory="---";
     
-    ############################################################
-    # This might be temporary
-    my $old_homedirectory_rel=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'};;
-    my $new_homedirectory_rel="---";
+        ############################################################
+        # This might be temporary
+        my $old_homedirectory_rel=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'};;
+        my $new_homedirectory_rel="---";
     
-    ############################################################
+        ############################################################
 
-    my $old_mail=$ref_AD_check->{'sAMAccountName'}{$sam}{'mail'};
-    my $new_mail="---";
+        my $old_mail=$ref_AD_check->{'sAMAccountName'}{$sam}{'mail'};
+        my $new_mail="---";
     
-    # old webui string is sorted already
-    my $old_webui_string=join(",",@{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} });
-    # new webui string
-    my $new_webui_string="---";
+        # old webui string is sorted already
+        my $old_webui_string=join(",",@{ $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} });
+        # new webui string
+        my $new_webui_string="---";
 
     ##################################################
     # unmatched users are moved into attic (if not there already) 
@@ -844,166 +838,162 @@ foreach my $sam ( keys %{$ref_AD_check->{'sAMAccountName'}} ) {
     # }
 
 
-    &test_attic_move($filename,$sam,\$old_class,\$new_class,\$old_status,\%sophomorix_config);
-    ##################################################
+        &test_attic_move($filename,$sam,\$old_class,\$new_class,\$old_status,\%sophomorix_config);
+        ##################################################
 
-    ##################################################
-    # check status update for users in AD
-    &test_UEAS_TM_update($filename,$sam,\$update,\$new_status);
-    &test_TM_DA_update($filename,$sam,\$update,\$new_status);
-    &test_DL_RA_update($filename,$sam,\$update,\$new_status);
-    &test_R_A_update($filename,$sam,\$update,\$new_status);
+        ##################################################
+        # check status update for users in AD
+        &test_UEAS_TM_update($filename,$sam,\$update,\$new_status);
+        &test_TM_DA_update($filename,$sam,\$update,\$new_status);
+        &test_DL_RA_update($filename,$sam,\$update,\$new_status);
+        &test_R_A_update($filename,$sam,\$update,\$new_status);
 
 #    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
-    if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
-        # check identifier update for matched users in AD
-        &test_user_update($filename,
-                          $sam,
-			  \%sophomorix_config,
-                          \$update,
-                          \$new_unid,
-                          \$old_surname_ascii,
-                          \$new_surname_ascii,
-                          \$old_firstname_ascii,
-                          \$new_firstname_ascii,
-                          \$new_birthdate,
-                          \$new_surname_utf8,
-                          \$new_firstname_utf8,
-                          \$new_surname_initial_utf8,
-                          \$new_firstname_initial_utf8,
-                          \$new_filename,
-                          \$new_role,
-                          \$new_class,
-	                  \$new_school,
-                          \$old_mail,
-                          \$new_mail,
-                          \$old_webui_string,
-                          \$new_webui_string,
+        if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
+            # check identifier update for matched users in AD
+            &test_user_update($filename,
+                              $sam,
+                              \%sophomorix_config,
+                              \$update,
+                              \$new_unid,
+                              \$old_surname_ascii,
+                              \$new_surname_ascii,
+                              \$old_firstname_ascii,
+                              \$new_firstname_ascii,
+                              \$new_birthdate,
+                              \$new_surname_utf8,
+                              \$new_firstname_utf8,
+                              \$new_surname_initial_utf8,
+                              \$new_firstname_initial_utf8,
+                              \$new_filename,
+                              \$new_role,
+                              \$new_class,
+	                      \$new_school,
+                              \$old_mail,
+                              \$new_mail,
+                              \$old_webui_string,
+                              \$new_webui_string,
 #                          \$old_homedirectory,
-                          \$new_homedirectory,
+                              \$new_homedirectory,
 #                          \$old_homedirectory_rel,
-                          \$new_homedirectory_rel,
-                         );
-    }
+                              \$new_homedirectory_rel,
+                             );
+        }
 
-    if ($update>0){
-        # write a line to sophomorix.update
-        my $update_line=$sam."::".
-                        $old_unid."::".
-                        $new_unid."::".
-                        $old_surname_ascii."::".
-                        $new_surname_ascii."::".
-                        $old_firstname_ascii."::".
-                        $new_firstname_ascii."::".
-                        $old_birthdate."::".
-                        $new_birthdate."::".
-                        $old_surname_utf8."::".
-                        $new_surname_utf8."::".
-                        $old_firstname_utf8."::".
-                        $new_firstname_utf8."::".
-                        $old_filename."::".
-                        $new_filename."::".
-                        $old_status."::".
-                        $new_status."::".
-                        $old_role."::".
-                        $new_role."::".
-                        $old_class."::".
-                        $new_class."::".
-                        $old_school."::".
-                        $new_school."::".
-                        $old_surname_initial_utf8."::".
-                        $new_surname_initial_utf8."::".
-                        $old_firstname_initial_utf8."::".
-                        $new_firstname_initial_utf8."::".
-                        $old_mail."::".
-                        $new_mail."::".
-                        $old_webui_string."::".
-                        $new_webui_string."::".
-                        $old_homedirectory."::".
-                        $new_homedirectory."::".
-                        $old_homedirectory_rel."::".
-                        $new_homedirectory_rel."::".
-                        "\n";
-        print UPDATE $update_line;
-        # create result
-        push @{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} }, $sam;
-        if ($new_unid ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'OLD'}=$old_unid;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'NEW'}=$new_unid;
+        if ($update>0){
+            # write a line to sophomorix.update
+            my $update_line=$sam."::".
+                            $old_unid."::".
+                            $new_unid."::".
+                            $old_surname_ascii."::".
+                            $new_surname_ascii."::".
+                            $old_firstname_ascii."::".
+                            $new_firstname_ascii."::".
+                            $old_birthdate."::".
+                            $new_birthdate."::".
+                            $old_surname_utf8."::".
+                            $new_surname_utf8."::".
+                            $old_firstname_utf8."::".
+                            $new_firstname_utf8."::".
+                            $old_filename."::".
+                            $new_filename."::".
+                            $old_status."::".
+                            $new_status."::".
+                            $old_role."::".
+                            $new_role."::".
+                            $old_class."::".
+                            $new_class."::".
+                            $old_school."::".
+                            $new_school."::".
+                            $old_surname_initial_utf8."::".
+                            $new_surname_initial_utf8."::".
+                            $old_firstname_initial_utf8."::".
+                            $new_firstname_initial_utf8."::".
+                            $old_mail."::".
+                            $new_mail."::".
+                            $old_webui_string."::".
+                            $new_webui_string."::".
+                            $old_homedirectory."::".
+                            $new_homedirectory."::".
+                            $old_homedirectory_rel."::".
+                            $new_homedirectory_rel."::".
+                            "\n";
+            # create result
+            push @{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} }, $sam;
+            if ($new_unid ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'OLD'}=$old_unid;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixUnid'}{'NEW'}=$new_unid;
+            }
+            if ($new_surname_ascii ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSurnameASCII'}{'OLD'}=$old_surname_ascii;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSurnameASCII'}{'NEW'}=$new_surname_ascii;
+            }
+            if ($new_firstname_ascii ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixFirstnameASCII'}{'OLD'}=$old_firstname_ascii;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixFirstnameASCII'}{'NEW'}=$new_firstname_ascii;
+            }
+            if ($new_birthdate ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixBirthdate'}{'OLD'}=$old_birthdate;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixBirthdate'}{'NEW'}=$new_birthdate;
+            }
+            if ($new_surname_utf8 ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sn'}{'OLD'}=$old_surname_utf8;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sn'}{'NEW'}=$new_surname_utf8;
+            }
+            if ($new_firstname_utf8 ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'givenName'}{'OLD'}=$old_firstname_utf8;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'givenName'}{'NEW'}=$new_firstname_utf8;
+            }
+            if ($new_filename ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminFile'}{'OLD'}=$old_filename;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminFile'}{'NEW'}=$new_filename;
+            }
+            if ($new_status ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixStatus'}{'OLD'}=$old_status;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixStatus'}{'NEW'}=$new_status;
+            }
+            if ($new_role ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixRole'}{'OLD'}=$old_role;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixRole'}{'NEW'}=$new_role;
+            }
+            if ($new_class ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminClass'}{'OLD'}=$old_class;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminClass'}{'NEW'}=$new_class;
+            }
+            if ($new_school ne "---"){
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'OLD'}=$old_school;
+                $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'NEW'}=$new_school;
+            }
+            $counters{'UPDATE'}++;
         }
-        if ($new_surname_ascii ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSurnameASCII'}{'OLD'}=$old_surname_ascii;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSurnameASCII'}{'NEW'}=$new_surname_ascii;
-        }
-        if ($new_firstname_ascii ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixFirstnameASCII'}{'OLD'}=$old_firstname_ascii;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixFirstnameASCII'}{'NEW'}=$new_firstname_ascii;
-        }
-        if ($new_birthdate ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixBirthdate'}{'OLD'}=$old_birthdate;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixBirthdate'}{'NEW'}=$new_birthdate;
-        }
-        if ($new_surname_utf8 ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sn'}{'OLD'}=$old_surname_utf8;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sn'}{'NEW'}=$new_surname_utf8;
-        }
-        if ($new_firstname_utf8 ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'givenName'}{'OLD'}=$old_firstname_utf8;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'givenName'}{'NEW'}=$new_firstname_utf8;
-        }
-        if ($new_filename ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminFile'}{'OLD'}=$old_filename;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminFile'}{'NEW'}=$new_filename;
-        }
-        if ($new_status ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixStatus'}{'OLD'}=$old_status;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixStatus'}{'NEW'}=$new_status;
-        }
-        if ($new_role ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixRole'}{'OLD'}=$old_role;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixRole'}{'NEW'}=$new_role;
-        }
-        if ($new_class ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminClass'}{'OLD'}=$old_class;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixAdminClass'}{'NEW'}=$new_class;
-        }
-        if ($new_school ne "---"){
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'OLD'}=$old_school;
-            $sophomorix_result{'CHECK_RESULT'}{'UPDATE'}{$sam}{'sophomorixSchoolname'}{'NEW'}=$new_school;
-        }
-        $counters{'UPDATE'}++;
-    }
 
-    &test_RK_kill($filename,$sam,\$kill);
-    if ($kill>0){
-        # write to sophomorix.kill
-        my $kill_line=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
-                      $sam."::".
-                      $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
-                      $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
-        print KILL $kill_line;
-        $counters{'KILL'}++;
-
-    }
-
-    # neither updated nor killed: nochange
-    if ($update==0 and $kill==0){
-        # write to sophomorix.nochange
-        my $nochange_line=$sam."::".
-                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sn'}."::".
-                          $ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'}."::".
-                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}."::".
-                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'}."::".
+        &test_RK_kill($filename,$sam,\$kill);
+        if ($kill>0){
+            # write to sophomorix.kill
+            my $kill_line=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}."::".
+                          $sam."::".
                           $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
-                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}."::".
-                          "\n";
-        print NOCHANGE $nochange_line;
-        #push @{ $sophomorix_result{'CHECK_RESULT'}{'NOCHANGELIST'} }, $sam;
-        $counters{'NOCHANGE'}++;
+                          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}."::\n";               
+            print KILL $kill_line;
+            $counters{'KILL'}++;
+        }
+
+        # neither updated nor killed: nochange
+        if ($update==0 and $kill==0){
+            # write to sophomorix.nochange
+            my $nochange_line=$sam."::".
+                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sn'}."::".
+                              $ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'}."::".
+                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'}."::".
+                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'}."::".
+                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}."::".
+                              $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}."::".
+                              "\n";
+            print NOCHANGE $nochange_line;
+            #push @{ $sophomorix_result{'CHECK_RESULT'}{'NOCHANGELIST'} }, $sam;
+            $counters{'NOCHANGE'}++;
+        }
     }
-}
-
-
 }
 
 
@@ -2336,7 +2326,7 @@ sub find_migration_unid_matches {
         $no_unid_count_file=0;
         $not_matched_count_file=0;
         foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
-	    print "HERE-NEW0: $filename $identifier_ascii\n";
+#	    print "HERE-NEW0: $filename $identifier_ascii\n";
             $line_count++;
             $line_count_file++;
             if ($users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
@@ -2351,7 +2341,7 @@ sub find_migration_unid_matches {
                     my $identifier_ascii_from_AD=
 		        $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'identifier_ascii_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}};
 #                    if($Conf::log_level>=2){
-                        print "HERE-NEW1 $filename:",
+                        print "MATCH in $filename:",
                               "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                               "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                               "$identifier_ascii\n";
@@ -2380,7 +2370,7 @@ sub find_migration_unid_matches {
                     $not_matched_count++;
                     $not_matched_count_file++;
 #                    if($Conf::log_level>=2){
-                        print "HERE-NEW2 $filename:",
+                        print "NOMATCH in $filename:",
                               "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                               "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                               "$identifier_ascii\n";
