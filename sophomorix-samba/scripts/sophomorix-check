@@ -1897,46 +1897,113 @@ sub find_migration_ascii_approx_matches {
         print "---> Nothing to do anymore\n";
 	    return 0;
     }
+    # total counters
     my $line_count=0;
     my $matched_count=0;
     my $not_matched_count=0;
-    foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
-        $line_count++;
-        my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-        print " $filename:",
-              "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-              "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-              "$identifier_ascii\n";
-        my $count=0;
-        foreach my $identifier_ascii_ad ( keys %{ $Match{'ad_dynamic_identifiers_ascii'} } ){
-            $count++;
-            my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
-            if($Conf::log_level>=3){
-                print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
-                print "      * $edit_distance (Edit distance)\n";
-            }
-            if ($edit_distance <= $max_edit_distance){
-                # APPROX MATCH
-                my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
-                print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
-                delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
-                # save match to delete this match from list
-                $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
-                # remove the approx matches from the list
-                delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+    # file counters
+    my $line_count_file=0;
+    my $matched_count_file=0;
+    my $no_unid_count_file=0;
+    my $not_matched_count_file=0;
 
-                # save to write later
-                my $sub=(caller(0))[3];
-                my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-                $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-                $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
-                $Match{'ACTION'}{$line_new}{'status'}=
-                    $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-                # reverse action_BY_sAMAccountName
-                $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
+    # test all files
+    foreach my $filename (keys %{$Match2{'file_dynamic_identifiers_ascii'}} ) {
+        # reset file counters
+        $line_count_file=0;
+        $matched_count_file=0;
+        $no_unid_count_file=0;
+        $not_matched_count_file=0;
+
+        foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
+            $line_count++;
+            $line_count_file++;
+#            my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+            print " $filename:",
+                  "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                  "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                  "$identifier_ascii\n";
+            my $count=0;
+            foreach my $identifier_ascii_ad ( keys %{ $Match2{'ad_dynamic_identifiers_ascii'}{$filename} } ){
+                $count++;
+                my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
+#                if($Conf::log_level>=3){
+                    print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
+                    print "      * $edit_distance (Edit distance)\n";
+#                }
+                if ($edit_distance <= $max_edit_distance){
+                    # APPROX MATCH
+                    my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
+                    print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
+# ??? 
+                    delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
+                    delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii_ad};
+                    # save match to delete this match from list
+                    $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
+                    $Match2{'file_approx_match'}{$run}{$filename}{$identifier_ascii}=$edit_distance;
+                    # remove the approx matches from the list
+                    delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+                    delete $Match{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+
+                    # save to write later
+                    my $sub=(caller(0))[3];
+                    my $line_new=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+
+# old ?????
+                    $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
+                    $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
+                    $Match{'ACTION'}{$line_new}{'status'}=
+                        $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    # reverse action_BY_sAMAccountName
+                    $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
+# new
+                    $Match2{'ACTION'}{$filename}{$line_new}{'sAMAccountName'}=$sam;
+                    $Match2{'ACTION'}{$filename}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
+                    $Match2{'ACTION'}{$filename}{$line_new}{'status'}=
+                        $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    # reverse action_BY_sAMAccountName
+                    $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new;
+                }
             }
         }
     }
+    # foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
+    #     $line_count++;
+    #     my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
+    #     print " $filename:",
+    #           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+    #           "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+    #           "$identifier_ascii\n";
+    #     my $count=0;
+    #     foreach my $identifier_ascii_ad ( keys %{ $Match{'ad_dynamic_identifiers_ascii'} } ){
+    #         $count++;
+    #         my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
+    #         if($Conf::log_level>=3){
+    #             print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
+    #             print "      * $edit_distance (Edit distance)\n";
+    #         }
+    #         if ($edit_distance <= $max_edit_distance){
+    #             # APPROX MATCH
+    #             my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
+    #             print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
+    #             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
+    #             # save match to delete this match from list
+    #             $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
+    #             # remove the approx matches from the list
+    #             delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
+
+    #             # save to write later
+    #             my $sub=(caller(0))[3];
+    #             my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+    #             $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
+    #             $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
+    #             $Match{'ACTION'}{$line_new}{'status'}=
+    #                 $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+    #             # reverse action_BY_sAMAccountName
+    #             $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
+    #         }
+    #     }
+    # }
     &print_title("Migration approx matching ($line_count tested)");
 }
 
@@ -2010,7 +2077,7 @@ sub find_migration_ascii_matches2 {
 
                 my $sub=(caller(0))[3];
 
-                # save to write later old
+                # save to write later old ????
                 $Match{'file'}{$filename}{$identifier_ascii}=$sam;
                 my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
                 $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
@@ -2031,7 +2098,7 @@ sub find_migration_ascii_matches2 {
                 $Match2{'action_BY_sAMAccountName'}{$sam}=$line_new2;
 
 
-                # remove from ad_to_be_matched old
+                # remove from ad_to_be_matched old ???
                 delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
                 delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
 
