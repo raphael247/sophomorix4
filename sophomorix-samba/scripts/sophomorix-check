@@ -689,12 +689,6 @@ if ($dump_login_avoid==1){
 # migration
 &populate_ad_dynamic_identifiers_ascii();
 
-print "------------------------------------------------------------\n";
-print "Match2 follows:\n";
-print "------------------------------------------------------------\n";
-print Dumper (\%Match2);
-print "------------------------------------------------------------\n";
-
 #exit;
 # find exact matches
 &print_title("Finding exact user matches ...");
@@ -708,6 +702,14 @@ print "------------------------------------------------------------\n";
 &find_migration_ascii_approx_matches(2);
 &find_migration_ascii_approx_matches(3);
 &find_migration_ascii_approx_matches(4);
+
+
+print "------------------------------------------------------------\n";
+print "Match2 follows:\n";
+print "------------------------------------------------------------\n";
+print Dumper (\%Match2);
+print "------------------------------------------------------------\n";
+
 
 # marriage, birthdate, ... and such matches ???
 
@@ -874,7 +876,6 @@ foreach my $filename ( keys %{ $ref_AD_check2->{'LOOKUP_by_filename'} } ) {
                               \$new_homedirectory_rel,
                              );
         }
-
         if ($update>0){
             # write a line to sophomorix.update
             my $update_line=$sam."::".
@@ -913,6 +914,7 @@ foreach my $filename ( keys %{ $ref_AD_check2->{'LOOKUP_by_filename'} } ) {
                             $old_homedirectory_rel."::".
                             $new_homedirectory_rel."::".
                             "\n";
+            print UPDATE $update_line;
             # create result
             push @{ $sophomorix_result{'CHECK_RESULT'}{'UPDATELIST'} }, $sam;
             if ($new_unid ne "---"){
@@ -1576,9 +1578,6 @@ sub test_user_update {
 #    my $line_new=$Match{'action_BY_sAMAccountName'}{$sam};
     my $line_new=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
 
-    #print Dumper (\%Match2);
-
-   
     # count changes to attributes, 
     # update unid only when ALL other values are the same
     my $identifier_class_changes=0;
@@ -1609,7 +1608,6 @@ sub test_user_update {
 #       $identifier_class_changes++;
 #   }
   
-
     # new_firstname_ascii
 #    if ( ($Match{'ACTION'}{$line_new}{'firstname_ascii'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'} )){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'firstname_ascii'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'} )){
@@ -2020,24 +2018,24 @@ sub show_dynamic_identifiers_ascii {
         $ad_count++;
     }
     my $diff=$ad_count-$file_count;
-    &print_title("$file_count users in files to be matched with $ad_count in AD (Diff: $diff)");
+    &print_title("$filename: $file_count user(s) to be matched with $ad_count in AD (Diff: $diff)");
     if ($file_count==0 or $ad_count==0){
 	return 0;
     } else {
-#        if($Conf::log_level>=2){
+        if($Conf::log_level>=2){
 	    @file_ids= sort @file_ids;
             print "file_dynamic_identifiers_ascii in $filename:\n";
             foreach my $id (@file_ids){
-                print "   * $id (in files)\n";
+                print "   * $id (in $filename)\n";
             }   
 	    @ad_ids = sort @ad_ids;
-            print "ad_dynamic_identifiers_ascii in $filename:\n";
+            print "ad_dynamic_identifiers_ascii in AD:\n";
             foreach my $id (@ad_ids){
                 my $status=
                 print "   * $id ($ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$id} in AD,",
                       " status $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$id})\n";
             }    
-#        }
+        }
         return 1;
     }
 }
@@ -2062,7 +2060,7 @@ sub find_migration_ascii_approx_matches {
     my ($max_edit_distance) = @_;
     my $run="approx_".$max_edit_distance."_run";
     print "\n";
-    &print_title("Migration approx matching (max. edit distance $max_edit_distance)");
+    &print_title("Starting migration approx matching (max. edit distance $max_edit_distance)");
     # total counters
     my $line_count=0;
     my $matched_count=0;
@@ -2089,23 +2087,20 @@ sub find_migration_ascii_approx_matches {
         foreach my $identifier_ascii (keys %{ $Match2{'file_dynamic_identifiers_ascii'}{$filename} } ) {
             $line_count++;
             $line_count_file++;
-#            my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-            print " $filename:",
-                  "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                  "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                  "$identifier_ascii\n";
+            print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                  "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
             my $count=0;
             foreach my $identifier_ascii_ad ( keys %{ $Match2{'ad_dynamic_identifiers_ascii'}{$filename} } ){
                 $count++;
                 my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
 #                if($Conf::log_level>=3){
-                    print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
-                    print "      * $edit_distance (Edit distance)\n";
+                    print "  * CHECK: $identifier_ascii -> $identifier_ascii_ad\n";
 #                }
                 if ($edit_distance <= $max_edit_distance){
                     # APPROX MATCH
                     my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
-                    print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
+                    print "    * Edit distance is $edit_distance\n";
+                    print "    * APPROXMATCH: $sam -> $identifier_ascii\n";
 # ??? 
 #                    delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
                     delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii_ad};
@@ -2134,6 +2129,8 @@ sub find_migration_ascii_approx_matches {
                         $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                     # reverse action_BY_sAMAccountName
                     $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new;
+                } else {
+                    print "    * NOMATCH: Edit distance is $edit_distance\n";
                 }
             }
         }
@@ -2321,9 +2318,11 @@ sub find_migration_unid_matches {
         $no_unid_count_file=0;
         $not_matched_count_file=0;
         foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
-#	    print "HERE-NEW0: $filename $identifier_ascii\n";
             $line_count++;
             $line_count_file++;
+            print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                  "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
+            print "  * CHECK: is unid $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} in AD at $filename?\n";
             if ($users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
                 # finding a unid match 
                 if ( exists $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}} and
@@ -2336,12 +2335,8 @@ sub find_migration_unid_matches {
                     my $identifier_ascii_from_AD=
 		        $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'identifier_ascii_BY_sophomorixUnid'}{$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}};
 #                    if($Conf::log_level>=2){
-                        print "MATCH in $filename:",
-                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                              "$identifier_ascii\n";
-	                print "  --> unidMATCH: $sam --> ",
-                              "$identifier_ascii_from_AD\n";
+                        print "    * Matching unid found at user $sam ($identifier_ascii_from_AD)\n";
+	                print "    * unidMATCH:  $sam --> $identifier_ascii\n";
 #                    }
                     $matched_count++;
                     $matched_count_file++;
@@ -2365,12 +2360,7 @@ sub find_migration_unid_matches {
                     $not_matched_count++;
                     $not_matched_count_file++;
 #                    if($Conf::log_level>=2){
-                        print "NOMATCH in $filename:",
-                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                              "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                              "$identifier_ascii\n";
-                        print "   --> Unid $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}",
-                              " not found in AD\n";
+                        print "    * NOMATCH: Unid $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} not found in AD\n";
 #                    }
                 }
             } else {
