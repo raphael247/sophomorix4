@@ -80,7 +80,6 @@ my @arguments = @ARGV;
 my $user_count=0;
 
 my $school="";
-my %users_file=();
 my %users_file2=();
 my %unid_seen=();
 
@@ -581,13 +580,6 @@ if ($dump_files==1){
                 jsoninfo => "USERS",
                 jsoncomment => "All users read from all user files",
                 log_level => $Conf::log_level,
-                hash_ref=>\%users_file,
-                sophomorix_config=>\%sophomorix_config,
-               });
-    &json_dump({json => $json,
-                jsoninfo => "USERS",
-                jsoncomment => "All users read from all user files",
-                log_level => $Conf::log_level,
                 hash_ref=>\%users_file2,
                 sophomorix_config=>\%sophomorix_config,
                });
@@ -598,12 +590,13 @@ if ($dump_files==1){
 # --follow
 # show the line
 if ($follow ne ""){
-    my $identifier=$users_file{'file'}{$follow_file}{$follow_line}{'identifier_ascii'};
+
+    my $identifier=$users_file2{$follow_file}{'file'}{$follow_file}{$follow_line}{'identifier_ascii'};
     if (not defined $identifier){
         print "   * Line $follow_line in file $follow_file contains no usable data\n";
     } else {
-        print "   * LINE ORIG: $users_file{'identifier_ascii'}{$identifier}{LINE_OLD}\n";
-        print "   * LINE UTF8: $users_file{'identifier_ascii'}{$identifier}{LINE_NEW}\n";
+        print "   * LINE ORIG: $users_file2{$follow_file}{'identifier_ascii'}{$identifier}{LINE_OLD}\n";
+        print "   * LINE UTF8: $users_file2{$follow_file}{'identifier_ascii'}{$identifier}{LINE_NEW}\n";
     }
 }
 
@@ -618,12 +611,6 @@ if ($follow ne ""){
 # ============================================================
 &print_title("Searching AD for users ...");
 # fetch system data
-#my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
-#                                     root_dse=>$root_dse,
-#                                     root_dns=>$root_dns,
-#                                     admins=>"FALSE",
-#                                     sophomorix_config=>\%sophomorix_config,
-#                                   });
 my ($ref_AD_check2) = &AD_get_AD_for_check2({ldap=>$ldap,
                                      root_dse=>$root_dse,
                                      root_dns=>$root_dns,
@@ -634,14 +621,6 @@ my ($ref_AD_check2) = &AD_get_AD_for_check2({ldap=>$ldap,
 
 # --dump-ad
 if ($dump_ad==1){
-#    &json_dump({json => $json,
-#                jsoninfo => "SEARCH",
-#                jsoncomment => "AD Content",
-#                log_level => $Conf::log_level,
-#                hash_ref=>$ref_AD_check,
-#                sophomorix_config=>\%sophomorix_config,
-#              });
-    print "\n\nMatch2 follows\n";
     &json_dump({json => $json,
                 jsoninfo => "SEARCH",
                 jsoncomment => "AD Content",
@@ -670,13 +649,13 @@ if ($dump_login_avoid==1){
 # Find Matches: Walk through all files and identifiers in %users_file
 # ============================================================
 
-# AD data is in: $ref_AD_check
-# file data is in %users_file
+# AD data is in: $ref_AD_check2
+# file data is in %users_file2
 
 # dynamic matching data ist contained in %Match
 # reading user files populate these subhashes (file identifiers):
-#    $Match{'file_dynamic_identifiers_ascii'} 
-#    $users_file{'file_dynamic_identifiers_utf8'}
+#    $Match2{'file_dynamic_identifiers_ascii'}{$filename} 
+#    $users_file2{$filename}{'file_dynamic_identifiers_utf8'}
 # and populated from AD by subs (AD identifiers): 
 # $Match{'ad_dynamic_identifiers_ascii'} $Match{'ad_dynamic_identifiers_utf8'}
 
@@ -693,7 +672,6 @@ if ($dump_login_avoid==1){
 # find exact matches
 &print_title("Finding exact user matches ...");
 &find_migration_unid_matches();
-#&find_migration_ascii_matches_old();
 &find_migration_ascii_matches2();
 
 # find approx matches
@@ -740,11 +718,6 @@ foreach my $line_new ( @{ $Match2{'lines_with_filename'} } ){
 # Users in AD:
 # UPDATE or KILL or NOCHANGE
 ############################################################
-print "ref_AD_check2 follows:\n";
-print "------------------------------------------------------------\n";
-#print Dumper ($ref_AD_check2);
-print "------------------------------------------------------------\n";
-
 foreach my $filename ( keys %{ $ref_AD_check2->{'LOOKUP_by_filename'} } ) {
     foreach my $sam ( keys %{ $ref_AD_check2->{'sAMAccountName'} } ) {
         # test all users in AD
@@ -845,7 +818,6 @@ foreach my $filename ( keys %{ $ref_AD_check2->{'LOOKUP_by_filename'} } ) {
         &test_DL_RA_update($filename,$sam,\$update,\$new_status);
         &test_R_A_update($filename,$sam,\$update,\$new_status);
 
-#    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
         if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
             # check identifier update for matched users in AD
             &test_user_update($filename,
@@ -1110,43 +1082,30 @@ if (exists $ref_AD_check2->{'WARNINGS'}){
 sub test_UEAS_TM_update{
     my ($filename,$sam,$update_ref,$new_status_ref)=@_;
     my $new_line;
-#    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
     if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
-        #$new_line=$Match{'action_BY_sAMAccountName'}{$sam};
         $new_line=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
     } else {
         $new_line="---";
     }
 
-#    if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "U" or
-#             $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "E" or
-#             $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "A" or
-#             $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "S"
-#           ){
     if ( $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "U" or
              $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "E" or
              $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "A" or
              $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "S"
            ){
         # update to T if not matched to a user in files
-#        if (not exists $Match{'action_BY_sAMAccountName'}{$sam}){
         if (not exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
             if($Conf::log_level>=2){
-#                print "   * $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
                 print "   * $sam: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
 	    }
             ${$new_status_ref}="T";
             ${$update_ref}++;
         } else {
             # existing from test_attic_move
-#            if (exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and 
-#                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
-#               ){
             if (exists $Match2{'ACTION'}{$filename}{$new_line}{'NOT_IN_FILES'} and 
                 $Match2{'ACTION'}{$filename}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
                ){
                 if($Conf::log_level>=2){
-#                    print "   * $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
                     print "   * $sam: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> T\n";
 	        }
                 ${$new_status_ref}="T";
@@ -1161,29 +1120,19 @@ sub test_UEAS_TM_update{
 sub test_TM_DA_update{
     my ($filename,$sam,$update_ref,$new_status_ref)=@_;
     my $new_line;
-#    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
-#        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
     if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
         $new_line=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
     } else {
         $new_line="---";
     }
 
-#    if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T" or 
-#         $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
-#       ){
     if ( $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T" or 
          $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
        ){
         if($Conf::log_level>=2){
-#            print "* Testing $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
-#                  " TolerationDate: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}\n";
             print "* Testing $sam: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'},",
                   " TolerationDate: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}\n";
         }
-#        my $file=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
-#        my $toleration_date_epoch=&ymdhms_to_epoch($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'});
-#        my $deactivation_date_epoch=&ymdhms_to_epoch($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'});
         my $file=$ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
         my $toleration_date_epoch=&ymdhms_to_epoch($ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'});
         my $deactivation_date_epoch=&ymdhms_to_epoch($ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'});
@@ -1196,25 +1145,12 @@ sub test_TM_DA_update{
         }
         my $toleration_end_epoch=$toleration_date_epoch+86400*$toleration_time_days;
         if($Conf::log_level>=2){
-#            print "    Toleration end: $toleration_end_epoch ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}",
-#                  " +  $toleration_time_days days)\n";
             print "    Toleration end: $toleration_end_epoch ($ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}",
                   " +  $toleration_time_days days)\n";
             print "    Today:          $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'}\n";
         }
 
         if (
-#               (not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-#                $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch 
-#               ) or (
-#                exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-#                defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-#                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
-#               ) or (
-#                exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-#                defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-#                $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
-#               )
                (not exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and 
                 $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch 
                ) or (
@@ -1230,39 +1166,27 @@ sub test_TM_DA_update{
             # update to D if 
             #     - not matched to a user in files
             #     - and toleration time expired
-#            if ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_date_epoch and
-#                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
-#                ){
             if ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_date_epoch and
                 $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "M"
                 ){
-#                print "    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
                 print "    ----> $sam: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
                 ${$new_status_ref}="D";
                 ${$update_ref}++;
-#            } elsif ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch and
-#                $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"
-#		){
             } elsif ($sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $toleration_end_epoch and
                 $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "T"
 		){
-#                print "    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
                 print "    ----> $sam: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> D\n";
                 ${$new_status_ref}="D";
                 ${$update_ref}++;
             } else {
                 # do nothing
 	    }
-#	} elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and
-#                 not defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
-#                ){
 	} elsif (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and
                  not defined $Match2{'ACTION'}{$filename}{$new_line}{'NOT_IN_FILES'}
                 ){
             # update to A if 
             #     - matched to a user in files
             if($Conf::log_level>=2){
-#                print "    ----> $sam: $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
                 print "    ----> $sam: $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} -> A\n";
             }
             ${$new_status_ref}="A";
@@ -1281,8 +1205,6 @@ sub test_TM_DA_update{
 sub test_DL_RA_update{
     my ($filename,$sam,$update_ref,$new_status_ref)=@_;
     my $new_line;
-#    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
-#        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
     if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
         $new_line=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
     } else {
@@ -1313,14 +1235,6 @@ sub test_DL_RA_update{
         }
         ########################################
         if (
-#               ( not exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-#                 $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch
-#               ) or (
-#                 exists $Match{'action_BY_sAMAccountName'}{$sam} and
-#                 defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-#                 $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE" and 
-#                 $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch
-#               )
                ( not exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and 
                  $sophomorix_config{'DATE'}{'LOCAL'}{'EPOCH'} > $deactivation_end_epoch
                ) or (
@@ -1360,10 +1274,6 @@ sub test_DL_RA_update{
             $sophomorix_result{'CHECK_RESULT'}{'KILL'}{$sam}{'sophomorixSchoolname'}=
                $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
             $counters{'KILL'}++;
-#        } elsif (exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-#                 $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D" and
-#                 not exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
-#                ){
         } elsif (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and 
                  $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "D" and
                  not exists $Match2{'ACTION'}{$filename}{$new_line}{'NOT_IN_FILES'}
@@ -1390,17 +1300,11 @@ sub test_DL_RA_update{
 sub test_R_A_update{
     my ($filename,$sam,$update_ref,$new_status_ref)=@_;
     my $new_line;
-#    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
-#        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
     if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
         $new_line=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
     } else {
         $new_line="---";
     }
-#    if ( $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and 
-#        exists $Match{'action_BY_sAMAccountName'}{$sam} and 
-#        not exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
-#       ){
     if ( $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and 
         exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and 
         not exists $Match2{'ACTION'}{$filename}{$new_line}{'NOT_IN_FILES'}
@@ -1420,27 +1324,11 @@ sub test_R_A_update{
 sub test_RK_kill{
     my ($filename,$sam,$kill_ref)=@_;
     my $new_line;
-#    if (exists $Match{'action_BY_sAMAccountName'}{$sam}){
-#        $new_line=$Match{'action_BY_sAMAccountName'}{$sam};
     if (exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}){
         $new_line=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
     } else {
         $new_line="---";
     }
-#    if ( ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "K" and 
-#          not exists $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}
-#       ) or (
-#          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "K" and
-#          defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-#          $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
-#       ) or (
-#          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" and
-#          defined $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} and
-#          $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'} eq "TRUE"
-#       ) or (
-#          $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "R" 
-#          and not exists $Match{'action_BY_sAMAccountName'}{$sam}
-#         )
     if ( ($ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixStatus'} eq "K" and 
           not exists $Match2{'ACTION'}{$filename}{$new_line}{'NOT_IN_FILES'}
        ) or (
@@ -1463,6 +1351,8 @@ sub test_RK_kill{
         ${$kill_ref}++;
     }
 }
+
+
 
 # test class movement (moves previously unmoved classes due to a bug prior to 3.71.1)
 ################################################################################
@@ -1506,41 +1396,6 @@ sub test_attic_move {
 
         # role in attic is student
         $Match2{'ACTION'}{$filename}{$new_line}{'role'}=$sophomorix_config{'INI'}{'ROLE_USER'}{'STUDENT'};
-
-
-
-
-#         $Match{'action_BY_sAMAccountName'}{$sam}=$new_line;
-
-#         # add ACTION data for moving to 'attic'-group
-#         $Match{'ACTION'}{$new_line}{'sAMAccountName'}=$sam;
-#         $Match{'ACTION'}{$new_line}{'identifier_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
-#         $Match{'ACTION'}{$new_line}{'class'}=${$new_class_ref};
-#         $Match{'ACTION'}{$new_line}{'surname_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
-#         $Match{'ACTION'}{$new_line}{'surname_utf8'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sn'};
-#         $Match{'ACTION'}{$new_line}{'firstname_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'};
-#         $Match{'ACTION'}{$new_line}{'firstname_utf8'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'};
-#         $Match{'ACTION'}{$new_line}{'birthdate'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'};
-#         $Match{'ACTION'}{$new_line}{'unid'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixUnid'};
-
-#         $Match{'ACTION'}{$new_line}{'school'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'};
-#         $Match{'ACTION'}{$new_line}{'filename'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
-#         $Match{'ACTION'}{$new_line}{'status'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixStatus'};
-# #        $Match{'ACTION'}{$new_line}{'status'}="KEEP_STATUS";
-#         $Match{'ACTION'}{$new_line}{'line_count'}=0;
-
-#         my $sub=(caller(0))[3];
-#         $Match{'ACTION'}{$new_line}{'MATCH_SUB'}="$sub";
-#         $Match{'ACTION'}{$new_line}{'class_type'}="???";
-#         $Match{'ACTION'}{$new_line}{'inject'}="???";
-#         $Match{'ACTION'}{$new_line}{'login'}="???";
-
-#         $Match{'ACTION'}{$new_line}{'NOT_IN_FILES'}="TRUE";
-
-#         # role in attic is student
-#         $Match{'ACTION'}{$new_line}{'role'}=$sophomorix_config{'INI'}{'ROLE_USER'}{'STUDENT'};
-
-
     }
 }
 
@@ -1575,7 +1430,6 @@ sub test_user_update {
         $new_homedirectory_rel_ref,
        )=@_;
     my $old_filename=$ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
-#    my $line_new=$Match{'action_BY_sAMAccountName'}{$sam};
     my $line_new=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
 
     # count changes to attributes, 
@@ -1583,14 +1437,14 @@ sub test_user_update {
     my $identifier_class_changes=0;
 
     # new_surname_ascii old
-#    if ( ($Match{'ACTION'}{$line_new}{'surname_ascii'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'})){
-    if ( ($Match2{'ACTION'}{$filename}{$line_new}{'surname_ascii'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'})){
+    if ( $Match2{'ACTION'}{$filename}{$line_new}{'surname_ascii'} eq 
+          $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}
+       ){
         # no update
         ${$new_surname_ascii_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_surname_ascii_ref}=$Match{'ACTION'}{$line_new}{'surname_ascii'};
         ${$new_surname_ascii_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'surname_ascii'};
         $identifier_class_changes++;
     }
@@ -1609,20 +1463,19 @@ sub test_user_update {
 #   }
   
     # new_firstname_ascii
-#    if ( ($Match{'ACTION'}{$line_new}{'firstname_ascii'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'} )){
-    if ( ($Match2{'ACTION'}{$filename}{$line_new}{'firstname_ascii'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'} )){
+    if ($Match2{'ACTION'}{$filename}{$line_new}{'firstname_ascii'} eq 
+        $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}
+       ){
         # no update
         ${$new_firstname_ascii_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_firstname_ascii_ref}=$Match{'ACTION'}{$line_new}{'firstname_ascii'};
         ${$new_firstname_ascii_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'firstname_ascii'};
         $identifier_class_changes++;
     }
 
     # new_surname_utf8
-#    if ( ($Match{'ACTION'}{$line_new}{'surname_utf8'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sn'})){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'surname_utf8'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sn'})){
         # no update
         ${$new_surname_utf8_ref}="---";
@@ -1630,15 +1483,12 @@ sub test_user_update {
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_surname_utf8_ref}=$Match{'ACTION'}{$line_new}{'surname_utf8'};
         ${$new_surname_utf8_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'surname_utf8'};
-#        ${$new_surname_initial_utf8_ref}=&Sophomorix::SophomorixBase::extract_initial($Match{'ACTION'}{$line_new}{'surname_utf8'});
         ${$new_surname_initial_utf8_ref}=&Sophomorix::SophomorixBase::extract_initial($Match2{'ACTION'}{$filename}{$line_new}{'surname_utf8'});
         $identifier_class_changes++;
     }
 
     # new_firstname_utf8
-#    if ( ($Match{'ACTION'}{$line_new}{'firstname_utf8'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'givenName'} )){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'firstname_utf8'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'givenName'} )){
         # no update
         ${$new_firstname_utf8_ref}="---";
@@ -1646,62 +1496,51 @@ sub test_user_update {
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_firstname_utf8_ref}=$Match{'ACTION'}{$line_new}{'firstname_utf8'};
         ${$new_firstname_utf8_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'firstname_utf8'};
         ${$new_firstname_initial_utf8_ref}=
-#            &Sophomorix::SophomorixBase::extract_initial($Match{'ACTION'}{$line_new}{'firstname_utf8'});
             &Sophomorix::SophomorixBase::extract_initial($Match2{'ACTION'}{$filename}{$line_new}{'firstname_utf8'});
         $identifier_class_changes++;
     }
 
     # birthdate
-#    if ( ($Match{'ACTION'}{$line_new}{'birthdate'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'} )){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'birthdate'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixBirthdate'} )){
         # no update
         ${$new_birthdate_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_birthdate_ref}=$Match{'ACTION'}{$line_new}{'birthdate'};
         ${$new_birthdate_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'birthdate'};
         $identifier_class_changes++;
     }
 
     # filename
-#    if ( ($Match{'ACTION'}{$line_new}{'filename'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'} )){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'filename'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'} )){
         # no update
         ${$new_filename_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_filename_ref}=$Match{'ACTION'}{$line_new}{'filename'};
         ${$new_filename_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'filename'};
         $identifier_class_changes++;
     }
 
     # role
-#    if ( ($Match{'ACTION'}{$line_new}{'role'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixRole'} )){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'role'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixRole'} )){
         # no update
         ${$new_role_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_role_ref}=$Match{'ACTION'}{$line_new}{'role'};
         ${$new_role_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'role'};
         $identifier_class_changes++;
     }
 
     # adminclass(with prefix) must be created from school and class
     my $adminclass;
-#    if ($adminclass=$Match{'ACTION'}{$line_new}{'school'} eq $DevelConf::name_default_school){
     if ($adminclass=$Match2{'ACTION'}{$filename}{$line_new}{'school'} eq $DevelConf::name_default_school){
         # default-school
-#        $adminclass=$Match{'ACTION'}{$line_new}{'class'};
         $adminclass=$Match2{'ACTION'}{$filename}{$line_new}{'class'};
     } else {
-#        $adminclass=$Match{'ACTION'}{$line_new}{'school'}."-".$Match{'ACTION'}{$line_new}{'class'};
         $adminclass=$Match2{'ACTION'}{$filename}{$line_new}{'school'}."-".$Match2{'ACTION'}{$filename}{$line_new}{'class'};
     }
 
@@ -1722,20 +1561,17 @@ sub test_user_update {
         }
         ${$update_ref}++;
         # ${$new_class_ref}=$adminclass; # with prefix
-#        ${$new_class_ref}=$Match{'ACTION'}{$line_new}{'class'}; # without prefix
         ${$new_class_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'class'}; # without prefix
         $identifier_class_changes++;
     }
 
     # school
-#    if ( ($Match{'ACTION'}{$line_new}{'school'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'} )){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'school'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'} )){
         # no update
         ${$new_school_ref}="---";
     } else {
         # update
         ${$update_ref}++;
-#        ${$new_school_ref}=$Match{'ACTION'}{$line_new}{'school'};
         ${$new_school_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'school'};
         $identifier_class_changes++;
     }
@@ -1746,16 +1582,13 @@ sub test_user_update {
         $role_for_homedirectory=${$new_role_ref};
     } else {
         # no role change: role according to filename
-#        $role_for_homedirectory=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{sophomorixRole};
-        $role_for_homedirectory=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match2{'ACTION'}{$filename}{$line_new}{'filename'}}{sophomorixRole};
+        $role_for_homedirectory=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match2{'ACTION'}{$filename}{$line_new}{'filename'}}{'sophomorixRole'};
     }
 
     # homedirectory could not be calculated for %Match, calculating here
     my ($homedirectory_new,$unix_home,$unc,$smb_rel_path)=
     &Sophomorix::SophomorixBase::get_homedirectory($root_dns,
-#                                                   $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match{'ACTION'}{$line_new}{'filename'}}{'SCHOOL'},
                                                    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$Match2{'ACTION'}{$filename}{$line_new}{'filename'}}{'SCHOOL'},
-#                                                   $Match{'ACTION'}{$line_new}{'class'}, # groupname is the subdir
                                                    $Match2{'ACTION'}{$filename}{$line_new}{'class'}, # groupname is the subdir
                                                    $sam,
                                                    $role_for_homedirectory,
@@ -1783,23 +1616,21 @@ sub test_user_update {
     }
     
     # unid
-#    if ( ($Match{'ACTION'}{$line_new}{'unid'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixUnid'}) or
-#         ($Match{'ACTION'}{$line_new}{'unid'} eq "" and $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixUnid'} eq "---") ){
     if ( ($Match2{'ACTION'}{$filename}{$line_new}{'unid'} eq $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixUnid'}) or
-         ($Match2{'ACTION'}{$filename}{$line_new}{'unid'} eq "" and $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixUnid'} eq "---") ){
+         ($Match2{'ACTION'}{$filename}{$line_new}{'unid'} eq "" and 
+          $ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixUnid'} eq "---") 
+       ){
         # no update
         ${$new_unid_ref}="---";
     } else {
         # update only if user is identically matched
         if ($identifier_class_changes==0){
-#            if ($Match{'ACTION'}{$line_new}{'unid'} eq "---"){
             if ($Match2{'ACTION'}{$filename}{$line_new}{'unid'} eq "---"){
                 # write empty value to sophomorix.update, so sophomorix-update 
                 # will not skip it ("---" would mean skip it)
                 ${$new_unid_ref}="";
                 ${$update_ref}++;
             } else {
-#                ${$new_unid_ref}=$Match{'ACTION'}{$line_new}{'unid'};
                 ${$new_unid_ref}=$Match2{'ACTION'}{$filename}{$line_new}{'unid'};
                 ${$update_ref}++;
             }
@@ -1812,8 +1643,6 @@ sub test_user_update {
     ############################################################
     # role/school dependant
     # school and role for mail webui 
-#    my $school=$Match{'ACTION'}{$line_new}{'school'};
-#    my $role=$Match{'ACTION'}{$line_new}{'role'};
     my $school=$Match2{'ACTION'}{$filename}{$line_new}{'school'};
     my $role=$Match2{'ACTION'}{$filename}{$line_new}{'role'};
 
@@ -1883,41 +1712,15 @@ sub write_add_file {
         $status="U";
     }
 
-
-    # schoolcheck begin
     my ($login,$error_message)=&create_test_login($Match2{'ACTION'}{$filename}{$line_add}{'identifier_ascii'}, # user data
         $Match2{'ACTION'}{$filename}{$line_add}{'filename'}, # filename for password length
         $Match2{'ACTION'}{$filename}{$line_add}{'login'}, # proposed login (will be tested)
         $ref_AD_check2, # forbidden logins
         $ref_login_avoid, # logins to avoid
         $Match2{'ACTION'}{$filename}{$line_add}{'line_count'},
-        \%users_file,
+        \%users_file2,
         \%sophomorix_config);
-     # schoolcheck end
 
-#<<<<<<< HEAD
-#    my ($login,$error_message)=&create_test_login($Match{'ACTION'}{$line_new}{'identifier_ascii'}, # user data
-#        $Match{'ACTION'}{$line_new}{'filename'}, # filename for password length
-#        $Match{'ACTION'}{$line_new}{'login'}, # proposed login (will be tested)
-#        $ref_AD_check, # forbidden logins
-#        $ref_login_avoid, # logins to avoid
-#        $Match{'ACTION'}{$line_new}{'line_count'},
-#        \%users_file,
-#        \%sophomorix_config);
-
-    # HEAD begin
-#    my $mail=&AD_create_new_mail($login,
-#                                 \@arguments,
-#                                 \%sophomorix_config,
-#         		         \%sophomorix_result,
-#				 $json,
-#                                 $Match{'ACTION'}{$line_new}{'role'},
-#                                 $Match{'ACTION'}{$line_new}{'school'},
-#                                 "---",
-#                                 $Match{'ACTION'}{$line_new}{'firstname_ascii'},
-#                                 "---",
-#				 $Match{'ACTION'}{$line_new}{'surname_ascii'}
-#0                                );
     my $mail=&AD_create_new_mail($login,
                                  \@arguments,
                                  \%sophomorix_config,
@@ -1930,15 +1733,6 @@ sub write_add_file {
                                  "---",
 				 $Match2{'ACTION'}{$filename}{$line_add}{'surname_ascii'}
                                 );
-    # HEAD end
-#=======
-
-     # schoolcheck begin
-#    my $mail=$login."@".
-#        $sophomorix_config{'ROLES'}{$Match2{'ACTION'}{$filename}{$line_add}{'school'}}{$Match2{'ACTION'}{$filename}{$line_add}{'role'}}{'MAILDOMAIN'};
-     # schoolcheck end
-
-#>>>>>>> bugfix/schoolcheck
     my $webui_permissions_string=join(",",
         @{ $sophomorix_config{'ROLES'}{$Match2{'ACTION'}{$filename}{$line_add}{'school'}}{$Match2{'ACTION'}{$filename}{$line_add}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
     my $add_line=$Match2{'ACTION'}{$filename}{$line_add}{'filename'}."::".
@@ -1987,9 +1781,6 @@ sub write_add_file {
 # UTF8 match
 ################################################################################
 sub populate_ad_dynamic_identifiers_utf8 {
-    #foreach my $identifier_utf8 (keys %{$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_utf8'}} ) { 
-    #    $Match{'ad_dynamic_identifiers_utf8'}{$identifier_utf8}="ad, not matched";
-    #} 
     foreach my $user_file (@filelist){
         my $filename=basename($user_file);
         foreach my $identifier_utf8 (keys %{ $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_utf8'} } ) { 
@@ -2043,9 +1834,6 @@ sub show_dynamic_identifiers_ascii {
 
 
 sub populate_ad_dynamic_identifiers_ascii {
-    #foreach my $identifier_ascii (keys %{$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}} ) { 
-    #    $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii}="ad, not matched";
-    #} 
     foreach my $user_file (@filelist){
         my $filename=basename($user_file);
         foreach my $identifier_ascii (keys %{ $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'} } ) { 
@@ -2101,28 +1889,15 @@ sub find_migration_ascii_approx_matches {
                     my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
                     print "    * Edit distance is $edit_distance\n";
                     print "    * APPROXMATCH: $sam -> $identifier_ascii\n";
-# ??? 
-#                    delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
                     delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii_ad};
                     # save match to delete this match from list
-#                    $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
                     $Match2{'file_approx_match'}{$run}{$filename}{$identifier_ascii}=$edit_distance;
                     # remove the approx matches from the list
-#                    delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
                     delete $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
 
                     # save to write later
                     my $sub=(caller(0))[3];
                     my $line_new=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-
-# old ?????
-#                    $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-#                    $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
-#                    $Match{'ACTION'}{$line_new}{'status'}=
-#                        $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-#                    # reverse action_BY_sAMAccountName
-#                    $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
-# new
                     $Match2{'ACTION'}{$filename}{$line_new}{'sAMAccountName'}=$sam;
                     $Match2{'ACTION'}{$filename}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
                     $Match2{'ACTION'}{$filename}{$line_new}{'status'}=
@@ -2135,93 +1910,8 @@ sub find_migration_ascii_approx_matches {
             }
         }
     }
-    # foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
-    #     $line_count++;
-    #     my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-    #     print " $filename:",
-    #           "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-    #           "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-    #           "$identifier_ascii\n";
-    #     my $count=0;
-    #     foreach my $identifier_ascii_ad ( keys %{ $Match{'ad_dynamic_identifiers_ascii'} } ){
-    #         $count++;
-    #         my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
-    #         if($Conf::log_level>=3){
-    #             print "   * $identifier_ascii <---> $identifier_ascii_ad ($count)\n";
-    #             print "      * $edit_distance (Edit distance)\n";
-    #         }
-    #         if ($edit_distance <= $max_edit_distance){
-    #             # APPROX MATCH
-    #             my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
-    #             print "   * APPROXMATCH($edit_distance): $identifier_ascii_ad\n";
-    #             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_ad};
-    #             # save match to delete this match from list
-    #             $Match{'file_approx_match'}{$run}{$identifier_ascii}=$edit_distance;
-    #             # remove the approx matches from the list
-    #             delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
-
-    #             # save to write later
-    #             my $sub=(caller(0))[3];
-    #             my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-    #             $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-    #             $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub $max_edit_distance";
-    #             $Match{'ACTION'}{$line_new}{'status'}=
-    #                 $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-    #             # reverse action_BY_sAMAccountName
-    #             $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
-    #         }
-    #     }
-    # }
     &print_title("Migration approx matching ($line_count tested)");
 }
-
-
-
-# sub find_migration_ascii_matches_old {
-#     print "\n";
-#     &print_title("Migration matching ascii-to-utf8");
-#     &show_dynamic_identifiers_ascii();
-#     my $line_count=0;
-#     my $matched_count=0;
-#     my $not_matched_count=0;
-#     foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
-#         $line_count++;
-#         my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-#         if ( exists $ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
-#             # MATCH
-#             my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_identifier_ascii'}{$identifier_ascii};
-#             if($Conf::log_level>=2){
-#                 print "    MATCH: $identifier_ascii to $sam\n";
-#             }
-
-#             # save to write later
-#             my $sub=(caller(0))[3];
-#             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-#             my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-#             $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-#             $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
-#             $Match{'ACTION'}{$line_new}{'status'}=
-#                 $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-#             # reverse action_BY_sAMAccountName
-#             $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
-
-#             # remove from ad_to_be_matched
-#             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
-#             delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
-#             $matched_count++;
-#         } else {
-#             # NO MATCH
-#             print " $filename:",
-#                   "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-#                   "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-#                   "$identifier_ascii\n";
-#             print "   --> No exact match for $identifier_ascii\n";
-#             $Match{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
-#             $not_matched_count++;
-#         }
-#     }
-#     &print_title("ascii--to-utf8-Matching $line_count lines: $matched_count matched, $not_matched_count unmatched");
-# }
 
 
 
@@ -2245,17 +1935,7 @@ sub find_migration_ascii_matches2 {
 
                 my $sub=(caller(0))[3];
 
-                # # save to write later old ????
-                # $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-                # my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-                # $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-                # $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
-                # $Match{'ACTION'}{$line_new}{'status'}=
-                #     $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-                # # reverse action_BY_sAMAccountName
-                # $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
-
-                # save to write later new
+                # save to write later
                 $Match2{'file'}{$filename}{$identifier_ascii}=$sam;
                 my $line_new2=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
                 $Match2{'ACTION'}{$filename}{$line_new2}{'sAMAccountName'}=$sam;
@@ -2277,11 +1957,10 @@ sub find_migration_ascii_matches2 {
             } else {
                 # NO MATCH
                 print " $filename:",
-                      "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                      "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
+                      "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
                       "$identifier_ascii\n";
                 print "   --> No exact match for $identifier_ascii\n";
-#                $Match{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
                 $Match2{'find_migration_ascii_matches'}{$filename}{$identifier_ascii}="no exact identifier match possible";
                 $not_matched_count++;
             }
@@ -2373,63 +2052,6 @@ sub find_migration_unid_matches {
     }
 
     print "\n";
-    # foreach my $identifier_ascii (keys %{$Match{'file_dynamic_identifiers_ascii'}} ) {
-    #     my $filename=$users_file{'identifier_ascii'}{$identifier_ascii}{FILE};
-    # 	print "HERE OLD: $filename $identifier_ascii\n";
-    #     $line_count++;
-    #     if ($users_file{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
-    #         # finding a unid match 
-    #         if ( exists $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} and
-    #              $ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
-    #            ){
-    #             # MATCH
-    #             my $sam=$ref_AD_check->{'LOOKUP'}{'user_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
-    #             my $role=$ref_AD_check->{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam};
-    #             # fetch the identifier from AD with same unid
-    #             my $identifier_ascii_from_AD=
-    # 		    $ref_AD_check->{'LOOKUP'}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}};
-    #             if($Conf::log_level>=2){
-    #                 print " $filename:",
-    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-    #                       "$identifier_ascii\n";
-    # 	            print "  --> unidMATCH: $sam --> ",
-    #                       "$identifier_ascii_from_AD\n";
-    #             }
-    #             $matched_count++;
-    #             # remove from dynamic hashes
-    #             delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii_from_AD};
-    #             delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
-
-    #             # save to write later
-    #             my $sub=(caller(0))[3];
-    #             $Match{'file'}{$filename}{$identifier_ascii}=$sam;
-    #             my $line_new=$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
-    #             $Match{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
-    #             $Match{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
-    #             $Match{'ACTION'}{$line_new}{'status'}=
-    #                 $ref_AD_check->{'LOOKUP'}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
-    #             # reverse action_BY_sAMAccountName
-    #             $Match{'action_BY_sAMAccountName'}{$sam}=$line_new;
-
-    #         } else {
-    #             # NO MATCH
-    #             $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
-    #             $not_matched_count++;
-    #             if($Conf::log_level>=2){
-    #                 print " $filename:",
-    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-    #                       "$users_file{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-    #                       "$identifier_ascii\n";
-    #                 print "   --> Unid $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}",
-    #                       " not found in AD\n";
-    #             }
-    #         }
-    #     } else {
-    #         $no_unid_count++;
-    #         $Match{'find_migration_unid_matches'}{$identifier_ascii}="no unid, no match possible";
-    #     }
-    # }
     &print_title("unidMatching $line_count lines total: $matched_count matched, $not_matched_count not matched, $no_unid_count without unid");
 }
 
@@ -2626,25 +2248,6 @@ sub analyze_user_line {
             return;
 	}
 
-        # old?
-        $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_UTF8}=$first_utf8;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{LASTNAME_ASCII}=$last_ascii;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{LASTNAME_UTF8}=$last_utf8;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{BIRTHDATE}=$birthdate;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{CLASS}=$class;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}=$unid;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{LOGIN}=$login;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{FILE}=$filename;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_ASCII}=$identifier_ascii;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{IDENTIFIER_UTF8}=$identifier_utf8;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}=$count;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
-        $users_file{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
-
-        # new
         $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
         $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW}=$line_new;
         $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{FIRSTNAME_ASCII}=$first_ascii;
@@ -2662,15 +2265,6 @@ sub analyze_user_line {
         $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{FILE_ABS}=$file_abs;
         $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{INJECTED}=$injected;
 
-
-        # old?
-        # add here more stuff to create sophomorix.add, ...
-        $users_file{'identifier_ascii'}{$identifier_ascii}{ROLE}=
-            $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
-        $users_file{'identifier_ascii'}{$identifier_ascii}{SCHOOL}=
-            $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
-
-        # new
         # add here more stuff to create sophomorix.add, ...
         $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{ROLE}=
             $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
@@ -2678,8 +2272,8 @@ sub analyze_user_line {
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
 
         # identifier list
-        #push @{ $users_file{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
-        #push @{ $users_file{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
+        #push @{ $users_file2{$filename}{'file'}{$filename}{'identifier_list_ascii'} }, $identifier_ascii;
+        #push @{ $users_file2{$filename}{'file'}{$filename}{'identifier_list_utf8'} }, $identifier_utf8;
 
         # # identifier hash old
         # $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii}="files, not matched";
@@ -2690,33 +2284,10 @@ sub analyze_user_line {
         $Match2{'file_dynamic_identifiers_utf8'}{$filename}{$identifier_utf8}="files, not matched";
 
         # file -> line
-        #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
-        #$users_file{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
+        #$users_file2{$filename}{'file'}{$filename}{$count}{'IDENTIFIER_ASCII'}=$identifier_ascii;
+        #$users_file2{$filename}{'file'}{$filename}{$count}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
-        # # save for action old 
-        # $Match{'ACTION'}{$line_new}{'identifier_ascii'}=$identifier_ascii;
-        # $Match{'ACTION'}{$line_new}{'school'}=
-        #     $sophomorix_config{'FILES'}{$type}{$filename}{'SCHOOL'};
-	# $Match{'ACTION'}{$line_new}{'birthdate'}=$birthdate;
-	# $Match{'ACTION'}{$line_new}{'class'}=$class;
-	# $Match{'ACTION'}{$line_new}{'filename'}=$filename;
-	# $Match{'ACTION'}{$line_new}{'firstname_ascii'}=$first_ascii;
-	# $Match{'ACTION'}{$line_new}{'surname_ascii'}=$last_ascii;
-	# $Match{'ACTION'}{$line_new}{'firstname_utf8'}=$first_utf8;
-	# $Match{'ACTION'}{$line_new}{'surname_utf8'}=$last_utf8;
-	# $Match{'ACTION'}{$line_new}{'line_count'}=$count;
-        # $Match{'ACTION'}{$line_new}{'role'}=
-        #     $sophomorix_config{'FILES'}{$type}{$filename}{sophomorixRole};
-	# $Match{'ACTION'}{$line_new}{'unid'}=$unid;
-	# $Match{'ACTION'}{$line_new}{'login'}=$login;
-	# $Match{'ACTION'}{$line_new}{'inject'}=$injected;
-	# $Match{'ACTION'}{$line_new}{'class_type'}=$type;
-
-#<<<<<<< HEAD
-#        # list of lines
-#        push @{ $Match{'lines'} }, $line_new;
-#=======
-        # save for action new 
+        # save for action
         $Match2{'ACTION'}{$filename}{$line_new}{'identifier_ascii'}=$identifier_ascii;
         $Match2{'ACTION'}{$filename}{$line_new}{'school'}=
             $sophomorix_config{'FILES'}{$type}{$filename}{SCHOOL};
