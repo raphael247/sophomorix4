@@ -4870,6 +4870,9 @@ sub AD_get_AD_for_check2 {
     my $admins = $arg_ref->{admins};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
+    my $unid_warn_count=0;
+    my $identifier_warn_count=0;
+
     # forbidden login names
     $AD{'FORBIDDEN'}{'root'}="forbidden by Hand";
     $AD{'FORBIDDEN'}{'linbo'}="forbidden by Hand";
@@ -4899,6 +4902,7 @@ sub AD_get_AD_for_check2 {
                                 'givenName',
                                 'displayName',
                                 'mail',
+				'homeDirectory',
                                 'sophomorixSurnameInitial',
                                 'sophomorixFirstnameInitial',
                                 'sophomorixAdminFile',
@@ -4910,6 +4914,11 @@ sub AD_get_AD_for_check2 {
                                 'SophomorixWebuiPermissions',
                                 'SophomorixWebuiPermissionsCalculated',
                                 'objectClass',
+                                'sophomorixIntrinsic1',
+                                'sophomorixIntrinsic2',
+                                'sophomorixIntrinsic3',
+                                'sophomorixIntrinsic4',
+                                'sophomorixIntrinsic5',
                                ]);
     my $max = $mesg->count;
     for( my $index = 0 ; $index < $max ; $index++) {
@@ -4923,7 +4932,7 @@ sub AD_get_AD_for_check2 {
        if (defined $entry->get_value('sophomorixRole')){
            ##### a sophomorix user #####
            $role=$entry->get_value('sophomorixRole');
-           $forbidden_warn="$sam forbidden, $sam is a sophomorix user";
+           $forbidden_warn="$sam forbidden, $sam exists already as a sophomorix user";
            if ($role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'STUDENT'} or
                $role eq $ref_sophomorix_config->{'INI'}{'ROLE_USER'}{'TEACHER'} or
                $role eq "schooladministrator" or 
@@ -4946,6 +4955,7 @@ sub AD_get_AD_for_check2 {
                    $AD{'sAMAccountName'}{$sam}{'givenName'}=$entry->get_value('givenName');
                    $AD{'sAMAccountName'}{$sam}{'displayName'}=$entry->get_value('displayName');
                    $AD{'sAMAccountName'}{$sam}{'mail'}=$entry->get_value('mail');
+                   $AD{'sAMAccountName'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$filename;
@@ -4970,11 +4980,67 @@ sub AD_get_AD_for_check2 {
                    # wegelassen: IDENTIFIER_UTF8,userAccountControl,sophomorixPrefix
                    # $AD{'sAMAccountName'}{$sam}{'IDENTIFIER_UTF8'}=$identifier_utf8;
 
+
+
+                   # check for double sophomorixUnid in AD
+		   if($entry->get_value('sophomorixUnid') ne "---" and
+                       exists $AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')}
+		     ){
+		       $unid_warn_count++;
+                       my $old_sam=$AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')};
+                       my $old_identifier_ascii=$AD{'sAMAccountName'}{$old_sam}{'IDENTIFIER_ASCII'};
+		       # save warning for later use
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{'TYPE'}="sophomorixUnid multiple";
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{'COUNT'}=$unid_warn_count;
+		       # current user
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{$sam}=$identifier_ascii;
+		       # other user
+                       $AD{'WARNINGS'}{'sophomorixUnid'}{$entry->get_value('sophomorixUnid')}{$old_sam}=$old_identifier_ascii;
+		   } else {
+                       $AD{'seen'}{'unid'}{$entry->get_value('sophomorixSchoolname')}{$entry->get_value('sophomorixUnid')}=$sam;
+		   }
+
+
+                   # check for double identifier in AD
+		   if(exists $AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii}
+		     ){
+		       $identifier_warn_count++;
+                       my $old_sam=$AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii};
+                       my $old_unid=$AD{'sAMAccountName'}{$old_sam}{'sophomorixUnid'};
+		       # save warning for later use
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{'TYPE'}="IDENTIFIER_ASCII multiple";
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{'COUNT'}=$identifier_warn_count;
+		       # current user
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{$sam}=$entry->get_value('sophomorixUnid');
+		       # other user
+                       $AD{'WARNINGS'}{'IDENTIFIER_ASCII'}{$identifier_ascii}{$old_sam}=$old_unid;
+		   } else {
+                       $AD{'seen'}{'IDENTIFIER_ASCII'}{$entry->get_value('sophomorixSchoolname')}{$identifier_ascii}=$sam;
+		   }
+
+
                    # save ui stuff
                    @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissions'} } =
                        sort $entry->get_value('sophomorixWebuiPermissions');
                    @{ $AD{'sAMAccountName'}{$sam}{'sophomorixWebuiPermissionsCalculated'} } =
                        sort $entry->get_value('sophomorixWebuiPermissionsCalculated');
+
+                   # save intrinsic stuff
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic1'}=$entry->get_value('sophomorixIntrinsic1');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic2'}=$entry->get_value('sophomorixIntrinsic2');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic3'}=$entry->get_value('sophomorixIntrinsic3');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic4'}=$entry->get_value('sophomorixIntrinsic4');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsic5'}=$entry->get_value('sophomorixIntrinsic5');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti1'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti1');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti2'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti2');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti3'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti3');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti4'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti4');
+                   @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti5'} } =
+                       sort $entry->get_value('sophomorixIntrinsicMulti5');
 
                    # LOOKUP
                    $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
@@ -4997,10 +5063,10 @@ sub AD_get_AD_for_check2 {
        } elsif (defined $entry->get_value('sophomorixType')){
            ##### a sophomorix group #####
            $type=$entry->get_value('sophomorixType');
-           $forbidden_warn="$sam forbidden, $sam is a sophomorix group";
+           $forbidden_warn="$sam forbidden, $sam exists already as a sophomorix group";
        } else {
            ##### a non sophomorix object #####
-           $forbidden_warn="$sam forbidden, $sam is a non-sophomorix object";
+           $forbidden_warn="$sam forbidden, $sam exists already as a non-sophomorix object";
        }
 
        $AD{'FORBIDDEN'}{$sam}=$forbidden_warn;
