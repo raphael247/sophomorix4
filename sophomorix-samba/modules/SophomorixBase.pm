@@ -103,16 +103,32 @@ sub print_line {
 
 
 sub print_title {
-   my ($a) = @_;
-   if($Conf::log_level>=2){
-   print  "\n########################################",
-            "########################################\n";
-   printf " # %-70s # ",$a;
-   print  "\n########################################",
-            "########################################\n";
-   } else {
-         printf "#### %-69s####\n",$a;
-   }
+    # type: top (no \n after title)
+    # type: bottom (no \n before title)
+    # type: slim always use oneliner
+    my ($a,$type) = @_;
+    if (not defined $type){
+        $type="standard";
+    }
+    if($Conf::log_level>=2 and $type ne "slim"){
+        if ($type eq "bottom"){
+            # no \n
+        } else {
+            print "\n";
+        }
+        print "#########################################",
+              "#########################################\n";
+        printf "# %-79s#\n",$a;
+        print "#########################################",
+              "#########################################\n";
+        if ($type eq "top"){
+            # no \n
+        } else {
+            print "\n";
+        }
+    } else {
+        printf "#### %-73s####\n",$a;
+    }
 }
 
 
