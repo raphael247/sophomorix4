@@ -225,6 +225,7 @@ my $analyze_encoding="";
 my $show_special_char_lines=0;
 my $non_umlaut=0;
 my $follow="";
+my $opt_edit_distance=4;
 my @injectlines=(); # list of injected lines
 
 # Parsen der Optionen
@@ -246,6 +247,7 @@ my $testopt=GetOptions(
            "injectline=s" => \@injectlines,
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
+           "edit-distance=i" => \$opt_edit_distance,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-check");
@@ -298,6 +300,7 @@ Options:
   --lock / --unlock
 
   --follow filename:linenumber     (show what happens to this line)
+  --edit-distance <num>            (default: 4, how similar must user be to be matched)
 
 Analyze the encoding of a file:
   --analyze-encoding /path/to/students.csv
@@ -669,16 +672,19 @@ if ($dump_login_avoid==1){
 
 #exit;
 # find exact matches
-&print_title("Finding exact user matches ...");
+&print_title("Matching lines in files to users in AD ...");
 &find_migration_unid_matches();
 &find_migration_ascii_matches2();
 
 # find approx matches
 # create loop that stopps itself???
-&find_migration_ascii_approx_matches(1);
-&find_migration_ascii_approx_matches(2);
-&find_migration_ascii_approx_matches(3);
-&find_migration_ascii_approx_matches(4);
+for (my $i=1;$i<$opt_edit_distance+1;$i++){
+    &find_migration_ascii_approx_matches($i);
+}
+#&find_migration_ascii_approx_matches(1);
+#&find_migration_ascii_approx_matches(2);
+#&find_migration_ascii_approx_matches(3);
+#&find_migration_ascii_approx_matches(4);
 
 
 print "------------------------------------------------------------\n";
@@ -1849,7 +1855,7 @@ sub find_migration_ascii_approx_matches {
     my ($max_edit_distance) = @_;
     my $run="approx_".$max_edit_distance."_run";
     print "\n";
-    &print_title("Starting migration approx matching (max. edit distance $max_edit_distance)");
+    &print_title("approxMATCH lines to accounts (max. edit distance $max_edit_distance/$opt_edit_distance)","top");
     # total counters
     my $line_count=0;
     my $matched_count=0;
@@ -1864,7 +1870,9 @@ sub find_migration_ascii_approx_matches {
     foreach my $filename (keys %{ $Match2{'file_dynamic_identifiers_ascii'} } ) {
         my $ret=&show_dynamic_identifiers_ascii($filename);
         if ($ret==0){
-            print "---> Nothing to do anymore\n";
+            if($Conf::log_level>=2){
+                &print_title("approxMATCH: Nothing to do anymore in  $filename (edit distance $max_edit_distance)","slim");
+            }
 	    next;
         }
         # reset file counters
@@ -1876,20 +1884,22 @@ sub find_migration_ascii_approx_matches {
         foreach my $identifier_ascii (keys %{ $Match2{'file_dynamic_identifiers_ascii'}{$filename} } ) {
             $line_count++;
             $line_count_file++;
-            print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                  "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
-            my $count=0;
+            if($Conf::log_level>=2){
+                print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
+            }
             foreach my $identifier_ascii_ad ( keys %{ $Match2{'ad_dynamic_identifiers_ascii'}{$filename} } ){
-                $count++;
                 my $edit_distance=&edit_distance($identifier_ascii,$identifier_ascii_ad);
-#                if($Conf::log_level>=3){
+                if($Conf::log_level>=3){
                     print "  * CHECK: $identifier_ascii -> $identifier_ascii_ad\n";
-#                }
+                }
                 if ($edit_distance <= $max_edit_distance){
                     # APPROX MATCH
                     my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
-                    print "    * Edit distance is $edit_distance\n";
-                    print "    * APPROXMATCH: $sam -> $identifier_ascii\n";
+                    if($Conf::log_level>=2){
+                        print "    * Edit distance is $edit_distance\n";
+                        print "    * approxMATCH: $sam -> $identifier_ascii\n";
+                    }
                     delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii_ad};
                     # save match to delete this match from list
                     $Match2{'file_approx_match'}{$run}{$filename}{$identifier_ascii}=$edit_distance;
@@ -1905,13 +1915,18 @@ sub find_migration_ascii_approx_matches {
                         $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                     # reverse action_BY_sAMAccountName
                     $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new;
+                    $matched_count++;
+                    $matched_count_file++;
                 } else {
+                    $not_matched_count++;
+                    $not_matched_count_file++;
                     print "    * NOMATCH: Edit distance is $edit_distance\n";
                 }
             }
         }
+        &print_title("approxMATCH: $line_count_file in $filename, MATCH: $matched_count_file, NOMATCH: $not_matched_count_file","slim");
     }
-    &print_title("Migration approx matching ($line_count tested)");
+    &print_title("approxMATCH: TOTAL: $line_count, MATCH: $matched_count, NOMATCH $not_matched_count (edit distance $max_edit_distance/$opt_edit_distance)","bottom");
 }
 
 
@@ -1927,11 +1942,6 @@ sub find_migration_ascii_matches2 {
     my $line_count_file=0;
     my $matched_count_file=0;
     my $not_matched_count_file=0;
-
-
-# change the loop??? OK so?
-#    foreach my $user_file (@filelist){
-#        my $filename=basename($user_file);
     # test all files
     foreach my $filename (keys %{ $Match2{'file_dynamic_identifiers_ascii'} } ) {
         &show_dynamic_identifiers_ascii($filename);
@@ -1942,12 +1952,17 @@ sub find_migration_ascii_matches2 {
         foreach my $identifier_ascii (keys %{ $Match2{'file_dynamic_identifiers_ascii'}{$filename} } ) {
             $line_count++;
             $line_count_file++;
+            if($Conf::log_level>=2){
+                print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
+                print "  * CHECK: is $identifier_ascii in AD ($filename)?\n";
+            }
             if ( exists $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
                 # MATCH
                 my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii};
-#                if($Conf::log_level>=2){
-                    print "    MATCH: $filename $identifier_ascii to $sam\n";
-#                }
+                if($Conf::log_level>=2){
+                    print "    * exactMATCH: $sam --> $identifier_ascii\n";
+                }
 
                 my $sub=(caller(0))[3];
 
@@ -1973,11 +1988,9 @@ sub find_migration_ascii_matches2 {
                 $matched_count_file++;
             } else {
                 # NO MATCH
-                print " $filename:",
-                      "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
-                      "$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}: ",
-                      "$identifier_ascii\n";
-                print "   --> No exact match for $identifier_ascii\n";
+                if($Conf::log_level>=2){
+                    print "    * NOexactMATCH for $identifier_ascii\n";
+                }
                 $Match2{'find_migration_ascii_matches'}{$filename}{$identifier_ascii}="no exact identifier match possible";
                 $not_matched_count++;
                 $not_matched_count_file++;
@@ -1985,7 +1998,7 @@ sub find_migration_ascii_matches2 {
         }
         &print_title("exactMATCH: $line_count_file in $filename, MATCH: $matched_count_file, NOMATCH: $not_matched_count_file","slim");
     }
-&print_title("exactMATCH: TOTAL: $line_count, MATCH: $matched_count, NOMATCH: $not_matched_count","bottom");
+    &print_title("exactMATCH: TOTAL: $line_count, MATCH: $matched_count, NOMATCH: $not_matched_count","bottom");
 }
 
 
@@ -2018,7 +2031,7 @@ sub find_migration_unid_matches {
             if($Conf::log_level>=2){
                 print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                       "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
-                print "  * CHECK: is unid $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} in AD at $filename?\n";
+                print "  * CHECK: is unid $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} in AD ($filename)\n";
             }
            if ($users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
                 # finding a unid match 
