@@ -677,15 +677,12 @@ if ($dump_login_avoid==1){
 &find_migration_ascii_matches2();
 
 # find approx matches
-# create loop that stopps itself???
 for (my $i=1;$i<$opt_edit_distance+1;$i++){
     &find_migration_ascii_approx_matches($i);
 }
-#&find_migration_ascii_approx_matches(1);
-#&find_migration_ascii_approx_matches(2);
-#&find_migration_ascii_approx_matches(3);
-#&find_migration_ascii_approx_matches(4);
 
+print "\n";
+&print_title("... Matching lines in files to users in AD done!");
 
 print "------------------------------------------------------------\n";
 print "Match2 follows:\n";
@@ -724,7 +721,7 @@ foreach my $line_new ( @{ $Match2{'lines_with_filename'} } ){
 # UPDATE or KILL or NOCHANGE
 ############################################################
 foreach my $filename ( keys %{ $ref_AD_check2->{'LOOKUP_by_filename'} } ) {
-    foreach my $sam ( keys %{ $ref_AD_check2->{'sAMAccountName'} } ) {
+    foreach my $sam ( keys %{ $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'user_BY_sAMAccountName'} } ) {
         # test all users in AD
         my $update=0; # if > 0 write to sophomorix.update
         my $kill=0; # if > 0 write to sophomorix.kill

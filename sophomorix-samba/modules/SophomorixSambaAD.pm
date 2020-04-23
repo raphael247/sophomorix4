@@ -5047,6 +5047,7 @@ sub AD_get_AD_for_check2 {
 
 
                    # LOOKUP by filename
+                   $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
                    $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
                    $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
                    $AD{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
