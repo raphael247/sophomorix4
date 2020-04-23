@@ -3938,7 +3938,7 @@ sub replace_vars {
 
 sub read_smb_conf {
     my ($ref_sophomorix_config,$ref_result)=@_;
-    &print_title("Reading $DevelConf::smb_conf");
+    &print_title("Reading $DevelConf::smb_conf","slim");
     if (not -e $DevelConf::smb_conf){
         print "\nERROR: $DevelConf::smb_conf not found!\n\n";
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$DevelConf::smb_conf." not found!");
@@ -3966,7 +3966,7 @@ sub read_smb_conf {
 sub read_ui {
     my ($ref_sophomorix_config,$ref_result)=@_;
     my $file=$ref_sophomorix_config->{'INI'}{'WEBUI'}{'INI'};
-    &print_title("Reading $file");
+    &print_title("Reading $file","slim");
     if (-f $file){
         tie %{ $ref_sophomorix_config->{'UI'}{'CONFIG'}{'WEBUI_PERMISSIONS'} }, 'Config::IniFiles',
             ( -file => $file, 
@@ -4064,7 +4064,7 @@ sub test_webui_permission {
 
 sub read_sophomorix_ini {
     my ($ref_sophomorix_config,$ref_result)=@_;
-    &print_title("Reading $DevelConf::sophomorix_ini");
+    &print_title("Reading $DevelConf::sophomorix_ini","slim");
     if (not -e $DevelConf::sophomorix_ini){
         print "\nERROR: $DevelConf::sophomorix_ini not found!\n\n";
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$DevelConf::sophomorix_ini." not found!");
@@ -4098,7 +4098,8 @@ sub read_lsbrelease {
     if ($release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_STABLE'} or
         $release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_UPCOMING'} or
         $release==$ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_EXPERIMENTAL'}){
-        print "Distro-check: $distrib_id $release is OK\n";
+        &print_title("Distro-check: $distrib_id $release is OK","slim");
+
     } else {
 	print "ERROR: sophomorix runs only on certain $allowed_distrib_id distributions:\n";
 	print "       $ref_sophomorix_config->{'INI'}{'LINUX'}{'DISTRIB_STABLE'} (STABLE)\n";
@@ -4184,7 +4185,7 @@ sub read_smb_domain_passwordsettings {
 sub read_master_ini {
     my ($masterfile,$ref_result)=@_;
     my %master=();
-    &print_title("Reading $masterfile");
+    &print_title("Reading $masterfile","slim");
     if (not -e $masterfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$masterfile." not found!");
         return;
@@ -4203,7 +4204,7 @@ sub read_master_ini {
 sub check_config_ini {
     my ($ref_school,$configfile,$ref_result,$ref_sophomorix_config)=@_;
     # take the master reference as school reference and overwrite it
-    &print_title("Reading $configfile");
+    &print_title("Reading $configfile","slim");
     if (not -e $configfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$configfile." not found!");
         print "\nERROR: $configfile not found!\n\n";
@@ -6663,7 +6664,7 @@ sub analyze_encoding {
     $ref_encoding_check_results->{$file}{'RESULT'}="unknown";
 
     # start to analyze file_tmp
-    &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp");
+    &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp","slim");
     open(DATAFILE, "$file_tmp") ||
          die "Error: $! $file_tmp not found!";
     my $count=0;

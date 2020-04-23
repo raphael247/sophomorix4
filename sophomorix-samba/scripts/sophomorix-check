@@ -471,7 +471,7 @@ if ($analyze_encoding ne ""){
 ################################################################################
 # cleaning up last check
 system("mkdir -p $sophomorix_config{'INI'}{'PATHS'}{'LOG'}");
-&print_title("Cleaning up last check");
+&print_title("Cleaning up last check","slim");
 system("rm -f $DevelConf::path_conf_tmp/*.csv*");
 system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.*");
 system("rm -f $sophomorix_config{'INI'}{'PATHS'}{'REPORT_OFFICE'}/report.office.*");
@@ -2501,10 +2501,6 @@ sub get_encoding {
     my $enc=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING};
     my $enc_force=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_FORCE};
     my $enc_checked=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{ENCODING_CHECKED};
-    &print_title("Encoding results for  $filename");
-    print "   * ENCODING:          $enc (configured)\n";
-    print "   * ENCODING_FORCE:    $enc_force\n";
-    print "   * ENCODING_CHECKED:  $enc_checked\n";
 
     # misconfigured *.school.conf: exit
     if ($enc eq "ERROR_ENCODING"){
@@ -2546,6 +2542,6 @@ sub get_encoding {
         }
     }
 
-    print "           ---> Using:  $enc_used\n";
+    print "Encoding $filename: $enc_used (ENCODING=$enc,*_FORCE=$enc_force, *_CHECKED=$enc_checked)\n";
     return $enc_used;
 }
