@@ -1995,11 +1995,6 @@ sub find_migration_ascii_matches2 {
                 # reverse action_BY_sAMAccountName
                 $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new2;
 
-
-                ## remove from ad_to_be_matched old ???
-                #delete $Match{'ad_dynamic_identifiers_ascii'}{$identifier_ascii};
-                #delete $Match{'file_dynamic_identifiers_ascii'}{$identifier_ascii};
-
                 # remove from ad_to_be_matched new
                 delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
                 delete $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
@@ -2021,11 +2016,169 @@ sub find_migration_ascii_matches2 {
 }
 
 
+
 sub find_role_matches {
-    print "HERE: roleMATCH\n";
-    foreach my $school (@schoollist){
-        print "  HERE: $school\n";
+    print "\n";
+    &print_title("roleMATCH (ASCII): lines to accounts of different sophomorixRole","top");
+    # total counters
+    my $line_count=0;
+    my $matched_count=0;
+    my $not_matched_count=0;
+    # school counters
+    my $line_count_school=0;
+    my $matched_count_school=0;
+    my $not_matched_count_school=0;
+    # role counters
+    my $line_count_role=0;
+    my $matched_count_role=0;
+    my $not_matched_count_role=0;
+    my $filename;
+
+    foreach my $school (@opt_schoollist){
+        if($Conf::log_level>=2){
+            &print_title("roleMATCH: school $school","slim");
+	}
+        my $student_file;
+        my $teacher_file;
+        if ($school eq "default-school"){
+            $student_file="students.csv";
+            $teacher_file="teachers.csv";;
+        } else {
+            $student_file=$school.".students.csv";
+            $teacher_file=$school.".teachers.csv";;
+        }
+
+        # reset school counters
+        $line_count_school=0;
+        $matched_count_school=0;
+        $not_matched_count_school=0;
+
+        ############################################################
+        # walk through teachers file: students -> teachers
+        ############################################################
+        $filename=$teacher_file;
+        if($Conf::log_level>=2){
+            &print_title("roleMATCH: $filename -> looking for student roleMATCH in AD","slim");
+        }
+        # role counters
+        $line_count_role=0;
+        $matched_count_role=0;
+        $not_matched_count_role=0;
+
+        foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
+            $line_count++;
+            $line_count_role++;
+            $line_count_school++;
+            if($Conf::log_level>=2){
+                print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
+                print "  * CHECK: is $identifier_ascii in AD as student?\n";
+            }
+            if ( exists $ref_AD_check2->{'LOOKUP_by_filename'}{$student_file}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
+                # MATCH
+                my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$student_file}{'user_BY_identifier_ascii'}{$identifier_ascii};
+                if($Conf::log_level>=2){
+                    print "    * roleMATCH: $sam ($ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixRole'})--> ".
+                          "$identifier_ascii\n";
+                }
+
+                my $sub=(caller(0))[3];
+
+                # save to write later
+                $Match2{'file'}{$filename}{$identifier_ascii}=$sam;
+                my $line_new2=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                $Match2{'ACTION'}{$filename}{$line_new2}{'sAMAccountName'}=$sam;
+                $Match2{'ACTION'}{$filename}{$line_new2}{'MATCH_SUB'}="$sub";
+                $Match2{'ACTION'}{$filename}{$line_new2}{'status'}=
+                    $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                # reverse action_BY_sAMAccountName
+                $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new2;
+
+                # remove from ad_to_be_matched new
+                delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+                delete $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+                $matched_count_school++;
+                $matched_count_role++;
+                $matched_count++;
+            } else {
+                # NO MATCH
+                if($Conf::log_level>=2){
+                    print "    * NOroleMATCH for $identifier_ascii\n";
+                }
+                $Match2{'find_migration_ascii_matches'}{$filename}{$identifier_ascii}="no role exact identifier match possible";
+                $not_matched_count_school++;
+                $not_matched_count_role++;
+                $not_matched_count++;
+            }
+        }
+        &print_title("roleMATCH: $filename: $line_count_role, MATCH: $matched_count_role, NOMATCH:  $not_matched_count_role","slim");
+
+
+        ############################################################
+        # walk through students file: teachers -> students
+        ############################################################
+        $filename=$student_file;
+        if($Conf::log_level>=2){
+            &print_title("roleMATCH: $filename -> looking for student roleMATCH in AD","slim");
+        }
+        # role counters
+        $line_count_role=0;
+        $matched_count_role=0;
+        $not_matched_count_role=0;
+
+        foreach my $identifier_ascii (keys %{$Match2{'file_dynamic_identifiers_ascii'}{$filename}} ) {
+            $line_count++;
+            $line_count_role++;
+            $line_count_school++;
+            if($Conf::log_level>=2){
+                print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
+                      "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
+                print "  * CHECK: is $identifier_ascii in AD as student?\n";
+            }
+            if ( exists $ref_AD_check2->{'LOOKUP_by_filename'}{$teacher_file}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
+                # MATCH
+                my $sam=$ref_AD_check2->{'LOOKUP_by_filename'}{$teacher_file}{'user_BY_identifier_ascii'}{$identifier_ascii};
+                if($Conf::log_level>=2){
+                    print "    * roleMATCH: $sam ($ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixRole'})--> ".
+                          "$identifier_ascii\n";
+                }
+
+                my $sub=(caller(0))[3];
+
+                # save to write later
+                $Match2{'file'}{$filename}{$identifier_ascii}=$sam;
+                my $line_new2=$users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_NEW};
+                $Match2{'ACTION'}{$filename}{$line_new2}{'sAMAccountName'}=$sam;
+                $Match2{'ACTION'}{$filename}{$line_new2}{'MATCH_SUB'}="$sub";
+                $Match2{'ACTION'}{$filename}{$line_new2}{'status'}=
+                    $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                # reverse action_BY_sAMAccountName
+                $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new2;
+
+                # remove from ad_to_be_matched new
+                delete $Match2{'ad_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+                delete $Match2{'file_dynamic_identifiers_ascii'}{$filename}{$identifier_ascii};
+                $matched_count_school++;
+                $matched_count_role++;
+                $matched_count++;
+            } else {
+                # NO MATCH
+                if($Conf::log_level>=2){
+                    print "    * NOroleMATCH for $identifier_ascii\n";
+                }
+                $Match2{'find_migration_ascii_matches'}{$filename}{$identifier_ascii}="no role exact identifier match possible";
+                $not_matched_count_school++;
+                $not_matched_count_role++;
+                $not_matched_count++;
+            }
+        }
+        &print_title("roleMATCH: $filename: $line_count_role, MATCH: $matched_count_role, NOMATCH:  $not_matched_count_role","slim");
+
+
+
+        &print_title("roleMATCH: SCHOOL $school: $line_count_school, MATCH: $matched_count_school, NOMATCH: $not_matched_count_school","slim");
     }
+    &print_title("roleMATCH: TOTAL: $line_count, MATCH: $matched_count, NOMATCH: $not_matched_count","bottom");
 }
 
 
