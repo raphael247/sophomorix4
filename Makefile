@@ -396,12 +396,12 @@ install-developer:
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.nighttime.conf.bsz $(TESTDATA)/managementgroup-testdata
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/managementgroup-testdata/wifi.all.conf.bsz $(TESTDATA)/managementgroup-testdata
 # schoolisolation testdata
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/teachers.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-1.8859_1 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.teachers.csv-workflow-schoolisolation-1.utf8 $(TESTDATA)
-	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-1.8859_1 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-0.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/teachers.csv-workflow-schoolisolation-0.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-0.8859_1 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-0.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.teachers.csv-workflow-schoolisolation-0.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-0.8859_1 $(TESTDATA)
 
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-2.utf8 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-2.utf8 $(TESTDATA)
