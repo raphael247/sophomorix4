@@ -3542,7 +3542,9 @@ sub config_sophomorix_read {
 	# test if school is configured
 	# share <school >must exist
 	if (exists $sophomorix_config{'samba'}{'net_conf_list'}{$school}){
-	    &print_title("OK: $school share exists");
+            if($Conf::log_level>=2){
+	        &print_title("OK: $school share exists");
+            }
 	} else {
 	    print "\n";
             print "ERROR: You have no share for the configured school $school\n";
@@ -3558,7 +3560,9 @@ sub config_sophomorix_read {
 
 	# <school>.school.conf must exist
 	if (-f $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'}){
-	    &print_title("OK: $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'}");
+            if($Conf::log_level>=2){
+	        &print_title("OK: $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'}");
+            }
 	} else {
 	    print "\n";
             print "ERROR: $sophomorix_config{'SCHOOLS'}{$school}{'CONF_FILE'} nonexisting\n";
@@ -4185,7 +4189,9 @@ sub read_smb_domain_passwordsettings {
 sub read_master_ini {
     my ($masterfile,$ref_result)=@_;
     my %master=();
-    &print_title("Reading $masterfile","slim");
+    if($Conf::log_level>=2){
+        &print_title("Reading $masterfile","slim");
+    }
     if (not -e $masterfile){
         &result_sophomorix_add($ref_result,"ERROR",-1,$ref_parameter,$masterfile." not found!");
         return;
@@ -6664,7 +6670,9 @@ sub analyze_encoding {
     $ref_encoding_check_results->{$file}{'RESULT'}="unknown";
 
     # start to analyze file_tmp
-    &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp","slim");
+    if($Conf::log_level>=2){
+        &Sophomorix::SophomorixBase::print_title("Encode-analyze $filename_tmp","slim");
+    }
     open(DATAFILE, "$file_tmp") ||
          die "Error: $! $file_tmp not found!";
     my $count=0;
