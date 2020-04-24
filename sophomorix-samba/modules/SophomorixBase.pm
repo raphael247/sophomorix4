@@ -34,6 +34,7 @@ $Data::Dumper::Terse = 1;
             mount_school
             umount_school
             testmount_school
+            create_schoollist
             NTACL_set_file
             remove_from_list
             ymdhms_to_date
@@ -250,6 +251,23 @@ sub umount_school {
         print "COMMAND: $umount_command\n";
         my $return=system($umount_command);
     }
+}
+
+
+
+sub create_schoollist {
+    my ($opt_school,$ref_sophomorix_config)=@_;
+    my @schoollist=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    if ($opt_school ne ""){
+        @schoollist=split(/,/,$opt_school);
+        foreach my $school (@schoollist){
+            if (not exists $ref_sophomorix_config->{'SCHOOLS'}{$school}){
+                print "ERROR: $school is not a valid school\n";
+                exit;
+            }
+        }
+    }
+    return (@schoollist);
 }
 
 

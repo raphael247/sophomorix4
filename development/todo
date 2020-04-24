@@ -62,6 +62,33 @@ sophomorix-class --members/addmembers/removemembers
 ------------------------------------------------------------
 
 ------------------------------------------------------------
+--school option:
+
+example code a sophomorix-check:
+1) schoollist from sophomorix-config
+2) override with school parameter --school <school1>,<school2>,... (put only these school in @schoollist)
+
+with each script: 
+
+1) -> load mdule from SophomorixBase
+                                 create_schoollist
+
+
+2) -> code at options
+my $school="";
+...
+           "school=s" => \$school,
+
+
+3) -> code after help
+# --school <school1,school2, ...>
+my @opt_schoollist=&create_schoollist($school,\%sophomorix_config);
+
+
+------------------------------------------------------------
+
+
+------------------------------------------------------------
 school isolation tests
 
 

@@ -27,6 +27,7 @@ use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
+                                 create_schoollist
                                  ymdhms_to_epoch
                                  unlock_sophomorix
                                  lock_sophomorix
@@ -78,7 +79,6 @@ my @arguments = @ARGV;
 
 my $user_count=0;
 
-my $school="";
 my %users_file2=();
 my %unid_seen=();
 
@@ -218,6 +218,8 @@ my $dump_files=0;
 my $dump_ad=0;
 my $dump_login_avoid=0;
 
+my $school="";
+
 my $list_files=0;
 my $cat_files=0;
 my $lock=0;
@@ -246,6 +248,7 @@ my $testopt=GetOptions(
            "cat-files|catfiles" => \$cat_files,
            "analyze-encoding=s" => \$analyze_encoding,
            "follow=s" => \$follow,
+           "school=s" => \$school,
            "injectline=s" => \@injectlines,
            "show-special-char-lines" => \$show_special_char_lines,
            "non-umlaut|nonumlaut" => \$non_umlaut,
@@ -335,6 +338,10 @@ Please see the sophomorix-check(8) man pages for full documentation
    print "\n";
    exit;
 }
+
+
+# --school <school1,school2, ...>
+my @opt_schoollist=&create_schoollist($school,\%sophomorix_config);
 
 
 # --unlock
@@ -687,6 +694,7 @@ if ($dump_login_avoid==1){
 &print_title("Matching lines in files to users in AD ...");
 &find_migration_unid_matches();
 &find_migration_ascii_matches2();
+&find_role_matches();
 
 # find approx matches
 for (my $i=1;$i<$opt_edit_distance+1;$i++){
@@ -2012,6 +2020,13 @@ sub find_migration_ascii_matches2 {
     &print_title("exactMATCH: TOTAL: $line_count, MATCH: $matched_count, NOMATCH: $not_matched_count","bottom");
 }
 
+
+sub find_role_matches {
+    print "HERE: roleMATCH\n";
+    foreach my $school (@schoollist){
+        print "  HERE: $school\n";
+    }
+}
 
 
 sub find_migration_unid_matches {
