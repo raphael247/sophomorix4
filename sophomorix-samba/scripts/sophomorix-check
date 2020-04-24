@@ -219,6 +219,7 @@ my $dump_ad=0;
 my $dump_login_avoid=0;
 
 my $list_files=0;
+my $cat_files=0;
 my $lock=0;
 my $unlock=0;
 my $analyze_encoding="";
@@ -241,7 +242,8 @@ my $testopt=GetOptions(
            "dump-ad" => \$dump_ad,
            "dump-login-avoid" => \$dump_login_avoid,
            "dump-matches" => \$dump_matches,
-           "list-files" => \$list_files,
+           "list-files|listfiles" => \$list_files,
+           "cat-files|catfiles" => \$cat_files,
            "analyze-encoding=s" => \$analyze_encoding,
            "follow=s" => \$follow,
            "injectline=s" => \@injectlines,
@@ -297,6 +299,7 @@ Options:
   -i --level --level
 
   --list-files                     (list processed files and exit)
+  --cat-files                      (cat/show processed files and exit)
   --lock / --unlock
 
   --follow filename:linenumber     (show what happens to this line)
@@ -406,18 +409,25 @@ if ($info==1 and $level==0) {
         }
     }
     exit;
-
-    exit;
 } 
 
 
 
 
-# --list-files
-if ($list_files==1) {
+# --list-files / --cat-files
+if ($list_files==1 or $cat_files==1) {
     &print_title("Reading the following user files:");
     foreach my $file (@filelist){
-        print "   * $file\n";
+        if ($list_files==1){
+            print "   * $file\n";
+        } elsif ($cat_files==1){
+            print "======================================================================\n";
+            print "  $file\n";
+            print "----------------------------------------------------------------------\n";
+            system("cat $file");
+            print "======================================================================\n";
+            print "\n";
+        }
     }
     exit;
 }
