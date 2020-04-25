@@ -91,6 +91,14 @@ bug: sophomorix-update --user maieran
   -> show 4 users updated, but was just one
 
 
+bug?: when an approx match is found
+       --> continue with next user? performance
+       --> look for multiple matches
+           class match? 
+           same class is best match 
+           approx class is second best match
+          
+
 ------------------------------------------------------------
 school isolation tests
 
@@ -126,7 +134,22 @@ WEITER:
 
 
 
+school umbau:
 
+  NOT OK: &test_attic_move
+  NOT OK: &test_UEAS_TM_update
+  NOT OK: &test_TM_DA_update
+  NOT OK: &test_DL_RA_update
+  NOT OK: &test_R_A_update
+  NOT OK: &test_RK_kill
+  NOT OK: &test_user_update
+
+  OK: find_migration_ascii_matches2
+  OK: show_dynamic_identifiers_ascii
+  OK: populate_ad_dynamic_identifiers_ascii
+  OK: find_migration_ascii_approx_matches
+  OK: analyze_user_line
+  OK: populate_ad_dynamic_identifiers_utf8 -> wird nicht aufgerufen, Match2
 
 
 

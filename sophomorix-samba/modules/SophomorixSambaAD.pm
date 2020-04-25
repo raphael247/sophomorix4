@@ -4943,10 +4943,11 @@ sub AD_get_AD_for_check2 {
                } else {
                    # save needed stuff
                    my $filename=$entry->get_value('sophomorixAdminFile');
+                   my $schoolname=$entry->get_value('sophomorixSchoolname');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
                    $AD{'sAMAccountName'}{$sam}{'dn'}=$entry->dn();
                    $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
-                   $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$schoolname;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
@@ -5059,6 +5060,22 @@ sub AD_get_AD_for_check2 {
                        $AD{'LOOKUP_by_filename'}{$filename}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
                            $identifier_ascii;
                    }
+
+                   # LOOKUP by school
+                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
+                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
+                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
+                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+                   if ($entry->get_value('sophomorixUnid') ne "---"){
+                       # no lookup for unid '---'
+                       $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
+                       # $AD{'LOOKUP_by_schoolname'}{$schoolname}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       #     $identifier_utf8;
+                       $AD{'LOOKUP_by_schoolname'}{$schoolname}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                           $identifier_ascii;
+                   }
+
+
                }
            }
        } elsif (defined $entry->get_value('sophomorixType')){
