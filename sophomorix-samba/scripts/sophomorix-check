@@ -1382,7 +1382,12 @@ sub test_attic_move {
     my ($filename,$sam,$old_class_ref,$new_class_ref,$old_status_ref,$ref_sophomorix_config)=@_;
     # not matched (=not in files anymore), but also not in attic -> move to attic
     # 3.74.5. do not move status M to attic
-    if (not exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and 
+    my $complementary_file_opp=$ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{$filename};
+    my $complementary_file_other=$ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{$filename};
+
+    if (not exists $Match2{'action_BY_sAMAccountName'}{$filename}{$sam} and
+        not exists $Match2{'action_BY_sAMAccountName'}{$complementary_file_opp}{$sam} and
+        not exists $Match2{'action_BY_sAMAccountName'}{$complementary_file_other}{$sam} and
         ${$old_class_ref} ne $ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'} and
         not ${$old_status_ref} eq "M"
        ){
@@ -1453,7 +1458,7 @@ sub test_user_update {
        )=@_;
     my $old_filename=$ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
     my $line_new=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
-
+    print "HERE: $sam ${$new_class_ref}\n";
     # count changes to attributes, 
     # update unid only when ALL other values are the same
     my $identifier_class_changes=0;
