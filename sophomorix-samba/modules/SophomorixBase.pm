@@ -4346,23 +4346,11 @@ sub load_school_ini {
                 $prefix="";
                 $postfix="";
                 $ou_top=$ref_sophomorix_config->{'SCHOOLS'}{$DevelConf::name_default_school}{OU_TOP};
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{'students.csv'}="teachers.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{'students.csv'}="extrastudents.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{'teachers.csv'}="students.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{'teachers.csv'}="extrastudents.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{'extrastudents.csv'}="teachers.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{'extrastudents.csv'}="students.csv";
             } else {
                 $filename=$school.".".$name.".".$extension;
                 $prefix=$school."-";
                 $postfix="-".$school;
                 $ou_top=$ref_sophomorix_config->{'SCHOOLS'}{$school}{OU_TOP};
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{$school.".students.csv"}=$school.".teachers.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{$school.".students.csv"}=$school.".extrastudents.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{$school.".teachers.csv"}=$school.".students.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{$school.".teachers.csv"}=$school.".extrastudents.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OPP_ROLE'}{$school.".extrastudents.csv"}=$school.".teachers.csv";
-                $ref_sophomorix_config->{'LOOKUP'}{'COMPLEMENTARY_FILES'}{'OTHER'}{$school.".extrastudents.csv"}=$school.".students.csv";
             }
             # # load parameters
             # foreach my $parameter ( keys %{ $ref_modmaster->{$section}} ) {
