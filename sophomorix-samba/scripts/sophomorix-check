@@ -708,11 +708,11 @@ for (my $i=1;$i<$opt_edit_distance+1;$i++){
 print "\n";
 &print_title("... Matching lines in files to users in AD done!");
 
-print "------------------------------------------------------------\n";
-print "Match2 follows:\n";
-print "------------------------------------------------------------\n";
-print Dumper (\%Match2);
-print "------------------------------------------------------------\n";
+#print "------------------------------------------------------------\n";
+#print "Match2 follows:\n";
+#print "------------------------------------------------------------\n";
+#print Dumper (\%Match2);
+#print "------------------------------------------------------------\n";
 
 
 # marriage, birthdate, ... and such matches ???
@@ -734,16 +734,16 @@ print "------------------------------------------------------------\n";
 ############################################################
 foreach my $school (@opt_schoollist) {
 #foreach my $line_new ( @{ $Match{'lines_with_filename'} } ){
-foreach my $line_new ( @{ $Match2{$school}{'lines_with_filename'} } ){
-    my ($file,$line)=split(/::/,$line_new);
-print "HERE: $school -> $file -> $line\n";
-    # if (not defined $Match{'ACTION'}{$line_new}{'sAMAccountName'}){
-    if (not defined $Match2{$school}{'ACTION'}{$line}{'sAMAccountName'}){
-print "HERE: ";
-        &write_add_file($school,$line_new);
+    foreach my $line_new ( @{ $Match2{$school}{'lines_with_filename'} } ){
+        my ($file,$line)=split(/::/,$line_new);
+        # if (not defined $Match{'ACTION'}{$line_new}{'sAMAccountName'}){
+        if (not defined $Match2{$school}{'ACTION'}{$line}{'sAMAccountName'}){
+            &write_add_file($school,$line_new);
+        }
     }
 }
-}
+
+
 # Users in AD:
 # UPDATE or KILL or NOCHANGE
 ############################################################
@@ -1566,7 +1566,6 @@ sub test_user_update {
     my $old_filename=$ref_AD_check2->{'sAMAccountName'}{$sam}{'sophomorixAdminFile'};
 #    my $line_new=$Match2{'action_BY_sAMAccountName'}{$filename}{$sam};
     my $line_new=$Match2{$school}{'action_BY_sAMAccountName'}{$sam};
-    print "HERE: $sam ${$new_class_ref}\n";
     # count changes to attributes, 
     # update unid only when ALL other values are the same
     my $identifier_class_changes=0;
@@ -2236,7 +2235,6 @@ sub find_migration_ascii_matches2 {
 #                print "  LINE $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
 #                      "$identifier_ascii (UNID: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
 #                print "  * CHECK: is $identifier_ascii in AD ($filename)?\n";
-		print "HERE\n";
                 print "  LINE $users_file2{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_COUNT}: ",
                       "$identifier_ascii (UNID: $users_file2{$school}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
                 print "  * CHECK: is $identifier_ascii in AD ($school)?\n";
@@ -2483,7 +2481,6 @@ sub find_migration_unid_matches {
     # test all schools
     foreach my $school (@opt_schoollist) {
 #	my $filename; # ?????
-	print "HERE SCHOOL: $school\n";
 #        my $ret=&show_dynamic_identifiers_ascii($filename);
         my $ret=&show_dynamic_identifiers_ascii($school);
         # reset file counters
@@ -2545,14 +2542,12 @@ sub find_migration_unid_matches {
 #                        $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
 #                    # reverse action_BY_sAMAccountName
 #                    $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new;
-		    print "HERESSSSSS: $sam\n";
                     $Match2{$school}{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
                     $Match2{$school}{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
                     $Match2{$school}{'ACTION'}{$line_new}{'status'}=
                         $ref_AD_check2->{'LOOKUP_by_schoolname'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                     # reverse action_BY_sAMAccountName
                     $Match2{$school}{'action_BY_sAMAccountName'}{$sam}=$line_new;
-print "HERESSSSSS:  -> $Match2{$school}{'ACTION'}{$line_new}{'sAMAccountName'} $Match2{$school}{'action_BY_sAMAccountName'}{$sam}\n";
                 } else {
                     # NO MATCH
 #                    $Match2{'find_migration_unid_matches'}{$filename}{$identifier_ascii}="no unid match";
