@@ -104,37 +104,7 @@ school isolation tests
 
 
 WEITER: 
-  sophomorix-check auf den neuen Hash Match2 umstellen
-
-  OLD: $Match{'ACTION'}{$line_new}{'login'}
-  NEU: $Match2{'ACTION'}{$filename}{$line_add}{'login'}
-  (line_add/line_new sind gleich, {$filename} kommt dazwischen)
-
-  OLD: $users_file{'identifier_ascii'}{$identifier_ascii}{UNID}
-  NEW: $users_file2{$filename}{'identifier_ascii'}{$identifier_ascii}{UNID}
-  ({$filename} kommt dazwischen)
-
-  Dies ersetzen in 
-  OK: &test_attic_move
-  OK: &test_UEAS_TM_update
-  OK: &test_TM_DA_update
-  OK: &test_DL_RA_update
-  OK: &test_R_A_update
-  OK: &test_RK_kill
-  OK: &test_user_update
-  OK: find_migration_ascii_matches_old auskommentiert
-  OK: find_migration_ascii_matches2
-  OK: show_dynamic_identifiers_ascii
-  OK: populate_ad_dynamic_identifiers_ascii
-      nur noch Match2
-      fileliste evtl. ändern
-  OK: find_migration_ascii_approx_matches
-  OK: analyze_user_line
-  OK: populate_ad_dynamic_identifiers_utf8 -> wird nicht aufgerufen, Match2
-
-
-
-school umbau:
+school umbau ist fertig:
 
   OK: &test_attic_move
   OK: &test_UEAS_TM_update
@@ -150,31 +120,26 @@ school umbau:
   OK: analyze_user_line
   OK: populate_ad_dynamic_identifiers_utf8 -> wird nicht aufgerufen, Match2
 
+   Test weiter:
 
+   noch ein Lehrer anlegen je schule und deaktivieren
+   
+   Toleration Date auf fixen wert setzen (1 Jahr zurück)
+   - 1 teacher taucht wieder auf, einer wird deaktiviert
+      und ein 2 student tauchen wieder auf:
+   - andere 2 müssen deaktiviert werden 
 
+      Dann die deaktivierten weiter durchschleusen
 
+      Die vorhandenen manuell bearbeiten sophomorix-user -P -u user,
+      ...
 
+      Am schluss die manuell bearbeiteten rauskillen.
 
+      
 
-  find_migration_unid_matches versagt bei identischen Einträgen in verschiedenen schulen (unid verschieden)
-  (verschiedene user tun aber)
-  test_attic_move spricht an??? Nein
-    --> erst mit verschiedener unid testen, dann mit derselben
-
-    --> wenns tut, test anpassen: 2 user mit derselben/verschiedenen/überkreuzten unid anlegen
-
-
-  Bugfix: 
-    sophomorix-test-workflow-schoolisolation --modify-1-check
-      - OK: user in default-school werden updedated
-      - BUG: user aus bsz sollen in defalult-school
-
-wenn nur noch match2 da ist:
-code cleanup sophomorix-check
--> funktion2 umbenenen in funktion, vorher funktion löschen
--> umbennen in Match
-&find_migration_unid_matches();
-
+      
+Fragen
 - was ist wenn in 2 verschiedenen Schulen gleiche kürzel stehen?
 - was ist wenn in 2 verschiedenen Schulen gleiche unid stehen?
 ------------------------------------------------------------
