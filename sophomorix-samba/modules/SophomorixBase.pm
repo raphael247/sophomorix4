@@ -5436,7 +5436,8 @@ sub get_login_avoid {
 
 sub create_test_login {
     # $ref_AD_check --> $ref_forbidden_logins
-    my ($identifier_ascii,
+    my ($school,
+        $identifier_ascii,
         $file,
         $login_wish,
         $ref_forbidden_logins,
@@ -5503,27 +5504,36 @@ sub create_test_login {
         # check wish login
         $login_char_length = length $login_wish;
         if (not $login_wish=~m/^[a-z0-9-_]+$/){
+#	    my $error_message="'".$login_wish."' contains invalid characters for a login name! (Allowed are: a-z0-9-_) ".
+#                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
 	    my $error_message="'".$login_wish."' contains invalid characters for a login name! (Allowed are: a-z0-9-_) ".
-                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
+                              "| $file LINE $line_num: $ref_users_file->{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif ($login_char_length<2){
+#	    my $error_message="'".$login_wish."' is to short for a login name! (Minimum number of characters for a login name is 2) ".
+#                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
 	    my $error_message="'".$login_wish."' is to short for a login name! (Minimum number of characters for a login name is 2) ".
-                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
+                              "| $file LINE $line_num: $ref_users_file->{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif (not $login_wish=~m/^[a-z]+/){
+#	    my $error_message="'".$login_wish."' does not begin with a-z ".
+#                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
 	    my $error_message="'".$login_wish."' does not begin with a-z ".
-                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
+                              "| $file LINE $line_num: $ref_users_file->{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
              return ("---",$error_message);
         } elsif (exists $ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}){
+#	    my $error_message="Login ".$ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}."' ".
+#                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
 	    my $error_message="Login ".$ref_forbidden_logins->{'FORBIDDEN'}{$login_wish}."' ".
-                              "| $file LINE $line_num: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
+                              "| $file LINE $line_num: $ref_users_file->{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}";
             return ("---",$error_message);
         } elsif (exists $ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}){
             # non reusable login
             my $days=int($ref_login_avoid->{'AVOID_LOGINS'}{$login_wish}{'UNUSED'}/86400);
             # put in result hash ?????
 	    print "\n   WARNING: $login_wish was used $days days ago (Not recommended to re-use $login_wish already)\n\n"; 
-	    print "        LINE: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+#	    print "        LINE: $ref_users_file->{$file}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
+	    print "        LINE: $ref_users_file->{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}\n";
 	    print "              ($file LINE $line_num)\n";
         }
         $login_check_ok=$login_wish;
