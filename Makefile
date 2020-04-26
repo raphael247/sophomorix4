@@ -417,8 +417,11 @@ install-developer:
 
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-10.utf8 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.extrastudents.csv-workflow-schoolisolation-10.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/bsz.teachers.csv-workflow-schoolisolation-10.utf8 $(TESTDATA)
+
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/students.csv-workflow-schoolisolation-11.utf8 $(TESTDATA)
 	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/extrastudents.csv-workflow-schoolisolation-11.utf8 $(TESTDATA)
+	@install -oroot -groot --mode=0644 sophomorix-developer/testdata/teachers.csv-workflow-schoolisolation-11.utf8 $(TESTDATA)
 # transfer testdata
 	@install -d $(TESTDATA)/transfer-testdata
 	@install -d $(TESTDATA)/transfer-testdata/subdir1-level1
