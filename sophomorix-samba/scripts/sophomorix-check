@@ -688,9 +688,12 @@ if ($dump_login_avoid==1){
 # find exact matches
 &print_title("Matching lines in files to users in AD ...");
 &find_migration_unid_matches();
+#print Dumper (\%Match2{'bsz'});
 
 &find_migration_ascii_matches2();
 #&find_role_matches();
+#print Dumper (\%Match2{'bsz'});
+#exit;
 
 
 # find approx matches
@@ -736,6 +739,7 @@ foreach my $line_new ( @{ $Match2{$school}{'lines_with_filename'} } ){
 print "HERE: $school -> $file -> $line\n";
     # if (not defined $Match{'ACTION'}{$line_new}{'sAMAccountName'}){
     if (not defined $Match2{$school}{'ACTION'}{$line}{'sAMAccountName'}){
+print "HERE: ";
         &write_add_file($school,$line_new);
     }
 }
@@ -2541,13 +2545,14 @@ sub find_migration_unid_matches {
 #                        $ref_AD_check2->{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
 #                    # reverse action_BY_sAMAccountName
 #                    $Match2{'action_BY_sAMAccountName'}{$filename}{$sam}=$line_new;
-
-                    $Match2{$school}{'ACTION'}{$school}{$line_new}{'sAMAccountName'}=$sam;
-                    $Match2{$school}{'ACTION'}{$school}{$line_new}{'MATCH_SUB'}="$sub";
-                    $Match2{$school}{'ACTION'}{$school}{$line_new}{'status'}=
+		    print "HERESSSSSS: $sam\n";
+                    $Match2{$school}{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
+                    $Match2{$school}{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
+                    $Match2{$school}{'ACTION'}{$line_new}{'status'}=
                         $ref_AD_check2->{'LOOKUP_by_schoolname'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                     # reverse action_BY_sAMAccountName
                     $Match2{$school}{'action_BY_sAMAccountName'}{$sam}=$line_new;
+print "HERESSSSSS:  -> $Match2{$school}{'ACTION'}{$line_new}{'sAMAccountName'} $Match2{$school}{'action_BY_sAMAccountName'}{$sam}\n";
                 } else {
                     # NO MATCH
 #                    $Match2{'find_migration_unid_matches'}{$filename}{$identifier_ascii}="no unid match";
