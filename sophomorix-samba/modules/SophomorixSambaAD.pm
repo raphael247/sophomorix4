@@ -58,6 +58,8 @@ $Data::Dumper::Terse = 1;
             AD_group_addmember
             AD_group_addmember_management
             AD_group_removemember
+            AD_rolegroup_update
+            AD_rolegroup_kill
             AD_group_update
             AD_group_list
             AD_get_schoolname
@@ -7614,6 +7616,20 @@ sub AD_dn_fetch_multivalue {
     my $entry = $mesg->entry(0);
     my @results = sort $entry->get_value($attr_name);
     return @results;
+}
+
+
+
+sub AD_rolegroup_update {
+    my ($school)=@_;
+    print "HERE update\n";
+}
+
+
+
+sub AD_rolegroup_kill {
+    my ($school)=@_;
+    print "HERE kill\n";
 }
 
 

@@ -32,6 +32,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_print
                                  json_dump
                                  remove_embracing_whitespace
+                                 create_schoollist
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
@@ -47,6 +48,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_AD_for_check
                                  AD_debug_logdump
                                  AD_get_group
+                                 AD_rolegroup_update
+                                 AD_rolegroup_kill
                                     );
 
 my @arguments = @ARGV;
@@ -87,6 +90,9 @@ my $set_printing="";
 my $set_group="";
 my $set_name="";
 
+my $update_rolegroups=0;
+my $kill_rolegroups=0;
+
 my $skiplock=0;
 
 # Parsen der Optionen
@@ -117,6 +123,8 @@ my $testopt=GetOptions(
            "set-printing=s" => \$set_printing,
            "set-group=s" => \$set_group,
            "set-name=s" => \$set_name,
+           "update-rolegroups" => \$update_rolegroups,
+           "kill-rolegroups" => \$kill_rolegroups,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-managementgroup");
@@ -178,7 +186,9 @@ Set any sophomorix-group memberships from a file (i.e. epoptes):
      # sophomorix-managementgroup --set-group epoptes --set-name default --school global
      (This will read the config in /etc/linuxmuster/sophomorix/global.epoptes.default.conf)
 
-Set any sophomorix-group  memberships
+Set rolegroups memberships:
+  --update-rolegroups
+  --kill-rolegroups
 
 
 Please see the sophomorix-managementgroup(8) man pages for full documentation
@@ -362,6 +372,19 @@ if ($set_printing ne ""){
 if ($set_group ne "" and $set_name ne ""){
     &set_members_from_file($set_group,$set_name,$school);
 }
+
+
+#  --update-rolegroups
+if ($update_rolegroups==1){
+    &AD_rolegroup_update($school);
+}
+
+#  --kill-rolegroups
+if ($kill_rolegroups==1){
+    &AD_rolegroup_kill($school);
+}
+
+
 
 &AD_unbind_admin($ldap);
 
