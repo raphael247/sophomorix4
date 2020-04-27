@@ -683,16 +683,23 @@ foreach my $school (@opt_schoollist) {
     # migration
     &populate_ad_dynamic_identifiers_ascii($school);
     # find exact matches
-    &print_title("Matching lines in files to users in AD (school $school) start ...");
-    &find_migration_unid_matches($school);
-    &find_migration_ascii_matches($school);
+    print "\n";
+    &print_title("### School $school: Matching lines in files to users in AD ...");
+    &find_unid_matches($school);
+    &find_ascii_matches($school);
     # find approx matches
     for (my $i=1;$i<$opt_edit_distance+1;$i++){
-        &find_migration_ascii_approx_matches($school,$i);
+        my ($return,
+            $line_count_school,
+            $school,
+            $matched_count_school,
+            $not_matched_count_school)=&find_ascii_approx_matches($school,$i);
+	if ($return>0){
+	    $i=$opt_edit_distance+1;
+            &print_title("approxMATCH: $line_count_school CHECKED in $school, MATCH: $matched_count_school (Edit distance: $return)","slim");
+	}
     }
-    &print_title("... Matching lines to users in AD (school $school): ... Done!");
 
-    &print_title("Writing the result files od school $school:");
     ############################################################
     # Users not in AD: sophomorix.add
     ############################################################
@@ -705,7 +712,7 @@ foreach my $school (@opt_schoollist) {
     ############################################################
     # Users in AD: sophomorix.update/sophomorix.kill/sophomorix.nochange
     ############################################################
-    foreach my $sam ( keys %{ $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_sAMAccountName'} } ) {
+    foreach my $sam ( keys %{ $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sAMAccountName'} } ) {
         # test all users in AD
         my $update=0; # if > 0 write to sophomorix.update
         my $kill=0; # if > 0 write to sophomorix.kill
@@ -916,6 +923,7 @@ foreach my $school (@opt_schoollist) {
             $counters{'NOCHANGE'}++;
         }
     }
+    &print_title("## School $school ... Done!");
 }
 
 
@@ -1318,9 +1326,8 @@ sub test_attic_move {
         ${$new_class_ref}=$ref_sophomorix_config->{'INI'}{'VARS'}{'ATTIC_GROUP_BASENAME'};
         my $new_line=${$new_class_ref}.";".$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'}.";---";
 
-        $Match{$school}{'action_BY_sAMAccountName'}{$sam}=$new_line;
-
         # add ACTION data for moving to 'attic'-group
+        $Match{$school}{'action_BY_sAMAccountName'}{$sam}=$new_line;
         $Match{$school}{'ACTION'}{$new_line}{'sAMAccountName'}=$sam;
         $Match{$school}{'ACTION'}{$new_line}{'identifier_ascii'}=$ref_AD_check->{'sAMAccountName'}{$sam}{'IDENTIFIER_ASCII'};
         $Match{$school}{'ACTION'}{$new_line}{'class'}=${$new_class_ref};
@@ -1339,16 +1346,14 @@ sub test_attic_move {
 
         my $sub=(caller(0))[3];
         $Match{$school}{'ACTION'}{$new_line}{'MATCH_SUB'}="$sub";
+
         $Match{$school}{'ACTION'}{$new_line}{'class_type'}="???";
         $Match{$school}{'ACTION'}{$new_line}{'inject'}="???";
         $Match{$school}{'ACTION'}{$new_line}{'login'}="???";
-
         $Match{$school}{'ACTION'}{$new_line}{'NOT_IN_FILES'}="TRUE";
 
         # role in attic is student
         $Match{$school}{'ACTION'}{$new_line}{'role'}=$sophomorix_config{'INI'}{'ROLE_USER'}{'STUDENT'};
-
-
     }
 }
 
@@ -1735,7 +1740,7 @@ sub write_add_file {
 sub populate_ad_dynamic_identifiers_utf8 {
     my ($school) = @_;
     foreach my $school (@opt_schoollist){
-        foreach my $identifier_utf8 (keys %{ $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_identifier_utf8'} } ) { 
+        foreach my $identifier_utf8 (keys %{ $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_identifier_utf8'} } ) { 
             $Match{$school}{'ad_dynamic_identifiers_utf8'}{$identifier_utf8}="ad, not matched";
         } 
     }
@@ -1777,8 +1782,8 @@ sub show_dynamic_identifiers_ascii {
             print "ad_dynamic_identifiers_ascii in AD:\n";
             foreach my $id (@ad_ids){
                 my $status=
-                print "   * $id ($ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_identifier_ascii'}{$id} in AD,",
-                      " status $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$id})\n";
+                print "   * $id ($ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_identifier_ascii'}{$id} in AD,",
+                      " status $ref_AD_check->{'LOOKUP_by_school'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$id})\n";
             }    
         }
         return 1;
@@ -1789,14 +1794,14 @@ sub show_dynamic_identifiers_ascii {
 
 sub populate_ad_dynamic_identifiers_ascii {
     my ($school)=@_;
-    foreach my $identifier_ascii (keys %{ $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_identifier_ascii'} } ) { 
+    foreach my $identifier_ascii (keys %{ $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_identifier_ascii'} } ) { 
         $Match{$school}{'ad_dynamic_identifiers_ascii'}{$identifier_ascii}="ad, not matched";
     } 
 }
 
 
 
-sub find_migration_ascii_approx_matches {
+sub find_ascii_approx_matches {
     my ($school,$max_edit_distance)=@_;
     my $run="approx_".$max_edit_distance."_run";
     my $line_count_school=0;
@@ -1806,9 +1811,9 @@ sub find_migration_ascii_approx_matches {
     my $ret=&show_dynamic_identifiers_ascii($school);
     if ($ret==0){
         if($Conf::log_level>=2){
-            &print_title("approxMATCH: Nothing to do anymore in  $school (edit distance $max_edit_distance)","slim");
+            &print_title("approxMATCH: Nothing to do anymore in $school at edit distance $max_edit_distance","slim");
         }
-        return;
+        return ($max_edit_distance,$line_count_school,$school,$matched_count_school,$not_matched_count_school);
     }
 
     foreach my $identifier_ascii (keys %{ $Match{$school}{'file_dynamic_identifiers_ascii'} } ) {
@@ -1824,7 +1829,7 @@ sub find_migration_ascii_approx_matches {
             }
             if ($edit_distance <= $max_edit_distance){
                 # APPROX MATCH
-                my $sam=$ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
+                my $sam=$ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii_ad};
                 if($Conf::log_level>=2){
                     print "    * Edit distance is $edit_distance\n";
                     print "    * approxMATCH: $sam -> $identifier_ascii\n";
@@ -1844,7 +1849,7 @@ sub find_migration_ascii_approx_matches {
 
                 $Match{$school}{'ACTION'}{$line_new}{'sAMAccountName'}=$sam;
                 $Match{$school}{'ACTION'}{$line_new}{'status'}=
-                    $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    $ref_AD_check->{'LOOKUP_by_school'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                 # reverse action_BY_sAMAccountName
                 $Match{$school}{'action_BY_sAMAccountName'}{$sam}=$line_new;
                 $matched_count_school++;
@@ -1856,12 +1861,13 @@ sub find_migration_ascii_approx_matches {
             }
         }
     }
-    &print_title("approxMATCH: $line_count_school in $school, MATCH: $matched_count_school, NOMATCH: $not_matched_count_school","slim");
+    &print_title("approxMATCH: $line_count_school CHECKED in $school, MATCH: $matched_count_school","slim");
+    return (-1,$line_count_school,$school,$matched_count_school,$not_matched_count_school);
 }
 
 
 
-sub find_migration_ascii_matches {
+sub find_ascii_matches {
     my ($school)=@_;
     my $line_count_school=0;
     my $matched_count_school=0;
@@ -1874,9 +1880,9 @@ sub find_migration_ascii_matches {
                   "$identifier_ascii (UNID: $users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID})\n";
             print "  * CHECK: is $identifier_ascii in AD ($school)?\n";
         }
-        if ( exists $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
+        if ( exists $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii} ){
             # MATCH
-            my $sam=$ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii};
+            my $sam=$ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii};
             if($Conf::log_level>=2){
                 print "    * exactMATCH: $sam --> $identifier_ascii\n";
             }
@@ -1889,7 +1895,7 @@ sub find_migration_ascii_matches {
             $Match{$school}{'ACTION'}{$line_new2}{'MATCH_SUB'}="$sub";
 
             $Match{$school}{'ACTION'}{$line_new2}{'status'}=
-                $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                $ref_AD_check->{'LOOKUP_by_school'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
             # reverse action_BY_sAMAccountName
             $Match{$school}{'action_BY_sAMAccountName'}{$sam}=$line_new2;
 
@@ -1902,16 +1908,16 @@ sub find_migration_ascii_matches {
             if($Conf::log_level>=2){
                 print "    * NOexactMATCH for $identifier_ascii\n";
             }
-            $Match{$school}{'find_migration_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
+            $Match{$school}{'find_ascii_matches'}{$identifier_ascii}="no exact identifier match possible";
             $not_matched_count_school++;
         }
     }
-    &print_title("exactMATCH: $line_count_school in $school, MATCH: $matched_count_school, NOMATCH: $not_matched_count_school","slim");
+    &print_title("exactMATCH: $line_count_school CHECKED in $school, MATCH: $matched_count_school, NOMATCH: $not_matched_count_school","slim");
 }
 
 
 
-sub find_migration_unid_matches {
+sub find_unid_matches {
     my ($school)=@_;
     my $line_count_school=0;
     my $matched_count_school=0;
@@ -1927,15 +1933,15 @@ sub find_migration_unid_matches {
         }
         if ($users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID} ne ""){
             # finding a unid match 
-            if ( exists $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}} and
-                $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
+            if ( exists $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}} and
+                $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}} ne "---"
                ){
                 # MATCH
-                my $sam=$ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'user_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}};
-                my $role=$ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'sophomorixRole_BY_sAMAccountName'}{$sam};
+                my $sam=$ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}};
+                my $role=$ref_AD_check->{'LOOKUP_by_school'}{$school}{'sophomorixRole_BY_sAMAccountName'}{$sam};
                 # fetch the identifier from AD with same unid
                 my $identifier_ascii_from_AD=
-                    $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}};
+                    $ref_AD_check->{'LOOKUP_by_school'}{$school}{'identifier_ascii_BY_sophomorixUnid'}{$users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID}};
                 if($Conf::log_level>=2){
                     print "    * Matching unid found at user $sam ($identifier_ascii_from_AD)\n";
 	            print "    * unidMATCH:  $sam --> $identifier_ascii\n";
@@ -1954,12 +1960,12 @@ sub find_migration_unid_matches {
                 $Match{$school}{'ACTION'}{$line_new}{'MATCH_SUB'}="$sub";
 
                 $Match{$school}{'ACTION'}{$line_new}{'status'}=
-                    $ref_AD_check->{'LOOKUP_by_schoolname'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
+                    $ref_AD_check->{'LOOKUP_by_school'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii};
                 # reverse action_BY_sAMAccountName
                 $Match{$school}{'action_BY_sAMAccountName'}{$sam}=$line_new;
             } else {
                 # NO MATCH
-                $Match{$school}{'find_migration_unid_matches'}{$identifier_ascii}="no unid match";
+                $Match{$school}{'find_unid_matches'}{$identifier_ascii}="no unid match";
                 $not_matched_count_school++;
                 if($Conf::log_level>=2){
                     print "    * NOMATCH: Unid $users_file{$school}{'identifier_ascii'}{$identifier_ascii}{UNID} not found in AD\n";
@@ -1967,10 +1973,10 @@ sub find_migration_unid_matches {
             }
         } else {
             $no_unid_count_school++;
-            $Match{$school}{'find_migration_unid_matches'}{$identifier_ascii}="no unid, no match possible";
+            $Match{$school}{'find_unid_matches'}{$identifier_ascii}="no unid, no match possible";
         }
     }
-    &print_title("unidMATCH: $line_count_school in $school, MATCH: $matched_count_school, NOMATCH: $not_matched_count_school, NOunid: $no_unid_count_school","slim");
+    &print_title("unidMATCH: $line_count_school CHECKED in $school, MATCH: $matched_count_school, NOMATCH: $not_matched_count_school, NOunid: $no_unid_count_school","slim");
 }
 
 

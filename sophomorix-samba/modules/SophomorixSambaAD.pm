@@ -4941,12 +4941,12 @@ sub AD_get_AD_for_check {
                    # do nothing
                } else {
                    # save needed stuff
-                   my $filename=$entry->get_value('sophomorixAdminFile');
-                   my $schoolname=$entry->get_value('sophomorixSchoolname');
+                   my $file=$entry->get_value('sophomorixAdminFile');
+                   my $school=$entry->get_value('sophomorixSchoolname');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
                    $AD{'sAMAccountName'}{$sam}{'dn'}=$entry->dn();
                    $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
-                   $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$schoolname;
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$school;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'}=$entry->get_value('sophomorixSurnameASCII');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}=$entry->get_value('sophomorixFirstnameASCII');
@@ -4958,7 +4958,7 @@ sub AD_get_AD_for_check {
                    $AD{'sAMAccountName'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
-                   $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$filename;
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$file;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
@@ -5047,30 +5047,30 @@ sub AD_get_AD_for_check {
 
 
                    # LOOKUP by filename
-                   $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
-                   $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
-                   $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
-                   $AD{'LOOKUP_by_filename'}{$filename}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+                   $AD{'LOOKUP_by_filename'}{$file}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
+                   $AD{'LOOKUP_by_filename'}{$file}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
+                   $AD{'LOOKUP_by_filename'}{$file}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
+                   $AD{'LOOKUP_by_filename'}{$file}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
                    if ($entry->get_value('sophomorixUnid') ne "---"){
                        # no lookup for unid '---'
-                       $AD{'LOOKUP_by_filename'}{$filename}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
-                       # $AD{'LOOKUP_by_filename'}{$filename}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       $AD{'LOOKUP_by_filename'}{$file}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
+                       # $AD{'LOOKUP_by_filename'}{$file}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
                        #     $identifier_utf8;
-                       $AD{'LOOKUP_by_filename'}{$filename}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       $AD{'LOOKUP_by_filename'}{$file}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
                            $identifier_ascii;
                    }
 
                    # LOOKUP by school
-                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
-                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
-                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
-                   $AD{'LOOKUP_by_schoolname'}{$schoolname}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
+                   $AD{'LOOKUP_by_school'}{$school}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
+                   $AD{'LOOKUP_by_school'}{$school}{'user_BY_identifier_utf8'}{$identifier_utf8}=$sam;
+                   $AD{'LOOKUP_by_school'}{$school}{'user_BY_identifier_ascii'}{$identifier_ascii}=$sam;
+                   $AD{'LOOKUP_by_school'}{$school}{'sophomorixStatus_BY_identifier_ascii'}{$identifier_ascii}=$entry->get_value('sophomorixStatus');
                    if ($entry->get_value('sophomorixUnid') ne "---"){
                        # no lookup for unid '---'
-                       $AD{'LOOKUP_by_schoolname'}{$schoolname}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
-                       # $AD{'LOOKUP_by_schoolname'}{$schoolname}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       $AD{'LOOKUP_by_school'}{$school}{'user_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=$sam;
+                       # $AD{'LOOKUP_by_school'}{$school}{'identifier_utf8_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
                        #     $identifier_utf8;
-                       $AD{'LOOKUP_by_schoolname'}{$schoolname}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
+                       $AD{'LOOKUP_by_school'}{$school}{'identifier_ascii_BY_sophomorixUnid'}{$entry->get_value('sophomorixUnid')}=
                            $identifier_ascii;
                    }
 
