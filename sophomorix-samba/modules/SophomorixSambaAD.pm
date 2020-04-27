@@ -67,7 +67,6 @@ $Data::Dumper::Terse = 1;
             AD_object_search
             AD_get_AD_for_repair
             AD_get_AD_for_check
-            AD_get_AD_for_check2
             AD_get_AD_for_device
             AD_check_ui
             AD_create_new_mail
@@ -4648,7 +4647,7 @@ sub AD_get_AD_for_repair {
 
 
 
-sub AD_get_AD_for_check {
+sub AD_get_AD_for_check_old {
     my %AD=();
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
@@ -4861,7 +4860,7 @@ sub AD_get_AD_for_check {
 
 
 
-sub AD_get_AD_for_check2 {
+sub AD_get_AD_for_check {
     my %AD=();
     my ($arg_ref) = @_;
     my $ldap = $arg_ref->{ldap};
