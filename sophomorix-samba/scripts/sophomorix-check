@@ -630,11 +630,11 @@ if ($follow ne ""){
 &print_title("Searching AD for users ...");
 # fetch system data
 my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
-                                     root_dse=>$root_dse,
-                                     root_dns=>$root_dns,
-                                     admins=>"FALSE",
-                                     sophomorix_config=>\%sophomorix_config,
-                                   });
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           admins=>"FALSE",
+                                           sophomorix_config=>\%sophomorix_config,
+                                         });
 
 
 # --dump-ad

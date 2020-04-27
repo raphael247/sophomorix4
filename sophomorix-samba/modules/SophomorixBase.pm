@@ -3726,9 +3726,9 @@ sub config_sophomorix_read {
             # do something
         } elsif ($section eq "ROLE_USER"){
             # create LOOKUP for ROLES
-            foreach my $keyname (keys %{$sophomorix_config{'INI'}{'ROLE_USER'}}) {
+            foreach my $keyname (keys %{ $sophomorix_config{'INI'}{'ROLE_USER'} }) {
                 $sophomorix_config{'LOOKUP'}{'ROLES_ALL'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}=$keyname;
-                $sophomorix_config{'LOOKUP'}{'ROLES_USER'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}=$keyname;
+                $sophomorix_config{'LOOKUP'}{'ROLES_USER'}{$sophomorix_config{'INI'}{'ROLE_USER'}{$keyname}}{'KEYNAME'}=$keyname;
             }
         } elsif ($section eq "SYNC_MEMBER"){
             my @keepgroup=&ini_list($sophomorix_config{'INI'}{$section}{'KEEPGROUP'});
@@ -3884,6 +3884,12 @@ sub config_sophomorix_read {
             $sub_ou.",".
             $sophomorix_config{$DevelConf::AD_global_ou}{'OU_TOP'};
         $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_TYPE'}{$groupname}=$grouptype;
+    }
+    # create rolegroup dn's
+    foreach my $role (keys %{ $sophomorix_config{'LOOKUP'}{'ROLES_USER'} }) {
+        my $rolegroup="role-".$role;
+        $sophomorix_config{'LOOKUP'}{'ROLES_USER'}{$role}{'GLOBAL_rolegroup_dn'}=
+            $sophomorix_config{$DevelConf::AD_global_ou}{'GROUP_OPTION'}{$rolegroup};
     }
 
     # GROUP in section SCHOOLS

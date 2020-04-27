@@ -59,7 +59,6 @@ $Data::Dumper::Terse = 1;
             AD_group_addmember_management
             AD_group_removemember
             AD_rolegroup_update
-            AD_rolegroup_kill
             AD_group_update
             AD_group_list
             AD_get_schoolname
@@ -4943,10 +4942,11 @@ sub AD_get_AD_for_check {
                    # do nothing
                } else {
                    # save needed stuff
+                   my $dn=$entry->dn();
                    my $file=$entry->get_value('sophomorixAdminFile');
                    my $school=$entry->get_value('sophomorixSchoolname');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixRole'}=$role;
-                   $AD{'sAMAccountName'}{$sam}{'dn'}=$entry->dn();
+                   $AD{'sAMAccountName'}{$sam}{'dn'}=$dn;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixUnid'}=$entry->get_value('sophomorixUnid');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSchoolname'}=$school;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixStatus'}=$entry->get_value('sophomorixStatus');
@@ -5044,9 +5044,11 @@ sub AD_get_AD_for_check {
                    @{ $AD{'sAMAccountName'}{$sam}{'sophomorixIntrinsicMulti5'} } =
                        sort $entry->get_value('sophomorixIntrinsicMulti5');
 
+                   # LIST for rolegroups
+                   push @{ $AD{'LIST_by_sophomorixRole'}{$role}{'GLOBAL'} }, $dn;
+
                    # LOOKUP
                    $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
-
 
                    # LOOKUP by filename
                    $AD{'LOOKUP_by_filename'}{$file}{'user_BY_sAMAccountName'}{$sam}="seen in AD";
@@ -7621,23 +7623,29 @@ sub AD_dn_fetch_multivalue {
 
 
 sub AD_rolegroup_update {
-    my ($ref_sophomorix_config)=@_;
-    print "HERE update\n";
+    my ($ldap,$root_dse,$root_dns,$ref_sophomorix_config)=@_;
     # fetch system data
     my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                                root_dse=>$root_dse,
                                                root_dns=>$root_dns,
-                                               admins=>"FALSE",
-                                               sophomorix_config=>\%sophomorix_config,
+                                               admins=>"TRUE",
+                                               sophomorix_config=>$ref_sophomorix_config,
                                              });
+    foreach my $role (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'} }){
+        my $rolegroup="role-".$role;
+        print "Setting member attribute of rolegroup $rolegroup\n";
+        print "  $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'}{$role}{'GLOBAL_rolegroup_dn'}\n";
+        print "to:\n";
+        print Dumper ($ref_AD_check->{'LIST_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou});
+        my $member_count=$#{ $ref_AD_check->{'LIST_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} }+1;
+        print "$member_count members in $rolegroup\n";
+        print "\n";
 
-}
-
-
-
-sub AD_rolegroup_kill {
-    my ($ref_sophomorix_config)=@_;
-    print "HERE kill\n";
+        my $mesg = $ldap->modify( $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'}{$role}{'GLOBAL_rolegroup_dn'},
+                          replace => { 'member' => $ref_AD_check->{'LIST_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} } 
+                         );
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
 }
 
 

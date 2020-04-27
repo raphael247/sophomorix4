@@ -49,7 +49,6 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_debug_logdump
                                  AD_get_group
                                  AD_rolegroup_update
-                                 AD_rolegroup_kill
                                     );
 
 my @arguments = @ARGV;
@@ -91,7 +90,6 @@ my $set_group="";
 my $set_name="";
 
 my $update_rolegroups=0;
-my $kill_rolegroups=0;
 
 my $skiplock=0;
 
@@ -124,7 +122,6 @@ my $testopt=GetOptions(
            "set-group=s" => \$set_group,
            "set-name=s" => \$set_name,
            "update-rolegroups" => \$update_rolegroups,
-           "kill-rolegroups" => \$kill_rolegroups,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-managementgroup");
@@ -376,12 +373,7 @@ if ($set_group ne "" and $set_name ne ""){
 
 #  --update-rolegroups
 if ($update_rolegroups==1){
-    &AD_rolegroup_update(\%sophomorix_config);
-}
-
-#  --kill-rolegroups
-if ($kill_rolegroups==1){
-    &AD_rolegroup_kill(\%sophomorix_config);
+    &AD_rolegroup_update($ldap,$root_dse,$root_dns,\%sophomorix_config);
 }
 
 
