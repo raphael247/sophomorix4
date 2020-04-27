@@ -7621,14 +7621,22 @@ sub AD_dn_fetch_multivalue {
 
 
 sub AD_rolegroup_update {
-    my ($school)=@_;
+    my ($ref_sophomorix_config)=@_;
     print "HERE update\n";
+    # fetch system data
+    my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                               root_dse=>$root_dse,
+                                               root_dns=>$root_dns,
+                                               admins=>"FALSE",
+                                               sophomorix_config=>\%sophomorix_config,
+                                             });
+
 }
 
 
 
 sub AD_rolegroup_kill {
-    my ($school)=@_;
+    my ($ref_sophomorix_config)=@_;
     print "HERE kill\n";
 }
 

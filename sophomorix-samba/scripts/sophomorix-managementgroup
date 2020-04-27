@@ -186,7 +186,7 @@ Set any sophomorix-group memberships from a file (i.e. epoptes):
      # sophomorix-managementgroup --set-group epoptes --set-name default --school global
      (This will read the config in /etc/linuxmuster/sophomorix/global.epoptes.default.conf)
 
-Set rolegroups memberships:
+Set GLOBAL rolegroup memberships:
   --update-rolegroups
   --kill-rolegroups
 
@@ -376,12 +376,12 @@ if ($set_group ne "" and $set_name ne ""){
 
 #  --update-rolegroups
 if ($update_rolegroups==1){
-    &AD_rolegroup_update($school);
+    &AD_rolegroup_update(\%sophomorix_config);
 }
 
 #  --kill-rolegroups
 if ($kill_rolegroups==1){
-    &AD_rolegroup_kill($school);
+    &AD_rolegroup_kill(\%sophomorix_config);
 }
 
 
