@@ -277,7 +277,7 @@ if ($add_check==1){
 
     my $command_add="sophomorix-check $all_options ";
     &run_command($command_add);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",12);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",16);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
@@ -296,6 +296,96 @@ if ($add_do==1){
     # i.E.: 
     #  Hugo Peréz of bsz gets perezhu 
     #  Hugo Peréz of default-school gets perezhu1
+
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24
     &AD_test_object({ldap=>$ldap,
@@ -561,6 +651,96 @@ if ($add_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -853,7 +1033,7 @@ if ($modify_1_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",3);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",13);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
@@ -861,7 +1041,7 @@ if ($modify_1_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",3);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",13);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -872,6 +1052,96 @@ if ($modify_1_do==1){
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
 
+
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24
     &AD_test_object({ldap=>$ldap,
@@ -1137,6 +1407,96 @@ if ($modify_1_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -1428,7 +1788,7 @@ if ($modify_2_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",3);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",13);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
@@ -1436,7 +1796,7 @@ if ($modify_2_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",3);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",13);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -1447,6 +1807,95 @@ if ($modify_2_do==1){
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
 
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24
     &AD_test_object({ldap=>$ldap,
@@ -1712,6 +2161,96 @@ if ($modify_2_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -2003,7 +2542,7 @@ if ($modify_3_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",4);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
@@ -2011,7 +2550,7 @@ if ($modify_3_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",4);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -2022,6 +2561,95 @@ if ($modify_3_do==1){
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
 
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24
     &AD_test_object({ldap=>$ldap,
@@ -2287,6 +2915,96 @@ if ($modify_3_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -2586,7 +3304,7 @@ if ($modify_4_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",4);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
@@ -2594,7 +3312,7 @@ if ($modify_4_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",4);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",8);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -2605,6 +3323,95 @@ if ($modify_4_do==1){
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
 
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24
     &AD_test_object({ldap=>$ldap,
@@ -2870,6 +3677,96 @@ if ($modify_4_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -3175,7 +4072,7 @@ if ($modify_5_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",2);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",10);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
@@ -3183,7 +4080,7 @@ if ($modify_5_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",2);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",10);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -3194,6 +4091,95 @@ if ($modify_5_do==1){
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
 
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24 -> extrastudents.csv in Klasse alumni
     &AD_test_object({ldap=>$ldap,
@@ -3459,6 +4445,96 @@ if ($modify_5_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -3756,7 +4832,7 @@ if ($modify_6_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",2);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",10);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
@@ -3764,7 +4840,7 @@ if ($modify_6_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",2);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",10);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -3775,6 +4851,95 @@ if ($modify_6_do==1){
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
 
+    # bsz teacher b-bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-bjarna24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"b-bjarna24",
+                   sAMAccountname=>"b-bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "b-bjarna24@".$root_dns,
+                   mail => "b-bjarna24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz teacher b-skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=b-skula24,OU=Teachers,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"b-skula24",
+                   sAMAccountname=>"b-skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\teachers\\b-skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/teachers/b-skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "b-skula24@".$root_dns,
+                   mail => "b-skula24@"."teacher.bsz.de",
+                   sophomorixAdminClass => "bsz-teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "bsz-teachers|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
 
     # bsz teacher b-oe24 -> extrastudents.csv in Klasse alumni
     &AD_test_object({ldap=>$ldap,
@@ -4040,6 +5205,96 @@ if ($modify_6_do==1){
                    accountExpires => "0",
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
 
     # default-school teacher oe24
@@ -4332,18 +5587,18 @@ if ($workflow_10_check==1){
     my $command_check="sophomorix-check $all_options ";
     &run_command($command_check);
 
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",5);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",11);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
 
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",5);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",11);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -4710,6 +5965,96 @@ if ($workflow_10_do==1){
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
+    # default-school teacher bjarna24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Elmar Bjarnason",
+                   givenName=>"Jürgen Elmar",
+                   name=>"bjarna24",
+                   sAMAccountname=>"bjarna24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\bjarna24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/bjarna24",
+                   sn=>"Bjarnason",
+                   userPrincipalName => "bjarna24@".$root_dns,
+                   mail => "bjarna24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster23!",
+                   sophomorixFirstnameASCII => "Juergen Elmar",
+                   sophomorixSurnameASCII  => "Bjarnason",
+                   sophomorixFirstnameInitial => "J. E.",
+                   sophomorixSurnameInitial  => "B.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "04.03.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
+    # default-school teacher skula24
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=skula24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ari Freyr Skúlason",
+                   givenName=>"Ari Freyr",
+                   name=>"skula24",
+                   sAMAccountname=>"skula24",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\default-school\\teachers\\skula24",
+                   unixHomeDirectory=>"/srv/samba/schools/default-school/teachers/skula24",
+                   sn=>"Skúlason",
+                   userPrincipalName => "skula24@".$root_dns,
+                   mail => "skula24@"."linuxmuster.local",
+                   sophomorixAdminClass => "teachers",
+                   sophomorixExitAdminClass => "unknown",
+#                   sophomorixFirstPassword => "LinuxMuster!",
+                   sophomorixFirstnameASCII => "Ari Freyr",
+                   sophomorixSurnameASCII  => "Skulason",
+                   sophomorixFirstnameInitial => "A. F.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "14.05.1987",
+                   sophomorixRole => "teacher",
+                   sophomorixQuota=>"default-school:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixMailQuota=>"---:---:",
+                   sophomorixMailQuotaCalculated=>"1",
+                   sophomorixSchoolPrefix => "---",
+                   sophomorixSchoolname => "default-school",
+                   sophomorixAdminFile => "teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "default",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: false|lm:quotas:apply: true",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "U",
+                   sophomorixUnid => "---",
+                   memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
+                  });
+
     # default-school teacher oe24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=oe24,OU=alumni,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -4999,18 +6344,18 @@ if ($workflow_11_check==1){
     my $command_check="sophomorix-check $all_options ";
     &run_command($command_check);
 
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",5);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",11);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
     &run_command($command_check);
 
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",2);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",5);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
-    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",11);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 
 
@@ -5377,9 +6722,6 @@ if ($workflow_11_do==1){
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-### ?????????
-
-
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -5469,10 +6811,6 @@ if ($workflow_11_do==1){
                    sophomorixUnid => "---",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
-
-
-
-
 
     # default-school teacher oe24
     &AD_test_object({ldap=>$ldap,
@@ -5741,6 +7079,9 @@ if ($workflow_11_do==1){
                   });
 
 }
+
+
+
 
 
 
