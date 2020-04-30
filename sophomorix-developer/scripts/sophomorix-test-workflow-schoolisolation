@@ -50,6 +50,10 @@ my $workflow_14_check=0;
 my $workflow_15_check=0;
 my $workflow_16_check=0;
 my $workflow_17_check=0;
+my $workflow_18_check=0;
+my $workflow_19_check=0;
+my $workflow_20_check=0;
+my $workflow_21_check=0;
 my $kill_user_check=0;
 my $kill_adminclasses_check=0;
 my $kill_projects_check=0;
@@ -69,6 +73,10 @@ my $workflow_14_do=0;
 my $workflow_15_do=0;
 my $workflow_16_do=0;
 my $workflow_17_do=0;
+my $workflow_18_do=0;
+my $workflow_19_do=0;
+my $workflow_20_do=0;
+my $workflow_21_do=0;
 my $kill_user_do=0;
 my $kill_adminclasses_do=0;
 my $kill_projects_do=0;
@@ -106,6 +114,10 @@ my $testopt=GetOptions(
            "workflow-15-check" => \$workflow_15_check,
            "workflow-16-check" => \$workflow_16_check,
            "workflow-17-check" => \$workflow_17_check,
+           "workflow-18-check" => \$workflow_18_check,
+           "workflow-19-check" => \$workflow_19_check,
+           "workflow-20-check" => \$workflow_20_check,
+           "workflow-21-check" => \$workflow_21_check,
            "modify-1-do" => \$modify_1_do,
            "modify-2-do" => \$modify_2_do,
            "modify-3-do" => \$modify_3_do,
@@ -120,6 +132,10 @@ my $testopt=GetOptions(
            "workflow-15-do" => \$workflow_15_do,
            "workflow-16-do" => \$workflow_16_do,
            "workflow-17-do" => \$workflow_17_do,
+           "workflow-18-do" => \$workflow_18_do,
+           "workflow-19-do" => \$workflow_19_do,
+           "workflow-20-do" => \$workflow_20_do,
+           "workflow-21-do" => \$workflow_21_do,
            "kill-user-check" => \$kill_user_check,
            "kill-adminclasses-check" => \$kill_adminclasses_check,
            "kill-projects-check" => \$kill_projects_check,
@@ -231,6 +247,18 @@ Step by step Test:
   Workflow with the users: default-school
       sophomorix-test-workflow-schoolisolation --workflow-17-check
       sophomorix-test-workflow-schoolisolation --workflow-17-do
+  Workflow with the users: bsz
+      sophomorix-test-workflow-schoolisolation --workflow-18-check
+      sophomorix-test-workflow-schoolisolation --workflow-18-do
+  Workflow with the users: default-school
+      sophomorix-test-workflow-schoolisolation --workflow-19-check
+      sophomorix-test-workflow-schoolisolation --workflow-19-do
+  Workflow with the users: bsz
+      sophomorix-test-workflow-schoolisolation --workflow-20-check
+      sophomorix-test-workflow-schoolisolation --workflow-20-do
+  Workflow with the users: default-school
+      sophomorix-test-workflow-schoolisolation --workflow-21-check
+      sophomorix-test-workflow-schoolisolation --workflow-21-do  
 
   Test if users are killed:
       sophomorix-test-workflow-schoolisolation --kill-user-test
@@ -281,6 +309,14 @@ if ($full==1){
     $workflow_16_do=1;
     $workflow_17_check=1;
     $workflow_17_do=1;
+    $workflow_18_check=1;
+    $workflow_18_do=1;
+    $workflow_19_check=1;
+    $workflow_19_do=1;
+    $workflow_20_check=1;
+    $workflow_20_do=1;
+    $workflow_21_check=1;
+    $workflow_21_do=1;
     $kill_user_check=1;
     $kill_user_do=1;
     $kill_user_test=1;
@@ -11234,6 +11270,223 @@ if ($workflow_15_do==1){
 
 
 
+############################################################
+# --workflow-16-check --workflow-16-do
+############################################################
+if ($workflow_16_check==1){
+
+    my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name bsz.students.csv ".
+                        "/usr/share/sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-16.utf8";
+    my $command_newfile_2="sophomorix-newfile $all_options --keep-file --name bsz.teachers.csv ".
+                        "/usr/share/sophomorix-developer/testdata/bsz.teachers.csv-workflow-schoolisolation-16.utf8";
+    &run_command($command_newfile_1);
+    &run_command($command_newfile_2);
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",5);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+}
+############################################################
+if ($workflow_16_do==1){
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
+}
+
+############################################################
+# --workflow-17-check --workflow-17-do
+############################################################
+if ($workflow_17_check==1){
+
+    my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name students.csv ".
+                        "/usr/share/sophomorix-developer/testdata/students.csv-workflow-schoolisolation-17.utf8";
+    my $command_newfile_2="sophomorix-newfile $all_options --keep-file --name teachers.csv ".
+                        "/usr/share/sophomorix-developer/testdata/teachers.csv-workflow-schoolisolation-17.utf8";
+    &run_command($command_newfile_1);
+    &run_command($command_newfile_2);
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",5);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",9);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+}
+############################################################
+if ($workflow_17_do==1){
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
+}
+
+
+
+############################################################
+# --workflow-18-check --workflow-18-do
+############################################################
+if ($workflow_18_check==1){
+
+    # set back toleration time of all 7 remaining users in bsz
+    my $dn_b_bjarna="CN=b-bjarna24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_bjarna,"20170101000001.0Z","---");
+    my $dn_b_skula="CN=b-skula24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_skula,"20170101000002.0Z","---");
+    my $dn_b_oe="CN=b-oe24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_oe,"20170101000002.0Z","---");
+    my $dn_b_wu="CN=b-wu24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_wu,"20170101000002.0Z","---");
+    my $dn_muelleju="CN=muelleju,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_muelleju,"20170101000004.0Z","---");
+    my $dn_stefanol="CN=stefanol,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_stefanol,"20170101000005.0Z","---");
+    my $dn_perezhu="CN=perezhu,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse; 
+    &AD_user_timeupdate($ldap,$root_dse,$dn_perezhu,"20170101000006.0Z","---");
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+}
+############################################################
+if ($workflow_18_do==1){
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
+}
+
+
+############################################################
+# --workflow-19-check --workflow-19-do
+############################################################
+if ($workflow_19_check==1){
+
+    # set back toleration time of all 7 remaining users in default-school
+    my $dn_b_bjarna="CN=bjarna24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_bjarna,"20170101000001.0Z","---");
+    my $dn_b_skula="CN=skula24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_skula,"20170101000002.0Z","---");
+    my $dn_b_oe="CN=oe24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_oe,"20170101000002.0Z","---");
+    my $dn_b_wu="CN=wu24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_wu,"20170101000002.0Z","---");
+    my $dn_muelleju="CN=muelleju1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_muelleju,"20170101000004.0Z","---");
+    my $dn_stefanol="CN=stefanol1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_stefanol,"20170101000005.0Z","---");
+    my $dn_perezhu="CN=perezhu1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse; 
+    &AD_user_timeupdate($ldap,$root_dse,$dn_perezhu,"20170101000006.0Z","---");
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+}
+############################################################
+if ($workflow_19_do==1){
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
+}
+
+
+
+############################################################
+# --workflow-20-check --workflow-20-do
+############################################################
+if ($workflow_20_check==1){
+
+    # set back deactivation time of all 7 remaining users in bsz
+    my $dn_b_bjarna="CN=b-bjarna24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_bjarna,"---","20170101000001.0Z");
+    my $dn_b_skula="CN=b-skula24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_skula,"---","20170101000002.0Z");
+    my $dn_b_oe="CN=b-oe24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_oe,"---","20170101000002.0Z");
+    my $dn_b_wu="CN=b-wu24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_wu,"---","20170101000002.0Z");
+    my $dn_muelleju="CN=muelleju,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_muelleju,"---","20170101000004.0Z");
+    my $dn_stefanol="CN=stefanol,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_stefanol,"---","20170101000005.0Z");
+    my $dn_perezhu="CN=perezhu,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse; 
+    &AD_user_timeupdate($ldap,$root_dse,$dn_perezhu,"---","20170101000006.0Z");
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+
+}
+############################################################
+if ($workflow_20_do==1){
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
+}
+
+############################################################
+# --workflow-21-check --workflow-21-do
+############################################################
+if ($workflow_21_check==1){
+
+    # set back deactivation time of all 7 remaining users in default-school
+    my $dn_b_bjarna="CN=bjarna24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_bjarna,"---","20180101000001.0Z");
+    my $dn_b_skula="CN=skula24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_skula,"---","20180101000002.0Z");
+    my $dn_b_oe="CN=oe24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_oe,"---","20180101000002.0Z");
+    my $dn_b_wu="CN=wu24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_b_wu,"---","20180101000002.0Z");
+    my $dn_muelleju="CN=muelleju1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_muelleju,"---","20180101000004.0Z");
+    my $dn_stefanol="CN=stefanol1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
+    &AD_user_timeupdate($ldap,$root_dse,$dn_stefanol,"---","20180101000005.0Z");
+    my $dn_perezhu="CN=perezhu1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse; 
+    &AD_user_timeupdate($ldap,$root_dse,$dn_perezhu,"---","20180101000006.0Z");
+
+    my $command_check="sophomorix-check $all_options ";
+    &run_command($command_check);
+
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.add",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.update",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",7);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
+    &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
+
+}
+############################################################
+if ($workflow_21_do==1){
+    &run_command("sophomorix-add $all_options");
+    &run_command("sophomorix-update $all_options");
+    &run_command("sophomorix-kill $all_options");
+}
+
+
+#exit;
+
+
+
+
 
 
 
@@ -11245,25 +11498,25 @@ if ($workflow_15_do==1){
 
 if ($kill_user_do==1){
     # kill users
-    &run_command("sophomorix-kill $all_options --killuser b-bjarna24");
-    &run_command("sophomorix-kill $all_options --killuser b-skula24");
-    &run_command("sophomorix-kill $all_options --killuser b-rukri24");
-    &run_command("sophomorix-kill $all_options --killuser b-oe24");
-    &run_command("sophomorix-kill $all_options --killuser b-wu24");
-    &run_command("sophomorix-kill $all_options --killuser stefanol");
-    &run_command("sophomorix-kill $all_options --killuser muelleju");
-    &run_command("sophomorix-kill $all_options --killuser perezhu");
-    &run_command("sophomorix-kill $all_options --killuser maieran");
+#    &run_command("sophomorix-kill $all_options --killuser b-bjarna24");
+#    &run_command("sophomorix-kill $all_options --killuser b-skula24");
+#    &run_command("sophomorix-kill $all_options --killuser b-rukri24");
+#    &run_command("sophomorix-kill $all_options --killuser b-oe24");
+#    &run_command("sophomorix-kill $all_options --killuser b-wu24");
+#    &run_command("sophomorix-kill $all_options --killuser stefanol");
+#    &run_command("sophomorix-kill $all_options --killuser muelleju");
+#    &run_command("sophomorix-kill $all_options --killuser perezhu");
+#    &run_command("sophomorix-kill $all_options --killuser maieran");
 
-    &run_command("sophomorix-kill $all_options --killuser bjarna24");
-    &run_command("sophomorix-kill $all_options --killuser skula24");
-    &run_command("sophomorix-kill $all_options --killuser rukri24");
-    &run_command("sophomorix-kill $all_options --killuser oe24");
-    &run_command("sophomorix-kill $all_options --killuser wu24");
-    &run_command("sophomorix-kill $all_options --killuser stefanol1");
-    &run_command("sophomorix-kill $all_options --killuser muelleju1");
-    &run_command("sophomorix-kill $all_options --killuser perezhu1");
-    &run_command("sophomorix-kill $all_options --killuser maieran1");
+#    &run_command("sophomorix-kill $all_options --killuser bjarna24");
+#    &run_command("sophomorix-kill $all_options --killuser skula24");
+#    &run_command("sophomorix-kill $all_options --killuser rukri24");
+#    &run_command("sophomorix-kill $all_options --killuser oe24");
+#    &run_command("sophomorix-kill $all_options --killuser wu24");
+#    &run_command("sophomorix-kill $all_options --killuser stefanol1");
+#    &run_command("sophomorix-kill $all_options --killuser muelleju1");
+#    &run_command("sophomorix-kill $all_options --killuser perezhu1");
+#    &run_command("sophomorix-kill $all_options --killuser maieran1");
 
 }
 
