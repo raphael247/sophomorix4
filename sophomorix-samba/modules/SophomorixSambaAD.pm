@@ -5045,7 +5045,8 @@ sub AD_get_AD_for_check {
                        sort $entry->get_value('sophomorixIntrinsicMulti5');
 
                    # LIST for rolegroups
-                   push @{ $AD{'LIST_by_sophomorixRole'}{$role}{'GLOBAL'} }, $dn;
+                   push @{ $AD{'LIST_user_by_sophomorixRole'}{$role}{'GLOBAL'} }, $sam;
+                   push @{ $AD{'LIST_dn_by_sophomorixRole'}{$role}{'GLOBAL'} }, $dn;
 
                    # LOOKUP
                    $AD{'LOOKUP'}{'sophomorixRole_BY_sAMAccountName'}{$sam}=$entry->get_value('sophomorixRole');
@@ -7633,18 +7634,29 @@ sub AD_rolegroup_update {
                                              });
     foreach my $role (keys %{ $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'} }){
         my $rolegroup="role-".$role;
+        if (not defined $ref_AD_check->{'LIST_user_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou}){
+            print "Skipping sophomorixRole $role: no users of this role found\n";
+            next;
+        }
         print "Setting member attribute of rolegroup $rolegroup\n";
         print "  $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'}{$role}{'GLOBAL_rolegroup_dn'}\n";
         print "to:\n";
-        print Dumper ($ref_AD_check->{'LIST_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou});
-        my $member_count=$#{ $ref_AD_check->{'LIST_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} }+1;
-        print "$member_count members in $rolegroup\n";
-        print "\n";
+        print Dumper ($ref_AD_check->{'LIST_user_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou});
 
-        my $mesg = $ldap->modify( $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'}{$role}{'GLOBAL_rolegroup_dn'},
-                          replace => { 'member' => $ref_AD_check->{'LIST_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} } 
-                         );
-        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+        foreach my $user (@{ $ref_AD_check->{'LIST_user_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} }){
+            &AD_group_addmember({ldap => $ldap,
+                                  root_dse => $root_dse,
+                                  group => $rolegroup,
+                                  addmember => $user,
+                                });
+        }
+        # my $member_count=$#{ $ref_AD_check->{'LIST_dn_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} }+1;
+        # print "$member_count members in $rolegroup\n";
+        # print "\n";
+        # my $mesg = $ldap->modify( $ref_sophomorix_config->{'LOOKUP'}{'ROLES_USER'}{$role}{'GLOBAL_rolegroup_dn'},
+        #     replace => { 'member' => $ref_AD_check->{'LIST_dn_by_sophomorixRole'}{$role}{$DevelConf::AD_global_ou} } 
+        #                         );
+        # &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
 }
 
