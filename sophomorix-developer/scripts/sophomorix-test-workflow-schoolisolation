@@ -270,7 +270,6 @@ Step by step Test:
 
 &run_command("mkdir -p /var/lib/sophomorix/check-result");
 
-
 # --full
 if ($full==1){
     $add_check=1;
@@ -319,8 +318,9 @@ if ($full==1){
 }
 
 
+
 ############################################################
-# Adding users
+# --add-check --add-do
 ############################################################
 if ($add_check==1){
     my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name students.csv ".
@@ -345,7 +345,6 @@ if ($add_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
-
 
 ############################################################
 if ($add_do==1){
@@ -755,6 +754,7 @@ if ($add_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -1012,6 +1012,7 @@ if ($add_do==1){
                    userAccountControl => "66048",
                    memberOf => "teachers|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school teacher oe24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=oe24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -1274,6 +1275,7 @@ if ($add_do==1){
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -1398,8 +1400,6 @@ if ($add_do==1){
 
 
 
-
-
 ############################################################
 # --modify-1-check --modify-1-do
 ############################################################
@@ -1429,9 +1429,8 @@ if ($modify_1_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",15);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
+
 ############################################################
 if ($modify_1_do==1){
     &run_command("sophomorix-add $all_options");
@@ -1844,6 +1843,7 @@ if ($modify_1_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -1965,6 +1965,7 @@ if ($modify_1_do==1){
         memberOf => "bsz-students",
         member => "stefanol",
         });
+
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -2370,6 +2371,7 @@ if ($modify_1_do==1){
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -2523,8 +2525,6 @@ if ($modify_2_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",15);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
 
 ############################################################
@@ -2938,6 +2938,7 @@ if ($modify_2_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-8a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -3059,6 +3060,7 @@ if ($modify_2_do==1){
         memberOf => "bsz-students",
         member => "stefanol",
         });
+
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -3464,6 +3466,7 @@ if ($modify_2_do==1){
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -3616,8 +3619,6 @@ if ($modify_3_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
 
 ############################################################
@@ -4031,6 +4032,7 @@ if ($modify_3_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -4581,6 +4583,7 @@ if ($modify_3_do==1){
                    userAccountControl => "66048",
                    memberOf => "8a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -4706,20 +4709,10 @@ if ($modify_3_do==1){
 
 
 
-
-
-
-
-
-
-
-
 ############################################################
 # --modify-4-check --modify-4-do
 ############################################################
 if ($modify_4_check==1){
-
-
     my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name students.csv ".
                         "/usr/share/sophomorix-developer/testdata/students.csv-workflow-schoolisolation-4.utf8";
     my $command_newfile_2="sophomorix-newfile $all_options --keep-file --name teachers.csv ".
@@ -4743,9 +4736,8 @@ if ($modify_4_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
+
 ############################################################
 if ($modify_4_do==1){
     &run_command("sophomorix-add $all_options");
@@ -5157,6 +5149,7 @@ if ($modify_4_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -5707,6 +5700,7 @@ if ($modify_4_do==1){
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -5855,23 +5849,10 @@ if ($modify_4_do==1){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ############################################################
 # --modify-5-check --modify-5-do
 ############################################################
 if ($modify_5_check==1){
-
-
     my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name bsz.students.csv ".
                         "/usr/share/sophomorix-developer/testdata/bsz.students.csv-workflow-schoolisolation-5.utf8";
     my $command_newfile_2="sophomorix-newfile $all_options --keep-file --name bsz.teachers.csv ".
@@ -5898,9 +5879,8 @@ if ($modify_5_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",16);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
+
 ############################################################
 if ($modify_5_do==1){
     &run_command("sophomorix-add $all_options");
@@ -6312,6 +6292,7 @@ if ($modify_5_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -6908,6 +6889,7 @@ if ($modify_5_do==1){
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -7056,15 +7038,10 @@ if ($modify_5_do==1){
 
 
 
-
-
-
 ############################################################
 # --modify-6-check --modify-6-do
 ############################################################
 if ($modify_6_check==1){
-
-
     my $command_newfile_1="sophomorix-newfile $all_options --keep-file --name students.csv ".
                         "/usr/share/sophomorix-developer/testdata/students.csv-workflow-schoolisolation-6.utf8";
     my $command_newfile_2="sophomorix-newfile $all_options --keep-file --name teachers.csv ".
@@ -7091,9 +7068,8 @@ if ($modify_6_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",16);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
+
 ############################################################
 if ($modify_6_do==1){
     &run_command("sophomorix-add $all_options");
@@ -7505,6 +7481,7 @@ if ($modify_6_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -7695,6 +7672,7 @@ if ($modify_6_do==1){
         memberOf => "bsz-students",
         member => "",
         });
+
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -8100,6 +8078,7 @@ if ($modify_6_do==1){
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -8294,8 +8273,6 @@ if ($modify_6_do==1){
 
 
 
-
-
 ############################################################
 # --workflow-10-check --workflow-10-do
 ############################################################
@@ -8327,9 +8304,8 @@ if ($workflow_10_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",10);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
+
 ############################################################
 if ($workflow_10_do==1){
     &run_command("sophomorix-add $all_options");
@@ -8565,6 +8541,183 @@ if ($workflow_10_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-10a|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
+    # bsz student stefanol -> teacher
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=stefanol,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Ólafur Indriði Stefánsson",
+                   givenName=>"Ólafur Indriði",
+                   name=>"stefanol",
+                   sAMAccountname=>"stefanol",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\stefanol",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/stefanol",
+                   sn=>"Stefánsson",
+                   userPrincipalName => "stefanol@".$root_dns,
+                   mail => "stefanol@"."student.bsz.de",
+                   sophomorixAdminClass => "bsz-attic",
+                   sophomorixExitAdminClass => "bsz-teachers",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Olafur Indridi",
+                   sophomorixSurnameASCII  => "Stefansson",
+                   sophomorixFirstnameInitial => "Ó. I.",
+                   sophomorixSurnameInitial  => "S.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "03.07.1973",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.teachers.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "T",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz student muelleju
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=muelleju,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Jürgen Müller",
+                   givenName=>"Jürgen",
+                   name=>"muelleju",
+                   sAMAccountname=>"muelleju",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\muelleju",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/muelleju",
+                   sn=>"Müller",
+                   userPrincipalName => "muelleju@".$root_dns,
+                   mail => "muelleju@"."student.bsz.de",
+                   sophomorixAdminClass => "bsz-attic",
+                   sophomorixExitAdminClass => "bsz-7b",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Juergen",
+                   sophomorixSurnameASCII  => "Mueller",
+                   sophomorixFirstnameInitial => "J.",
+                   sophomorixSurnameInitial  => "M.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "10.11.1988",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "T",
+                   sophomorixUnid => "unid1234",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz student perezhu -> extrastudents.csv, Klasse web
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=perezhu,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"Hugo Pérez",
+                   givenName=>"Hugo",
+                   name=>"perezhu",
+                   sAMAccountname=>"perezhu",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\perezhu",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/perezhu",
+                   sn=>"Pérez",
+                   userPrincipalName => "perezhu@".$root_dns,
+                   mail => "perezhu@"."student.bsz.de",
+                   sophomorixAdminClass => "bsz-attic",
+                   sophomorixExitAdminClass => "bsz-web",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Hugo",
+                   sophomorixSurnameASCII  => "Perez",
+                   sophomorixFirstnameInitial => "H.",
+                   sophomorixSurnameInitial  => "P.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "10.10.1986",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.extrastudents.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "T",
+                   sophomorixUnid => "---",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
+    # bsz student maieran
+    &AD_test_object({ldap=>$ldap,
+                   dn=>"CN=maieran,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
+                   #####
+                   displayName=>"André Maier",
+                   givenName=>"André",
+                   name=>"maieran",
+                   sAMAccountname=>"maieran",
+                   homeDrive=>"H:",
+                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\maieran",
+                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/maieran",
+                   sn=>"Maier",
+                   userPrincipalName => "maieran@".$root_dns,
+                   mail => "maieran@"."student.bsz.de",
+                   sophomorixAdminClass => "bsz-attic",
+                   sophomorixExitAdminClass => "bsz-10a",
+#                   sophomorixFirstPassword => "Muster!",
+                   sophomorixFirstnameASCII => "Andre",
+                   sophomorixSurnameASCII  => "Maier",
+                   sophomorixFirstnameInitial => "A.",
+                   sophomorixSurnameInitial  => "M.",
+                   sophomorixCloudQuotaCalculated => "---",
+                   sophomorixUserToken => "---",
+                   sophomorixBirthdate  => "12.12.1987",
+                   sophomorixRole => "student",
+                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
+                   sophomorixSchoolPrefix => "bsz",
+                   sophomorixSchoolname => "bsz",
+                   sophomorixAdminFile => "bsz.students.csv",
+                   sophomorixCreationDate => "exists",
+                   sophomorixTolerationDate => "exists",
+                   sophomorixDeactivationDate => "default",
+                   sophomorixComment => "created by sophomorix",
+                   sophomorixWebuiDashboard => "---",
+                   sophomorixWebuiPermissions => "",
+                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
+                   sophomorixExamMode => "---",
+                   sophomorixStatus => "T",
+                   sophomorixUnid => "unid2345",
+                   accountExpires => "0",
+                   userAccountControl => "66048",
+                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                  });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -8779,181 +8932,6 @@ if ($workflow_10_do==1){
         member => "",
         });
 
-    # bsz student stefanol -> teacher
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=stefanol,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Ólafur Indriði Stefánsson",
-                   givenName=>"Ólafur Indriði",
-                   name=>"stefanol",
-                   sAMAccountname=>"stefanol",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\stefanol",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/stefanol",
-                   sn=>"Stefánsson",
-                   userPrincipalName => "stefanol@".$root_dns,
-                   mail => "stefanol@"."student.bsz.de",
-                   sophomorixAdminClass => "bsz-attic",
-                   sophomorixExitAdminClass => "bsz-teachers",
-#                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Olafur Indridi",
-                   sophomorixSurnameASCII  => "Stefansson",
-                   sophomorixFirstnameInitial => "Ó. I.",
-                   sophomorixSurnameInitial  => "S.",
-                   sophomorixCloudQuotaCalculated => "---",
-                   sophomorixUserToken => "---",
-                   sophomorixBirthdate  => "03.07.1973",
-                   sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixAdminFile => "bsz.teachers.csv",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixWebuiDashboard => "---",
-                   sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "T",
-                   sophomorixUnid => "---",
-                   accountExpires => "0",
-                   userAccountControl => "66048",
-                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
-
-    # bsz student muelleju
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=muelleju,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Jürgen Müller",
-                   givenName=>"Jürgen",
-                   name=>"muelleju",
-                   sAMAccountname=>"muelleju",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\muelleju",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/muelleju",
-                   sn=>"Müller",
-                   userPrincipalName => "muelleju@".$root_dns,
-                   mail => "muelleju@"."student.bsz.de",
-                   sophomorixAdminClass => "bsz-attic",
-                   sophomorixExitAdminClass => "bsz-7b",
-#                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Juergen",
-                   sophomorixSurnameASCII  => "Mueller",
-                   sophomorixFirstnameInitial => "J.",
-                   sophomorixSurnameInitial  => "M.",
-                   sophomorixCloudQuotaCalculated => "---",
-                   sophomorixUserToken => "---",
-                   sophomorixBirthdate  => "10.11.1988",
-                   sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixAdminFile => "bsz.students.csv",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixWebuiDashboard => "---",
-                   sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "T",
-                   sophomorixUnid => "unid1234",
-                   accountExpires => "0",
-                   userAccountControl => "66048",
-                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
-
-    # bsz student perezhu -> extrastudents.csv, Klasse web
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=perezhu,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"Hugo Pérez",
-                   givenName=>"Hugo",
-                   name=>"perezhu",
-                   sAMAccountname=>"perezhu",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\perezhu",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/perezhu",
-                   sn=>"Pérez",
-                   userPrincipalName => "perezhu@".$root_dns,
-                   mail => "perezhu@"."student.bsz.de",
-                   sophomorixAdminClass => "bsz-attic",
-                   sophomorixExitAdminClass => "bsz-web",
-#                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Hugo",
-                   sophomorixSurnameASCII  => "Perez",
-                   sophomorixFirstnameInitial => "H.",
-                   sophomorixSurnameInitial  => "P.",
-                   sophomorixCloudQuotaCalculated => "---",
-                   sophomorixUserToken => "---",
-                   sophomorixBirthdate  => "10.10.1986",
-                   sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixAdminFile => "bsz.extrastudents.csv",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixWebuiDashboard => "---",
-                   sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "T",
-                   sophomorixUnid => "---",
-                   accountExpires => "0",
-                   userAccountControl => "66048",
-                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
-
-    # bsz student maieran
-    &AD_test_object({ldap=>$ldap,
-                   dn=>"CN=maieran,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse,
-                   #####
-                   displayName=>"André Maier",
-                   givenName=>"André",
-                   name=>"maieran",
-                   sAMAccountname=>"maieran",
-                   homeDrive=>"H:",
-                   homeDirectory=>"\\\\bionic\\bsz\\students\\attic\\maieran",
-                   unixHomeDirectory=>"/srv/samba/schools/bsz/students/attic/maieran",
-                   sn=>"Maier",
-                   userPrincipalName => "maieran@".$root_dns,
-                   mail => "maieran@"."student.bsz.de",
-                   sophomorixAdminClass => "bsz-attic",
-                   sophomorixExitAdminClass => "bsz-10a",
-#                   sophomorixFirstPassword => "Muster!",
-                   sophomorixFirstnameASCII => "Andre",
-                   sophomorixSurnameASCII  => "Maier",
-                   sophomorixFirstnameInitial => "A.",
-                   sophomorixSurnameInitial  => "M.",
-                   sophomorixCloudQuotaCalculated => "---",
-                   sophomorixUserToken => "---",
-                   sophomorixBirthdate  => "12.12.1987",
-                   sophomorixRole => "student",
-                   sophomorixQuota=>"bsz:---:---:new:---:|linuxmuster-global:---:---:new:---:",
-                   sophomorixSchoolPrefix => "bsz",
-                   sophomorixSchoolname => "bsz",
-                   sophomorixAdminFile => "bsz.students.csv",
-                   sophomorixCreationDate => "exists",
-                   sophomorixTolerationDate => "exists",
-                   sophomorixDeactivationDate => "default",
-                   sophomorixComment => "created by sophomorix",
-                   sophomorixWebuiDashboard => "---",
-                   sophomorixWebuiPermissions => "",
-                   sophomorixWebuiPermissionsCalculated => "lm:printers: true|lm:quotas:apply: false",
-                   sophomorixExamMode => "---",
-                   sophomorixStatus => "T",
-                   sophomorixUnid => "unid2345",
-                   accountExpires => "0",
-                   userAccountControl => "66048",
-                   memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
-                  });
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bjarna24,OU=Teachers,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -9359,6 +9337,7 @@ if ($workflow_10_do==1){
                    userAccountControl => "66048",
                    memberOf => "10a|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -9585,9 +9564,8 @@ if ($workflow_11_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",10);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
-
 }
+
 ############################################################
 if ($workflow_11_do==1){
     &run_command("sophomorix-add $all_options");
@@ -9999,6 +9977,7 @@ if ($workflow_11_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -10212,6 +10191,7 @@ if ($workflow_11_do==1){
         memberOf => "bsz-students",
         member => "",
         });
+
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
                    dn=>"CN=bjarna24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse,
@@ -10617,6 +10597,7 @@ if ($workflow_11_do==1){
                    userAccountControl => "66048",
                    memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -10834,9 +10815,6 @@ if ($workflow_11_do==1){
 
 
 
-#exit;
-
-
 ############################################################
 # --workflow-12-check --workflow-12-do
 ############################################################
@@ -10879,6 +10857,7 @@ if ($workflow_12_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
+
 ############################################################
 if ($workflow_12_do==1){
     &run_command("sophomorix-add $all_options");
@@ -11290,6 +11269,7 @@ if ($workflow_12_do==1){
                    userAccountControl => "66050",
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -11909,6 +11889,7 @@ if ($workflow_12_do==1){
                    userAccountControl => "66048",
                    memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -12126,11 +12107,6 @@ if ($workflow_12_do==1){
 
 
 
-
-
-#exit;
-
-
 ############################################################
 # --workflow-13-check --workflow-13-do
 ############################################################
@@ -12173,6 +12149,7 @@ if ($workflow_13_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
+
 ############################################################
 if ($workflow_13_do==1){
     &run_command("sophomorix-add $all_options");
@@ -12584,6 +12561,7 @@ if ($workflow_13_do==1){
                    userAccountControl => "66050",
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -13203,6 +13181,7 @@ if ($workflow_13_do==1){
                    userAccountControl => "66050",
                    memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -13419,21 +13398,13 @@ if ($workflow_13_do==1){
 }
 
 
-#exit;
-
-
 
 ############################################################
 # --workflow-14-check --workflow-14-do
 ############################################################
 if ($workflow_14_check==1){
-#    my $dn_skula="CN=b-skula24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
-#    &AD_user_timeupdate($ldap,$root_dse,$dn_skula,"20180101000002.0Z","---");
     my $dn_rukri="CN=b-rukri24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse; 
     &AD_user_timeupdate($ldap,$root_dse,$dn_rukri,"---","20180101000003.0Z");
-
-#    my $dn_stefanol="CN=stefanol,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
-#    &AD_user_timeupdate($ldap,$root_dse,$dn_stefanol,"20180101000005.0Z","---");
     my $dn_maieran="CN=maieran,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse; 
     &AD_user_timeupdate($ldap,$root_dse,$dn_maieran,"---","20180101000006.0Z");
 
@@ -13461,6 +13432,7 @@ if ($workflow_14_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",14);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
+
 ############################################################
 if ($workflow_14_do==1){
     &run_command("sophomorix-add $all_options");
@@ -13784,7 +13756,6 @@ if ($workflow_14_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
-
 
     # bsz student maieran
     &AD_object_nonexist($ldap,$root_dse,"user","maieran");
@@ -14408,6 +14379,7 @@ if ($workflow_14_do==1){
                    userAccountControl => "66050",
                    memberOf => "attic|wifi|internet|webfilter|intranet|printing",
                   });
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -14624,23 +14596,14 @@ if ($workflow_14_do==1){
 }
 
 
-#exit;
-
-
-
-
 
 ############################################################
 # --workflow-15-check --workflow-15-do
 ############################################################
 if ($workflow_15_check==1){
-#    my $dn_skula="CN=b-skula24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-#    &AD_user_timeupdate($ldap,$root_dse,$dn_skula,"20180101000002.0Z","---");
     my $dn_rukri="CN=rukri24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse; 
     &AD_user_timeupdate($ldap,$root_dse,$dn_rukri,"---","20180101000003.0Z");
 
-#    my $dn_stefanol="CN=stefanol,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
-#    &AD_user_timeupdate($ldap,$root_dse,$dn_stefanol,"20180101000005.0Z","---");
     my $dn_maieran="CN=maieran1,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse; 
     &AD_user_timeupdate($ldap,$root_dse,$dn_maieran,"---","20180101000006.0Z");
 
@@ -14668,6 +14631,7 @@ if ($workflow_15_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",12);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
+
 ############################################################
 if ($workflow_15_do==1){
     &run_command("sophomorix-add $all_options");
@@ -15748,10 +15712,6 @@ if ($workflow_15_do==1){
 
 
 
-
-#exit;
-
-
 ############################################################
 # --workflow-16-check --workflow-16-do
 ############################################################
@@ -16097,7 +16057,6 @@ if ($workflow_16_do==1){
                    userAccountControl => "66048",
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
-
 
     # bsz student maieran
     &AD_object_nonexist($ldap,$root_dse,"user","maieran");
@@ -17201,7 +17160,6 @@ if ($workflow_17_do==1){
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-
     # bsz student maieran
     &AD_object_nonexist($ldap,$root_dse,"user","maieran");
 
@@ -17741,7 +17699,6 @@ if ($workflow_17_do==1){
     # default-school student maieran1
     &AD_object_nonexist($ldap,$root_dse,"user","maieran1");
 
-
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -17989,6 +17946,7 @@ if ($workflow_18_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
+
 ############################################################
 if ($workflow_18_do==1){
     &run_command("sophomorix-add $all_options");
@@ -18313,7 +18271,6 @@ if ($workflow_18_do==1){
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-
     # bsz student maieran
     &AD_object_nonexist($ldap,$root_dse,"user","maieran");
 
@@ -19069,6 +19026,7 @@ if ($workflow_18_do==1){
 }
 
 
+
 ############################################################
 # --workflow-19-check --workflow-19-do
 ############################################################
@@ -19099,12 +19057,12 @@ if ($workflow_19_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
 }
+
 ############################################################
 if ($workflow_19_do==1){
     &run_command("sophomorix-add $all_options");
     &run_command("sophomorix-update $all_options");
     &run_command("sophomorix-kill $all_options");
-
 
     # bsz teacher b-bjarna24
     &AD_test_object({ldap=>$ldap,
@@ -19424,9 +19382,9 @@ if ($workflow_19_do==1){
                    memberOf => "bsz-attic|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
 
-
     # bsz student maieran
     &AD_object_nonexist($ldap,$root_dse,"user","maieran");
+
     # bsz group test
     # bsz-teachers
     &AD_test_object({ldap=>$ldap,
@@ -19962,6 +19920,7 @@ if ($workflow_19_do==1){
 
     # default-school student maieran1
     &AD_object_nonexist($ldap,$root_dse,"user","maieran1");    
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -20183,7 +20142,6 @@ if ($workflow_19_do==1){
 # --workflow-20-check --workflow-20-do
 ############################################################
 if ($workflow_20_check==1){
-
     # set back deactivation time of all 7 remaining users in bsz
     my $dn_b_bjarna="CN=b-bjarna24,OU=attic,OU=Students,OU=bsz,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_b_bjarna,"---","20170101000001.0Z");
@@ -20208,8 +20166,8 @@ if ($workflow_20_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",7);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",7);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
 }
+
 ############################################################
 if ($workflow_20_do==1){
     &run_command("sophomorix-add $all_options");
@@ -20440,7 +20398,6 @@ if ($workflow_20_do==1){
         memberOf => "bsz-students",
         member => "",
         });
-
 
     # default-school teacher bjarna24
     &AD_test_object({ldap=>$ldap,
@@ -20763,6 +20720,7 @@ if ($workflow_20_do==1){
 
     # default-school student maieran1
     &AD_object_nonexist($ldap,$root_dse,"user","maieran1");    
+
     # default-school group test
     # teachers
     &AD_test_object({ldap=>$ldap,
@@ -20980,11 +20938,12 @@ if ($workflow_20_do==1){
 
 }
 
+
+
 ############################################################
 # --workflow-21-check --workflow-21-do
 ############################################################
 if ($workflow_21_check==1){
-
     # set back deactivation time of all 7 remaining users in default-school
     my $dn_b_bjarna="CN=bjarna24,OU=attic,OU=Students,OU=default-school,OU=SCHOOLS,".$root_dse;
     &AD_user_timeupdate($ldap,$root_dse,$dn_b_bjarna,"---","20180101000001.0Z");
@@ -21009,8 +20968,8 @@ if ($workflow_21_check==1){
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.kill",7);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.nochange",0);
     &file_test_lines("/var/lib/sophomorix/check-result/sophomorix.error",0);
-
 }
+
 ############################################################
 if ($workflow_21_do==1){
     &run_command("sophomorix-add $all_options");
@@ -21466,25 +21425,14 @@ if ($workflow_21_do==1){
         memberOf => "students",
         member => "",
         });
-  
-
-
-
-    
 }
 
 
-#exit;
 
-
-
-
-
-
-
-
+############################################################
+# --kill-adminclasses-1-do
+############################################################
 if ($kill_adminclasses_1_do==1){
-
     &run_command("sophomorix-class --kill --class bsz-alumni");#
     &run_command("sophomorix-class --kill --class bsz-attic");
     &run_command("sophomorix-class --kill --class bsz-web");
@@ -21506,8 +21454,10 @@ if ($kill_adminclasses_1_do==1){
 
 
 
+############################################################
+# --kill-adminclasses-2-do
+############################################################
 if ($kill_adminclasses_2_do==1){
-
     &run_command("sophomorix-class --kill --class alumni");
     &run_command("sophomorix-class --kill --class attic");
     &run_command("sophomorix-class --kill --class web");
@@ -21527,10 +21477,4 @@ if ($kill_adminclasses_2_do==1){
     &AD_object_nonexist($ldap,$root_dse,"group","12a");
 }
 
-
-
-
 &AD_unbind_admin($ldap);
-
-
-
