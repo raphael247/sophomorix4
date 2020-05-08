@@ -75,7 +75,7 @@ my $unlock=0;
 
 my $school="";
 my $create=0;
-my $recreate_all_schools=0;
+my $create_all_schools=0;
 my $kill=0;
 
 my $gpo_listall=0;
@@ -102,7 +102,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "create|c" => \$create,
-           "recreate-all-schools" => \$recreate_all_schools,
+           "create-all-schools" => \$create_all_schools,
            "kill" => \$kill,
            "school=s" => \$school,
            "mount=s" => \$mount,
@@ -147,7 +147,7 @@ Options:
   --create --school <schoolname>
   --kill --school <schoolname>
 
-  --recreate-all-schools   (recreates all configured schools from sophomorix.conf)
+  --create-all-schools   (creates all configured schools from sophomorix.conf)
 
   --mount <school>
   --umount <school>
@@ -279,8 +279,8 @@ if ($listmount==1){
 # ============================================================
 # recreating all schools
 # ============================================================
-# --recreate-all-schools
-if ($recreate_all_schools==1){
+# --create-all-schools
+if ($create_all_schools==1){
     foreach my $school (keys %{$sophomorix_config{'SCHOOLS'}}) {
         # create new ou
         &AD_school_create({ldap=>$ldap,
