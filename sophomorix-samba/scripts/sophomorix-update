@@ -45,6 +45,8 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_passwd
                                  AD_object_search
                                  AD_get_name_tokened
+                                 AD_group_addmember
+                                 AD_group_removemember
                                     );
 my @arguments = @ARGV;
 
@@ -427,6 +429,22 @@ while(<USERUPDATE>){
                        sophomorix_config=>\%sophomorix_config,
                        sophomorix_result=>\%sophomorix_result,
                       });
+        if ($role_new ne $role_old){
+            # add new role membership
+            my $rolegroup_new="role-".$role_new;
+            &AD_group_addmember({ldap => $ldap,
+                                 root_dse => $root_dse,
+                                 group => $rolegroup_new,
+                                 addmember => $user,
+                               });
+            # remove old role membership
+            my $rolegroup_old="role-".$role_old;
+            &AD_group_removemember({ldap => $ldap,
+                                    root_dse => $root_dse,
+                                    group => $rolegroup_old,
+                                    removemember => $user,
+                                  });
+        }
     }
 }
 
