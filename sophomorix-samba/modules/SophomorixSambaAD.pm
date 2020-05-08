@@ -2272,6 +2272,14 @@ sub AD_user_create {
     ######################################################################
     # memberships of created user
     ######################################################################
+    # add user to rolegroup
+    my $rolegroup="role-".$role;
+    &AD_group_addmember({ldap => $ldap,
+                         root_dse => $root_dse,
+                         group => $rolegroup,
+                         addmember => $login,
+                       });
+    # other memberships
     if ($role eq $ref_sophomorix_config->{'INI'}{'binduser.global'}{'USER_ROLE'}){
         #######################################################
         # global binduser
