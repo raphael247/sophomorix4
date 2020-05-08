@@ -48,6 +48,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_AD_for_check
                                  AD_debug_logdump
                                  AD_get_group
+                                 AD_get_passwd
                                  AD_rolegroup_update
                                     );
 
@@ -371,6 +372,17 @@ if ($set_group ne "" and $set_name ne ""){
 
 #  --update-rolegroups
 if ($update_rolegroups==1){
+    my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                         $DevelConf::secret_file_sophomorix_file_admin);
+    # create new school in AD
+    &AD_school_create({ldap=>$ldap,
+                       root_dse=>$root_dse,
+                       root_dns=>$root_dns,
+                       school=>$DevelConf::name_default_school,
+                       smb_admin_pass=>$smb_admin_pass,
+                       sophomorix_config=>\%sophomorix_config,
+                       sophomorix_result=>\%sophomorix_result,
+                     });
     &AD_rolegroup_update($ldap,$root_dse,$root_dns,\%sophomorix_config);
 }
 
