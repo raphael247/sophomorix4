@@ -238,7 +238,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66048",
-                   memberOf => "bsz-admins|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
+                   memberOf => "role-schooladministrator|bsz-admins|bsz-wifi|bsz-internet|bsz-webfilter|bsz-intranet|bsz-printing",
                   });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
@@ -294,7 +294,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66048",
-                   memberOf => "abc-admins|abc-wifi|abc-internet|abc-webfilter|abc-intranet|abc-printing",
+                   memberOf => "role-schooladministrator|abc-admins|abc-wifi|abc-internet|abc-webfilter|abc-intranet|abc-printing",
                   });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
@@ -349,7 +349,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66048",
-                   memberOf => "admins|wifi|internet|webfilter|intranet|printing",
+                   memberOf => "role-schooladministrator|admins|wifi|internet|webfilter|intranet|printing",
                   });
     # admin-666
     &AD_test_object({ldap=>$ldap,
@@ -389,7 +389,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66048",
-                   memberOf => "admins|wifi|internet|webfilter|intranet|printing",
+                   memberOf => "role-schooladministrator|admins|wifi|internet|webfilter|intranet|printing",
                   });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
@@ -461,7 +461,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66048",
-                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
+                   memberOf => "role-globaladministrator|global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
                   });
     &file_test_chars("/etc/linuxmuster/.secret/global-admin-66",22);
 
@@ -503,7 +503,7 @@ if ($test_add_admin==1){
                    sophomorixUnid => "---",
                    accountExpires => "0",
                    userAccountControl => "66048",
-                   memberOf => "global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
+                   memberOf => "role-globaladministrator|global-admins|all-wifi|all-internet|all-webfilter|all-intranet|all-printing",
                   });
     ##### Testing the users group
     &AD_test_object({ldap=>$ldap,
