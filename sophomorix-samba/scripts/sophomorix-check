@@ -2231,12 +2231,18 @@ sub check_class {
     $class=&remove_whitespace($class); # remove all whitespace
     # convert to small letters
     $class=~tr/A-Z/a-z/; 
-    # sternchenklassen filtern ?????
-    # klassen filtern ?????
+
+    foreach my $forbidden ( @{ $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'FORBIDDEN_GROUP_BASENAME'} }){
+        if ($class eq $forbidden){
+	   my $error_message="Class '".$class."' is forbidden in file '".$filename."'";
+	   &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+        }
+    }
 
     # replacements in classnames
-    if (defined $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_SLASH_TO_HYPHEN} and
-        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_SLASH_TO_HYPHEN} eq "TRUE"){
+    if (defined $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'CLASSNAME_SLASH_TO_HYPHEN'} and
+        $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'CLASSNAME_SLASH_TO_HYPHEN'} eq "TRUE"){
         $class=~s/\//-/g;
     } else {
         $class=~s/\//$DevelConf::replace_slash_with/g;

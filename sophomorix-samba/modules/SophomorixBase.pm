@@ -3812,6 +3812,13 @@ sub config_sophomorix_read {
                     } else {
                         $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORCE_GROUPNAME'}="FALSE";
                     }
+                    # forbidden groupname
+                    if (defined $sophomorix_config{'INI'}{$section}{'FORBIDDEN_GROUP_BASENAME'}){
+                        $sophomorix_config{'FILES'}{$file_type}{$filename}{'FORBIDDEN_GROUP_BASENAME'}=
+                            $sophomorix_config{'INI'}{$section}{'FORBIDDEN_GROUP_BASENAME'};
+                    } else {
+                        #$sophomorix_config{'FILES'}{$file_type}{$filename}{'FORBIDDEN_GROUP_BASENAME'}="FALSE";
+                    }
                     # MANMEMBEROF
                     my @manmember=&ini_list($sophomorix_config{'INI'}{$section}{'MANMEMBEROF'});
                     foreach my $manmember (@manmember){
