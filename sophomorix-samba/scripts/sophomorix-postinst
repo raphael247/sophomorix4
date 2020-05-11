@@ -158,6 +158,16 @@ foreach my $script (@custom_windows){
 
 
 ######################################################################
+# update rolegroup memberships
+######################################################################
+print "\n";
+print "* Updating rolegroups (sophomorix 3.79.3 or later) ...\n";
+system("sophomorix-managementgroup --update-rolegroups > /dev/null");
+print "* Updating rolegroups ... done!\n";
+
+
+
+######################################################################
 # update the schema (If the schema is not there --> DO NOTHING)
 ######################################################################
 
