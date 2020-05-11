@@ -621,6 +621,9 @@ sub make_output_files_ro {
     system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.* $dev_null");
     system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-* $dev_null");
     system("chmod 400 $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_* $dev_null");
+    system("chown $caller $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.* $dev_null");
+    system("chown $caller $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-* $dev_null");
+    system("chown $caller $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_* $dev_null");
 }
 
 
