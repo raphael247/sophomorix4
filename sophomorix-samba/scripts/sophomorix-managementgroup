@@ -30,6 +30,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
+                                 result_sophomorix_add_log
                                  json_dump
                                  remove_embracing_whitespace
                                  create_schoollist
@@ -429,6 +430,8 @@ sub set_members_from_file {
                 $config{$opt}{$arg}="seen";
             }
         }
+        close(CONFIG);
+	# print Dumper(\%config);
 
         # walk through all users
         my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
@@ -437,6 +440,14 @@ sub set_members_from_file {
                                                    admins=>"TRUE",
                                                    sophomorix_config=>\%sophomorix_config,
                                                  });
+        # warn if class does not exist in this school
+        foreach my $class (keys %{ $config{'MEMBER_CLASS'} }){
+            if (not exists $ref_AD_check->{'LOOKUP_by_school'}{$school}{'group_BY_sAMAccountName'}{$class}){
+                &result_sophomorix_add_log(\%sophomorix_result,
+                    "WARNING: Configured MEMBER_CLASS $class does not exist in school $school");
+            }
+	}
+
         foreach my $sam (keys %{ $ref_AD_check->{'sAMAccountName'} }){
             if ($school eq "global"){
                 # just go on
