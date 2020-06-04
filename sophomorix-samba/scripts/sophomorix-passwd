@@ -564,7 +564,7 @@ if ($configfile==1){
 # --common
 if ($common==1){
     @password_chars=&get_passwd_charlist();
-    $password=&create_plain_password($random,@password_chars);
+    $password=&create_plain_password("TRUE",$random,"",@password_chars);
 }
 
 
@@ -652,12 +652,12 @@ if ($userlist_count>0 and ($password ne "" or
 	if ($max==1){
             # create pasword for each user
             if ($random!=0 and $common==0){
-                $password=&create_plain_password($random,@password_chars);
+                $password=&create_plain_password("TRUE",$random,"",@password_chars);
             } elsif ($configfile==1){
                 my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
                     $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
                     $school_AD,$status_AD,$firstpassword_AD,$unid_AD,$firstname_ASCII_AD,$lastname_ASCII_AD,
-                    $firstname_initial_AD,$lastname_initial_AD,$user_token_AD,$file_AD)=
+                    $firstname_initial_AD,$lastname_initial_AD,$user_token_AD,$file_AD,$birthdate_AD)=
                     &AD_get_user({ldap=>$ldap,
                                   root_dse=>$root_dse,
                                   root_dns=>$root_dns,
@@ -668,6 +668,7 @@ if ($userlist_count>0 and ($password ne "" or
                         $file_AD,
                         $sophomorix_config{'FILES'}{'USER_FILE'}{$file_AD}{'RANDOM_PWD'}, # yes|no
                         $sophomorix_config{'FILES'}{'USER_FILE'}{$file_AD}{'PWD_LENGTH'}, # length of random pwd
+                        $birthdate_AD,
                         \%sophomorix_config,
                         @password_chars);
             }

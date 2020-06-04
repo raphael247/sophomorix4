@@ -658,7 +658,9 @@ sub choose_password {
     if ($random_password_save==1){
         my @password_chars=&get_passwd_charlist();
         $password=&Sophomorix::SophomorixBase::create_plain_password(
+            $sophomorix_config{'INI'}{$role_user}{'RANDOM_PWD'},
             $sophomorix_config{'INI'}{$role_user}{'RANDOM_PWD_LENGTH'},
+            "01.01.1970", # dummy birthday
             @password_chars);
         my $mkdir=$sophomorix_config{'INI'}{'PATHS'}{'SECRET_PWD'};
         system("mkdir -p $mkdir");
@@ -671,7 +673,9 @@ sub choose_password {
     } elsif ($random_password_show==1){
         my @password_chars=&get_passwd_charlist();
         $password=&Sophomorix::SophomorixBase::create_plain_password(
+            $sophomorix_config{'INI'}{$role_user}{'RANDOM_PWD'},
             $sophomorix_config{'INI'}{$role_user}{'RANDOM_PWD_LENGTH'},
+            "01.01.1970", # dummy birthday
             @password_chars);
         &result_sophomorix_add_summary({
                      NAME=>"ADD", 

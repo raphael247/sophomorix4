@@ -5904,20 +5904,20 @@ sub get_passwd_charlist {
 
 
 sub get_plain_password {
-    my ($role,$file,$random,$length,$ref_sophomorix_config,@password_chars)=@_;
+    my ($role,$file,$random,$length,$birthdate,$ref_sophomorix_config,@password_chars)=@_;
     my $password="";
     my $i;
     if ($role eq "teacher") {
         # Teacher
-        if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'}) {
-	    $password=&create_plain_password($length,@password_chars);
+        if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
+	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
             $password=$DevelConf::student_password_default;
 	}
     } elsif ($role eq "student") {
         # Student
-        if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'}) {
-	    $password=&create_plain_password($length,@password_chars);
+        if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
+	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
             $password=$DevelConf::teacher_password_default;
         }
@@ -5928,18 +5928,24 @@ sub get_plain_password {
 
 
 sub create_plain_password {
-    my ($num,@password_chars)=@_;
+    my ($random,$num,$birthdate,@password_chars)=@_;
     my $password="";
-    until ($password=~m/[!,\$,&,\(,\),?]/ and 
-           $password=~m/[a-z]/ and 
-           $password=~m/[A-Z]/ and
-           $password=~m/[0-9]/
-          ){
-        $password="";
-        for ($i=1;$i<=$num;$i++){
-            $password=$password.$password_chars[int (rand $#password_chars)];
+    if ($random eq "birthday"){
+        my @letters = ('A'..'Z');
+        my $random_letter = $letters[int rand @letters];
+        $password=$random_letter.$birthdate;
+    } else {
+        until ($password=~m/[!,\$,&,\(,\),?]/ and 
+               $password=~m/[a-z]/ and 
+               $password=~m/[A-Z]/ and
+               $password=~m/[0-9]/
+              ){
+            $password="";
+            for ($i=1;$i<=$num;$i++){
+                $password=$password.$password_chars[int (rand $#password_chars)];
+            }
+	    print "Password to test: $password\n";
         }
-	print "Password to test: $password\n";
     }
     print "Password OK: $password\n";
     return $password;

@@ -328,8 +328,9 @@ while(<SOPHOMORIXADD>){
         $sophomorix_first_password=&get_plain_password(
                         $role,
                         $file,
-                        $random_pwd, # TRUE/FALSE
+                        $random_pwd, # TRUE/FALSE/birthday
                         $pwd_length, # length of random pwd
+                        $birthdate,
                         \%sophomorix_config,
                         @password_chars);
     } else {
