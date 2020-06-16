@@ -1,0 +1,83 @@
+############################################################
+# bionic --> focal
+############################################################
+
+Virtualbox Testsystem auf 20.04 upgraden:
+
+1) sophomorix-supertest -s rp
+2) do-release-upgrade -d
+   smb.conf automatisch korrigieren: NO
+   ntp.conf .... RETURN (beibehalten)
+3) Veraltete pakete NICHT entfernen (da ist sophomorix-samba dabei)
+4) neustart
+
+webui test config instalieren von Hand:
+
+cp /usr/share/sophomorix/config-templates/test-ui-perm.ini /usr/lib/linuxmuster-webui/etc/default-ui-permissions.ini
+
+# samba -V
+Version 4.11.6-Ubuntu
+
+
+------------------------------------------------------------
+1) Fehler bei sophomorix-test-1:
+------------------------------------------------------------
+
+cli_full_connection failed! (NT_STATUS_INVALID_PARAMETER_MIX)
+
+Ursache sind die ACL's, die samba anlegt:
+ACL:Owner Rights:ALLOWED/OI|CI|IO/CHANGE (altes Samba)
+ACL:OWNER RIGHTS:ALLOWED/OI|CI|IO/CHANGE (neues Samba)
+
+Lösung: gefixed mit script auf installiertem system: sophomorix-testtool-convert-to-focal
+(konvertiert den obige NTACL test)
+
+Fehler:
+1                10
+2                 0
+3                 1
+4                 0
+5                 0
+workflow          0
+error             0
+exammode        439
+
+
+------------------------------------------------------------
+2) Fehler:
+------------------------------------------------------------
+NT_STATUS_INVALID_PARAMETER_MIX
+https://www.kaipee.co.uk/var/log/smb1-nt1-smbclient-issues
+
+
+LÖSUNG: smb.conf anpassen:
+[global]
+server min protocol = NT1
+client min protocol = NT1
+
+Fehler:
+1                 0
+2                 0
+3                 1
+4                 0
+5                 0
+workflow          0
+error             0
+exammode          0
+
+------------------------------------------------------------
+3) Fehler ?:
+------------------------------------------------------------
+
+Test 3 ist manchmal OK, manchmal nicht
+sophomorixMailQuotaCalculated is 728
+#          got: '362'
+#     expected: '728'
+
+
+------------------------------------------------------------
+Performance
+------------------------------------------------------------
+Dauer des Gesamttests (sophomorix-supertest -s all):
+bionic: 30,5 min
+focal:  20,5 min

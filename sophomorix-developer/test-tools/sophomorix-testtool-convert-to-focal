@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-testtool-convert-to-focal) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+#use Sophomorix::SophomorixConfig;
+#use Sophomorix::SophomorixSambaAD qw(AD_sophomorix_schema_update);
+#use Sophomorix::SophomorixBase qw(read_smb_conf);
+
+#$Conf::log_level=1;
+my %smb_conf=();
+my $ref_result;
+
+
+######################################################################
+my $sed_command="sed -e 's/:Owner Rights:/:OWNER RIGHTS:/g' /usr/sbin/sophomorix-test-1 >/tmp/test";
+my $cp_command="cp /tmp/test /usr/sbin/sophomorix-test-1";
+my $chmod_command="chmod +x /usr/sbin/sophomorix-test-1";
+
+print "$sed_command\n";
+system($sed_command);
+print "$cp_command\n";
+system($cp_command);
+print "$chmod_command\n";
+system($chmod_command);
+
+
+$sed_command="sed -e 's/:Owner Rights:/:OWNER RIGHTS:/g' /usr/sbin/sophomorix-test-5 >/tmp/test";
+$cp_command="cp /tmp/test /usr/sbin/sophomorix-test-5";
+$chmod_command="chmod +x /usr/sbin/sophomorix-test-5";
+
+print "$sed_command\n";
+system($sed_command);
+print "$cp_command\n";
+system($cp_command);
+print "$chmod_command\n";
+system($chmod_command);
+
+
+$sed_command="sed -e 's/:Owner Rights:/:OWNER RIGHTS:/g' /usr/sbin/sophomorix-test-exammode >/tmp/test";
+$cp_command="cp /tmp/test /usr/sbin/sophomorix-test-exammode";
+$chmod_command="chmod +x /usr/sbin/sophomorix-test-exammode";
+
+print "$sed_command\n";
+system($sed_command);
+print "$cp_command\n";
+system($cp_command);
+print "$chmod_command\n";
+system($chmod_command);
