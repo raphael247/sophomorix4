@@ -148,6 +148,7 @@ install-sophomorix-samba:
 	@install -d -m700 -oroot -groot $(LIBDIR)/check-result
 	@install -d -m700 -oroot -groot $(LOGDIR)
 	@install -d -m700 -oroot -groot $(LOGDIR)/user
+	@install -d -m700 -oroot -groot $(LOGDIR)/cron
 # Install the scripts
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-samba/scripts/sophomorix-*[a-z1-9] $(DESTDIR)/usr/sbin

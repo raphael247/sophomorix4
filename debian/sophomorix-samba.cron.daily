@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# log start
+logger $0 started
+
+
+# sophomorix-cron-daily
+/usr/sbin/sophomorix-cron-daily > /var/log/sophomorix/cron/cron.daily.lastlog && logger '   sophomorix-cron-daily run successfully' || logger '   sophomorix-cron-daily run with ERROR' 
+
+# log end
+logger $0 ended
+
