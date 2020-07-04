@@ -809,6 +809,10 @@ foreach my $school (@opt_schoollist) {
                              );
         }
         if ($update>0){
+	    if (not defined $old_homedirectory_rel){
+		# avoid undefined value for users created with old version of sophomorix
+                $old_homedirectory_rel="";
+            }
             # write a line to sophomorix.update
             my $update_line=$sam."::".
                             $old_unid."::".
