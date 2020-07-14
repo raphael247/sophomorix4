@@ -2525,6 +2525,11 @@ sub AD_user_update {
     my $comment = $arg_ref->{comment};
     my $homedirectory = $arg_ref->{homedirectory};
     my $homedirectory_rel = $arg_ref->{homedirectory_rel};
+    # change proxyAddresses (multi-value)
+    my $proxy_addresses_set = $arg_ref->{proxy_addresses_set};
+    my $proxy_addresses_add = $arg_ref->{proxy_addresses_add};
+    my $proxy_addresses_remove = $arg_ref->{proxy_addresses_remove};
+    my $proxy_addresses_entry = $arg_ref->{proxy_addresses_entry};
     # changing OTHER single-value attributes
     my $single_value_set = $arg_ref->{single_value_set};
     my $single_value_entry = $arg_ref->{single_value_entry};
@@ -3016,7 +3021,36 @@ sub AD_user_update {
         my $mesg = $ldap->modify($dn,replace => {$multi_value_remove => \@multi_value_entry }); 
         &AD_debug_logdump($mesg,2,(caller(0))[3]);
     }
-    
+
+    # proxyAddresses
+    if (defined $proxy_addresses_set){
+        my @proxy_addresses=split(/,/,$proxy_addresses_set);
+        @proxy_addresses = reverse @proxy_addresses;
+        print "   * Setting proxyAddresses to: @proxy_addresses\n";
+        my $proxy_addresses_string=join("|",@proxy_addresses);
+        $update_log_string=$update_log_string."\"proxyAddresses=".$proxy_addresses_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'proxyAddresses' => \@proxy_addresses }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $proxy_addresses_add and defined $proxy_addresses_entry){
+        my @proxy_addresses_entry=split(/,/,$proxy_addresses_entry);
+        @proxy_addresses_entry = reverse @proxy_addresses_entry;
+        print "   * Setting proxyAddresses to: @proxy_addresses_entry\n";
+        my $proxy_addresses_entry_string=join("|",@proxy_addresses_entry);
+        $update_log_string=$update_log_string."\"proxyAddresses=".$proxy_addresses_entry_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'proxyAddresses' => \@proxy_addresses_entry }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+    if (defined $proxy_addresses_remove and defined $proxy_addresses_entry){
+        my @proxy_addresses_entry=split(/,/,$proxy_addresses_entry);
+        @proxy_addresses_entry = reverse @proxy_addresses_entry;
+        print "   * Setting proxyAddresses to: @proxy_addresses_entry\n";
+        my $proxy_addresses_entry_string=join("|",@proxy_addresses_entry);
+        $update_log_string=$update_log_string."\"proxyAddresses=".$proxy_addresses_entry_string."\",";
+        my $mesg = $ldap->modify($dn,replace => {'proxyAddresses' => \@proxy_addresses_entry }); 
+        &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    }
+
     
     # custom attributes (multiValue)
     if (defined $custom_multi_1){

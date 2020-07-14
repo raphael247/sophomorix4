@@ -85,6 +85,10 @@ my $add_webui_permissions;
 my $remove_webui_permissions;
 
 my $comment;
+my $set_proxy_addresses;
+my $add_proxy_addresses;
+my $remove_proxy_addresses;
+
 my $set_single_value_attribute;
 my $set_multi_value_attribute;
 my $add_multi_value_attribute;
@@ -177,6 +181,9 @@ my $testopt=GetOptions(
        "set-multi-value-attribute=s" => \$set_multi_value_attribute,
        "add-multi-value-attribute=s" => \$add_multi_value_attribute,
        "remove-multi-value-attribute=s" => \$remove_multi_value_attribute,
+       "set-proxy-addresses=s" => \$set_proxy_addresses,
+       "add-proxy-addresses=s" => \$add_proxy_addresses,
+       "remove-proxy-addresses=s" => \$remove_proxy_addresses,
        "entry=s" => \$entry,
        "custom1=s" => \$custom_1,
        "custom2=s" => \$custom_2,
@@ -320,6 +327,11 @@ MailQuota:
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
+
+Updating the user configurable E-Mail address attribute proxyAddresses (multi-value):
+  --user <user> --set-proxy-addresses <address1>,<address2>,...
+  --user <user> --add-proxy-addresses <address>
+  --user <user> --remove-proxy-addresses <address>
 
 Updating sophomorixCustom1 - sophomorixCustom5:
   --user <user> --custom<n> "Content of sophomorixCustom<n>"
@@ -1338,6 +1350,61 @@ if ($user ne "" and defined $remove_multi_value_attribute and defined $entry ){
                      user=>$user,
                      multi_value_remove=>$remove_multi_value_attribute,
                      multi_value_entry=>$multi_value_entry,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --set-proxy-addresses <entry>
+if ($user ne "" and defined $set_proxy_addresses ){
+    #my @permissions=split(/,/,$custom_multi_1);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     proxy_addresses_set=>$set_proxy_addresses,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --add-proxy-addresses <entry>
+if ($user ne "" and defined $add_proxy_addresses ){
+    my @add=split(/,/,$add_proxy_addresses);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"proxyAddresses");
+    my @proxy_addresses_entry = uniq(@old,@add); 
+    my $proxy_addresses_entry=join(",",@proxy_addresses_entry);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     proxy_addresses_add=>$add_proxy_addresses,
+                     proxy_addresses_entry=>$proxy_addresses_entry,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --remove-proxy-addresses <entry>
+if ($user ne "" and defined $remove_proxy_addresses){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"proxyAddresses");
+    my @proxy_addresses_entry = &remove_from_list($remove_proxy_addresses,@old);
+    my $proxy_addresses_entry=join(",",@proxy_addresses_entry);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     proxy_addresses_remove=>$remove_proxy_addresses,
+                     proxy_addresses_entry=>$proxy_addresses_entry,
                      user_count=>"",
                      max_user_count=>"-",
                      json=>$json,
