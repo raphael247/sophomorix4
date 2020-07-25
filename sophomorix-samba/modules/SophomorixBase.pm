@@ -739,10 +739,13 @@ sub _console_print_groups_overview {
 
     foreach my $school (@school_list){
         print "\n";
-        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'} sophomorix-groups in school $school:");
-        if ($ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'}==0){
+        if (not defined $ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'} or
+	    $ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'}==0
+	    ){
+            &print_title("0 sophomorix-groups in school $school:");
             next;
         }
+        &print_title("$ref_groups_v->{'COUNTER'}{$school}{'by_type'}{'sophomorix-group'} sophomorix-groups in school $school:");
         print $line;
         print "| Group Name        |AQ|AMQ|A|L| m| t| s| Group Description                     |\n";
         print $line;
