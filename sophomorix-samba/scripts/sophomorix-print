@@ -571,6 +571,7 @@ sub pdflatex {
 
 
 sub latex {
+    &print_title("Processing $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.tex");
     &print_title("latex is creating $output_file_basename.dvi");
     # PS aus $output_file_basename.tex erzeugen
     my $latex_command="cd $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}; ".
@@ -643,18 +644,23 @@ sub latex_datablock_from_list {
             $latex_datablock=$latex_datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
         }
         my @data=split(/;/,$item);
-        # $data[3] is the password ??? convert to latex
-        my $password=&string_to_latex($data[3]);
+        my $lastname= &string_to_latex($data[0]);
+        my $firstname=&string_to_latex($data[1]);
+        my $login=    &string_to_latex($data[2]);
+        my $password= &string_to_latex($data[3]);
+        my $school=   &string_to_latex($data[4]);
+        my $role=     &string_to_latex($data[8]);
+	my $workgroup=&string_to_latex($sophomorix_config{'samba'}{'smb.conf'}{'global'}{'workgroup'});
         my $class=&string_to_latex($data[5]);
-        $latex_datablock=$latex_datablock."\\sophomorixdatabox{".$data[0]."}".
-                                          "{".$data[1]."}".
-                                          "{".$data[2]."}".
+        $latex_datablock=$latex_datablock."\\sophomorixdatabox{".$lastname."}".
+                                          "{".$firstname."}".
+                                          "{".$login."}".
                                           "{".$password."}".
-                                          "{".$data[4]."}".
+                                          "{".$school."}".
                                           "{".$class."}".
-                                          "{".$data[8]."}".
+                                          "{".$role."}".
                                           "{".$data[9]."}".
-                                          "{".$sophomorix_config{'samba'}{'smb.conf'}{'global'}{'workgroup'}."}%\n";
+                                          "{".$workgroup."}%\n";
         # decide if dataline_count must be reset (page completely full)
 	if ($dataline_count==$dataline_max){
             $dataline_count=0;
