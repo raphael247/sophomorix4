@@ -166,10 +166,12 @@ Fragen
 - was ist wenn in 2 verschiedenen Schulen gleiche unid stehen?
 ------------------------------------------------------------
 
-Was ist neu in 3.90.0:
+Was ist neu ab 3.90.0:
+  * Logging in /var/log/sophomorix/grouplog added
+    adding and deleting of groups is now logged
   * New option in school.conf, section [userfile.students.csv]|[userfile.extrastudents.csv]:
     MAILDOMAIN_BY_GROUP=7a=7a.com,12a=mail.org.de
-    sets the Maildomain for these groups (if they are in this file)
+    sets the Maildomain for these groups (only if they are in this file)
   * Bugfix: make school.conf option [type.adminclass]-> MAILDOMAIN work in default-school
   * Warn when configured MEMBER_CLASS  does not exist in AD
   * Option RANDOM_PWD=birthdate
@@ -177,7 +179,7 @@ Was ist neu in 3.90.0:
     Example Y01.01.1970 (Y is random, 01.01.1970 is the birthdate of the user)
   * sophomorix-user -u <user> --set|add|remove-proxy-addresses
     Sets/updates the user configurable E-Mail addresses
-  * fixed issue #114: printing _ and other special latex-characters in first/lastname with latex  
+  * fixed issue #114: printing _ (underscore) and other special latex-characters in first/lastname with latex  
     
 
 ------------------------------------------------------------

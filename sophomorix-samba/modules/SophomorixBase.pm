@@ -5422,6 +5422,50 @@ sub log_user_kill {
 }
 
 
+sub log_group_add {
+    my ($arg_ref) = @_;
+    my $group = $arg_ref->{sAMAccountName};
+    my $type = $arg_ref->{sophomorixType};
+    my $school = $arg_ref->{sophomorixSchoolname};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    my $log_line="ADD::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}."::".
+                 $school."::".$group."::".$type."::\n";
+    my $logfile=$ref_sophomorix_config->{'INI'}{'GROUPLOG'}{'GROUP_LOGDIR'}."/".
+	$ref_sophomorix_config->{'INI'}{'GROUPLOG'}{'GROUP_ADD'};
+
+    system ("mkdir -p $ref_sophomorix_config->{'INI'}{'GROUPLOG'}{'GROUP_LOGDIR'}");
+
+    open (LOG,">>$logfile");
+    print LOG $log_line;
+    close(LOG);
+}
+
+
+sub log_group_kill {
+    my ($arg_ref) = @_;
+    my $group = $arg_ref->{sAMAccountName};
+    my $type = $arg_ref->{sophomorixType};
+    my $school = $arg_ref->{sophomorixSchoolname};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+    my $ref_sophomorix_result = $arg_ref->{sophomorix_result};
+
+    my $log_line="KILL::".$ref_sophomorix_config->{'DATE'}{'LOCAL'}{'EPOCH'}."::".
+                 $ref_sophomorix_config->{'DATE'}{'LOCAL'}{'TIMESTAMP_AD'}."::".
+                 $school."::".$group."::".$type."::\n";
+    my $logfile=$ref_sophomorix_config->{'INI'}{'GROUPLOG'}{'GROUP_LOGDIR'}."/".
+	$ref_sophomorix_config->{'INI'}{'GROUPLOG'}{'GROUP_KILL'};
+
+    system ("mkdir -p $ref_sophomorix_config->{'INI'}{'GROUPLOG'}{'GROUP_LOGDIR'}");
+
+    open (LOG,">>$logfile");
+    print LOG $log_line;
+    close(LOG);
+}
+
+
 
 sub get_login_avoid {
     # avoid logins of recently killed users

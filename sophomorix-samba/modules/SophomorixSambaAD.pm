@@ -1309,7 +1309,7 @@ sub AD_user_kill {
         }
 
         if ($kill_return==0){
-            # log the killing of a user 
+            # log the killing of a user
             &Sophomorix::SophomorixBase::log_user_kill({sAMAccountName=>$user,
                                                         sophomorixRole=>$role_AD, 
                                                         home_delete_string=>$home_delete_string,
@@ -1604,6 +1604,13 @@ sub AD_group_kill {
         } else {
             print "ERROR: Not killing Group of unknown type $type\n";
         }
+        # log the killing of a group
+        &Sophomorix::SophomorixBase::log_group_kill({sAMAccountName=>$group,
+                                                     sophomorixType=>$type,
+                                                     sophomorixSchoolname=>$school,
+                                                     sophomorix_config=>$ref_sophomorix_config,
+                                                     sophomorix_result=>$ref_sophomorix_result,
+                                                   });
         &Sophomorix::SophomorixBase::print_title("Killing group $group ($type, $school) (end)");
         return;
     } else {
@@ -2255,7 +2262,7 @@ sub AD_user_create {
 
     my $add_result=&AD_debug_logdump($result,2,(caller(0))[3]);
     if ($add_result!=0){ # add was succesful
-        # log the killing of a user 
+        # log the addition of a user
         &Sophomorix::SophomorixBase::log_user_add({sAMAccountName=>$login,
                                                    sophomorixRole=>$role, 
                                                    #home_delete_string=>$home_delete_string,
@@ -8286,6 +8293,7 @@ sub AD_group_create {
         my $target = $ldap->add($target_branch,attr => ['objectClass' => ['top', 'organizationalUnit']]);
         &AD_debug_logdump($target,2,(caller(0))[3]);
         # Create object
+	my $result;
 	if ($type eq "project"){
             my $add_array = [
                 objectClass => ['top','group'],
@@ -8314,7 +8322,7 @@ sub AD_group_create {
             }
 
             # do it
-            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "adminclass" or $type eq "teacherclass" or $type eq "extraclass"){
             my $add_array = [
@@ -8344,7 +8352,7 @@ sub AD_group_create {
             }
 
             # do it
-            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "sophomorix-group"){
             my $add_array = [
@@ -8374,7 +8382,7 @@ sub AD_group_create {
             }
 
             # do it
-            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq $ref_sophomorix_config->{'INI'}{'TYPE'}{'DGR'}){
             my $add_array = [
@@ -8404,7 +8412,7 @@ sub AD_group_create {
             }
 
             # do it
-            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
 	} elsif ($type eq "room"){
             my $add_array = [
@@ -8436,7 +8444,7 @@ sub AD_group_create {
             }
 
             # do it
-            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
         } else {
             my $add_array = [
@@ -8465,8 +8473,18 @@ sub AD_group_create {
             }
 
             # do it
-            my $result = $ldap->add( $dn, attr => [@{ $add_array }]);
+            $result = $ldap->add( $dn, attr => [@{ $add_array }]);
             &AD_debug_logdump($result,2,(caller(0))[3]);
+
+	}
+        if ($result!=0){ # add was succesful
+	    # log the addition of a user
+            &Sophomorix::SophomorixBase::log_group_add({sAMAccountName=>$group,
+                                                   sophomorixType=>$type,
+                                                   sophomorixSchoolname=>$school,
+                                                   sophomorix_config=>$ref_sophomorix_config,
+                                                   sophomorix_result=>$ref_sophomorix_result,
+                                                 });
 	}
     } else {
         print "   * Group $group exists already ($count results)\n";
