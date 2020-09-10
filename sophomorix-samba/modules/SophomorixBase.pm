@@ -3842,6 +3842,16 @@ sub config_sophomorix_read {
                         $s_member=&replace_vars($s_member,\%sophomorix_config,$school);
                         push @{ $sophomorix_config{'FILES'}{$file_type}{$filename}{'SOPHOMORIXMEMBEROF'} }, $s_member; 
                     }
+                    # MAILDOMAIN_BY_GROUP
+		    if (defined $sophomorix_config{'FILES'}{$file_type}{$filename}{'MAILDOMAIN_BY_GROUP'} and
+			$sophomorix_config{'FILES'}{$file_type}{$filename}{'MAILDOMAIN_BY_GROUP'} ne ""){
+			my @entries=split(/,/,$sophomorix_config{'FILES'}{$file_type}{$filename}{'MAILDOMAIN_BY_GROUP'});
+			foreach my $entry (@entries){
+			    $entry=~s/ //g;
+			    my ($class,$maildomain)=split(/=/,$entry);
+			    $sophomorix_config{'FILES'}{$file_type}{$filename}{'MAILDOMAIN_BY_GROUP_LOOKUP'}{$class}=$maildomain;
+			}
+		    }
                 } elsif ($string eq "devicefile"){
                     # role
                     $sophomorix_config{'FILES'}{'DEVICE_FILE'}{$filename}{'sophomorixRole'}=

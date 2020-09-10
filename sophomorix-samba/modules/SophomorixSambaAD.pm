@@ -5622,8 +5622,19 @@ sub AD_check_ui {
 
 
 sub AD_create_new_mail {
-    my ($sam,$ref_arguments,$ref_sophomorix_config,$ref_sophomorix_result,$json,$role_file,$school_file,
-        $firstname_old,$firstname_new,$lastname_old,$lastname_new) = @_;
+    my ($sam,
+	$ref_arguments,
+	$ref_sophomorix_config,
+	$ref_sophomorix_result,
+	$json,
+	$role_file,
+	$school_file,
+        $firstname_old,
+	$firstname_new,
+	$lastname_old,
+	$lastname_new,
+	$filename_new,
+	$class_new) = @_;
 
     my $firstname;
     if ($firstname_new ne "---"){
@@ -5673,18 +5684,26 @@ sub AD_create_new_mail {
                          $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
 
     }
+
     # override MAIL_LOCAL_PART by MAIL_LOCAL_PART_MAP, if there
     if (exists $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'MAIL_LOCAL_PART'}){
         $mail_local_part=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'MAIL_LOCAL_PART'};
         $ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAIL_LOCAL_PART_MAP_LOOKUP'}{$sam}{'USED'}="TRUE";
     }
-    
+
     # MAILDOMAIN part
     if ($ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'} eq "NONE"){
         $mail="NONE";
     } else {
-        $mail=$mail_local_part."@".$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+	# set maildomain by role
+        my $maildomain=$ref_sophomorix_config->{'ROLES'}{$school}{$role}{'MAILDOMAIN'};
+	# override maildomain by MAILDOMAIN_BY_GROUP option
+	if (exists $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename_new}{'MAILDOMAIN_BY_GROUP_LOOKUP'}{$class_new}){
+	    $maildomain=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename_new}{'MAILDOMAIN_BY_GROUP_LOOKUP'}{$class_new};
+	}
+        $mail=$mail_local_part."@".$maildomain;
     }
+
     return $mail;
 }
  
