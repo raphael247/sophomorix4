@@ -66,26 +66,43 @@ sophomorix-class --members/addmembers/removemembers
 ------------------------------------------------------------
 --school option:
 
-example code a sophomorix-check:
+OHNE OPTION: default-school
+MIT OPTION: nur diese Schulen
+Ausser bei Auflistungen
+
+example code at sophomorix-check:
 1) schoollist from sophomorix-config
-2) override with school parameter --school <school1>,<school2>,... (put only these school in @schoollist)
+2) override with school parameter --school <school1>,<school2>,... (put only these schools in @schoollist)
 
 with each script: 
 
-1) -> load mdule from SophomorixBase
-                                 create_schoollist
-
+1) -> load module from SophomorixBase  :  create_schoollist
 
 2) -> code at options
 my $school="";
 ...
            "school=s" => \$school,
 
-
 3) -> code after help
 # --school <school1,school2, ...>
 my @opt_schoollist=&create_schoollist($school,\%sophomorix_config);
 
+###############  ODER    ####################
+
+1) -> load module from SophomorixBase  :  create_schoollist
+
+2) -> code at options
+my $school="";
+...
+           "school=s" => \$school,
+
+if (not defined $options{'school'}){
+    $options{'school'}="---";
+}
+...
+3) -> code after help
+# --school <school1,school2, ...>
+my @opt_schoollist=&create_schoollist($options{'school'},\%sophomorix_config);s
 
 OK: sophomorix-check
 NOT OK: sophomorix-managementgroups has option, but as a single variable
@@ -150,13 +167,14 @@ Fragen
 ------------------------------------------------------------
 
 Was ist neu in 3.90.0:
+  * Bugfix: make  
   * Warn when configured MEMBER_CLASS  does not exist in AD
   * Option RANDOM_PWD=birthdate
     creates very simple ramdom passwords from birthdate of a user:
     Example Y01.01.1970 (Y is random, 01.01.1970 is the birthdate of the user)
   * sophomorix-user -u <user> --set|add|remove-proxy-addresses
     Sets/updates the user configurable E-Mail addresses
-  * fixed issue #114: printing _in first/ölastname in latex  
+  * fixed issue #114: printing _ and other special latex-characters in first/lastname with latex  
     
 
 ------------------------------------------------------------

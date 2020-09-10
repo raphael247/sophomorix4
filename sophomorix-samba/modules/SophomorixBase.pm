@@ -258,7 +258,9 @@ sub umount_school {
 sub create_schoollist {
     my ($opt_school,$ref_sophomorix_config)=@_;
     my @schoollist=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
-    if ($opt_school ne ""){
+    if ($opt_school eq "---"){
+        @schoollist=($DevelConf::name_default_school);
+    } elsif ($opt_school ne ""){
         @schoollist=split(/,/,$opt_school);
         foreach my $school (@schoollist){
             if (not exists $ref_sophomorix_config->{'SCHOOLS'}{$school}){

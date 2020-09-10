@@ -20,6 +20,7 @@ use JSON;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
+                                 create_schoollist
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -240,6 +241,11 @@ Please see the sophomorix-class(8) man pages for full documentation
 }
 
 
+# --school <school1,school2, ...>
+my @opt_schoollist=&create_schoollist($options{'school'},\%sophomorix_config);
+
+
+
 ############################################################
 # config values
 ############################################################
@@ -313,12 +319,17 @@ if (defined $options{'update-maildomain'}){
                                    sophomorix_config=>\%sophomorix_config,
 				     });
     #print Dumper($ref_group_v);
-    foreach my $school (@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} }){
+    foreach my $school (@opt_schoollist){
 	foreach my $class (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
 	    my $type=$ref_group_v->{'GROUPS'}{$class}{'sophomorixType'};
 	    my $dn=$ref_group_v->{'GROUPS'}{$class}{'DN'};
 	    my $mail = $class."\@".$root_dns;
-	    my $maildomain_key=$school."-".$type;
+	    my $maildomain_key;
+            if ($school eq $DevelConf::name_default_school){
+                $maildomain_key=$type;
+            } else {
+                $maildomain_key=$school."-".$type;
+            }
 	    if (exists $sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'}){
                 if ($sophomorix_config{'TYPES'}{$maildomain_key}{'MAILDOMAIN'} ne ""){
                     $mail=$class."\@".
@@ -343,13 +354,6 @@ if (defined $options{'update-maildomain'}){
 # --delete-all-empty-classes / --delete-all-teacheronly-classes
 if (defined $options{'delete-all-empty-classes'} or defined $options{'delete-all-teacheronly-classes'}){
     my @to_delete=();
-    my @school_list;
-    if ($options{'school'} eq "" or $options{'school'} eq "---"){
-        @school_list=@{ $sophomorix_config{'LISTS'}{'SCHOOLS'} };
-    } else {
-        @school_list=($options{'school'});
-    }
-
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
@@ -359,7 +363,7 @@ if (defined $options{'delete-all-empty-classes'} or defined $options{'delete-all
 
     my $line1="------------------------------------------------------------\n";
     my $line2="############################################################\n";
-    foreach my $school (@school_list){
+    foreach my $school (@opt_schoollist){
         print $line1;
         print "Looking for adminclasses in school $school:\n";
         foreach my $adminclass (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'adminclass'} }){
