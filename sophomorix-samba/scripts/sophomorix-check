@@ -1682,7 +1682,7 @@ sub write_add_file {
         $ref_login_avoid, # logins to avoid
         $Match{$school}{'ACTION'}{$line_add}{'line_count'},
         \%users_file,
-        \%sophomorix_config);
+						  \%sophomorix_config);
     my $mail=&AD_create_new_mail($login,
                                  \@arguments,
                                  \%sophomorix_config,
@@ -1693,7 +1693,9 @@ sub write_add_file {
                                  "---",
                                  $Match{$school}{'ACTION'}{$line_add}{'firstname_ascii'},
                                  "---",
-				 $Match{$school}{'ACTION'}{$line_add}{'surname_ascii'}
+				 $Match{$school}{'ACTION'}{$line_add}{'surname_ascii'},
+				 $Match{$school}{'ACTION'}{$line_add}{'filename'},
+				 $Match{$school}{'ACTION'}{$line_add}{'class'}
                                 );
     my $webui_permissions_string=join(",",
         @{ $sophomorix_config{'ROLES'}{$Match{$school}{'ACTION'}{$line_add}{'school'}}{$Match{$school}{'ACTION'}{$line_add}{'role'}}{'UI'}{'WEBUI_PERMISSIONS'} });
