@@ -7534,6 +7534,7 @@ sub AD_get_printdata {
                                  'sophomorixRole',
                                  'sophomorixCreationDate',
                                  'sophomorixFirstPassword',
+                                 'sophomorixUnid',
                                 ]);
         my $max_user = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_user sophomorix users found for password printout");
@@ -7550,7 +7551,8 @@ sub AD_get_printdata {
                      $entry->get_value('sophomorixSurnameASCII').";".
                      $entry->get_value('sophomorixFirstnameASCII').";".
                      $entry->get_value('sophomorixRole').";".
-                     $entry->get_value('sophomorixCreationDate').";";
+                     $entry->get_value('sophomorixCreationDate').";".
+                     $entry->get_value('sophomorixUnid').";";
             if (not exists $seen_classes{$entry->get_value('sophomorixAdminClass')}){
                 push @{ $AD_printdata{'LIST_BY_sophomorixSchoolname_sophomorixAdminClass'}
 		                      {$entry->get_value('sophomorixSchoolname')} },$entry->get_value('sophomorixAdminClass');
