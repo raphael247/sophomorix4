@@ -164,7 +164,7 @@ Quick introduction:
         A) The ldap adressbook at belwue 
         B) Downloads html pages from the CommuniGate admin webinterface
   4) You can analyze and access the downloaded data offline with:
-     sophomorix-belwue --school <schoolname> --parse-belwue-data -- show-object <object_name>
+     sophomorix-belwue --school <schoolname> --parse-belwue-data --show-object <object_name>
   5) Todo:
      Show nonsynchonized data, create files to create accounts, ...
 
@@ -596,7 +596,7 @@ sub bind_admin {
     }
     my $ldap = Net::LDAP->new($conf{'SCHOOL'}{$school}{'CONNECT'}{HOST}) or
         die "\nERROR: Connection to $conf{'SCHOOL'}{$school}{'CONNECT'}{HOST} failed!\n",
-            " USER: $conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}, PASSWORD: $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'})\n\n";
+            " USER: $conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}, PASSWORD: $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'}\n\n";
 
     my $mesg = $ldap->bind($conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINUSER'}, 
                       password => $conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'});
