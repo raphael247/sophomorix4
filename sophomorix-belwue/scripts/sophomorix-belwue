@@ -150,7 +150,7 @@ Options
 
   --dump-belwue-data (download and parse)
   --parse-belwue-data (parse already downloaded data)
-  -- show-object <object_name>
+  --show-object <object_name>
 
   Todo:
   --create-login-data /path/to/file
@@ -463,6 +463,48 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             $belwue{'multimailbox'}{$object}{'storage'}=$storage;
             $belwue{'multimailbox'}{$object}{'access'}=$access;
             push @multi_mailboxes, $object;
+
+            if ($parse_belwue_data==0){
+                my $download_list_command="wget ".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
+                    "-q --http-user=admin ".
+                    "--http-password=$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'} ".
+                    "--output-document=".$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object-settings.html ".
+                    "\"https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}/".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}".
+                    "/AccountSettings.html?&domainName=".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}&&accountName=$object\"";
+                if($Conf::log_level>=2){
+                    print "\nWGET: $download_list_command\n\n";
+                }
+                my $return=system($download_list_command);
+                &wget_return($download_list_command,
+                             $return,
+                             $object,
+                             "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
+	    }
+            if ($parse_belwue_data==0){
+                my $download_list_command="wget ".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
+                    "-q --http-user=admin ".
+                    "--http-password=$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'} ".
+                    "--output-document=".$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object-mailsettings.html ".
+                    "\"https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}/".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}".
+                    "/AccountMailSettings.html?&domainName=".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}&&accountName=$object\"";
+                if($Conf::log_level>=2){
+                    print "\nWGET: $download_list_command\n\n";
+                }
+                my $return=system($download_list_command);
+                &wget_return($download_list_command,
+                             $return,
+                             $object,
+                             "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
+	    }
+
+
+	    
         } else {
             print "Unknown object $type\n";
         }
