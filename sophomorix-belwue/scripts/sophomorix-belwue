@@ -464,6 +464,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             $belwue{'multimailbox'}{$object}{'access'}=$access;
             push @multi_mailboxes, $object;
 
+            ############################################################
+            # downloading Multi-Mailbox Settings
+            ############################################################
             if ($parse_belwue_data==0){
                 my $download_list_command="wget ".
                     "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
@@ -483,6 +486,14 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                              $object,
                              "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
 	    }
+            ############################################################
+            # parsing Multi-Mailbox Settings
+            ############################################################
+            # nothing so far
+	    
+            ############################################################
+            # downloading Multi-Mailbox Mail Settings
+            ############################################################
             if ($parse_belwue_data==0){
                 my $download_list_command="wget ".
                     "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
@@ -502,6 +513,14 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                              $object,
                              "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
 	    }
+            ############################################################
+            # parsing Multi-Mailbox Mail Settings
+            ############################################################
+            # nothing so far
+
+            ############################################################
+            # downloading Multi-Mailbox Mail Rules
+            ############################################################
             if ($parse_belwue_data==0){
                 my $download_list_command="wget ".
                     "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
@@ -521,7 +540,10 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                              $object,
                              "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
 	    }
-
+            ############################################################
+            # parsing Multi-Mailbox Mail Rules
+            ############################################################
+            # nothing so far
 
 	    
         } else {

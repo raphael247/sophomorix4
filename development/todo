@@ -239,6 +239,27 @@ Todo:
    Gruppe members listen
    Löschliste erstellen, hochladen auf Kundenportal   
 
+   MAILBOX-Umsetung:
+   Config MAILBOX durchgenen
+--> accountnamen ermitteln die mailbox haben sollten:
+   CONF -> MAILBOXES -> USER -> REASON (GROUP, USER, ONLYMAILBOX)
+
+   1) Schleife über configurierte USER:
+   Mailbox existenz:
+  --> haben die User eine Mailbox: OK, Reason ausgeben
+   --> haben sie keine --> Liste erstellen
+    (settings zu [MAILBOX])
+   
+   2) Schleife über existierende Mailboxen
+   --> ist Mailbox konfiguriert: OK, Reason ausgeben
+   --> kein Grund: Löschliste
+       --> membership in maillisten entfernen (Vorschlag)
+   
+   MAILLIST-Umsetung:
+   Config MAILLIST durchgenen
+   Welche Maillisten sind gemanaged/gemappt?
+   diese abgleichen
+   
 
 --school option in alle Befehle
 --school global für schulübergreifend
