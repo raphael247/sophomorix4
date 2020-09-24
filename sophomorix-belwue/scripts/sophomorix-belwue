@@ -502,6 +502,25 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                              $object,
                              "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
 	    }
+            if ($parse_belwue_data==0){
+                my $download_list_command="wget ".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'} ".
+                    "-q --http-user=admin ".
+                    "--http-password=$conf{'SCHOOL'}{$school}{'CONNECT'}{'PASSWORD'} ".
+                    "--output-document=".$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object-mailrules.html ".
+                    "\"https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'ADMINURL'}/".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}".
+                    "/AccountMaillinRules.html?&domainName=".
+                    "$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}&&accountName=$object\"";
+                if($Conf::log_level>=2){
+                    print "\nWGET: $download_list_command\n\n";
+                }
+                my $return=system($download_list_command);
+                &wget_return($download_list_command,
+                             $return,
+                             $object,
+                             "$conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}/$object.html");
+	    }
 
 
 	    
