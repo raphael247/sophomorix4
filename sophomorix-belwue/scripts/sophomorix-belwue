@@ -55,7 +55,9 @@ my $ldap_fetch=1;
 my $no_ldap_fetch=0;
 my $copy_to_teachershare=0;
 my $create_login_data="";
+
 my $dump_belwue_data=0;
+my $skip_addressbook=0;
 my $parse_belwue_data=0;
 my $school="default-school";
 my $show_object="";
@@ -76,6 +78,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "dump-belwue-data" => \$dump_belwue_data,
+           "skip-addressbook" => \$skip_addressbook,
            "parse-belwue-data" => \$parse_belwue_data,
            "create-login-data=s" => \$create_login_data,
            "show-object=s" => \$show_object,
@@ -194,61 +197,62 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     ############################################################ 
     print "\n";
     print "============================================================\n";
-    print "Accessing belwue address book:\n";
-    my ($ldap) = &bind_admin();
-    if($Conf::log_level>=2){
-        print "  Searching for data in Belwue address book via ldap\n";
-        print "    SEARCHBASE: $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'}\n";
-        print "    SCOPE: $conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'}\n";
-        print "    FILTER: $conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'}\n";
-    }
-    my $mesg = $ldap->search(
-                   base   => $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'},
-                   scope => $conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'},
-                   filter => $conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'},
-                        );
-
-    my $max = $mesg->count; 
-    my $count = $mesg->count;
-    for( my $index = 0 ; $index < $max ; $index++) {
-        my $num=$index+1;
-        my $entry = $mesg->entry($index);
-        my $dn=$entry->dn();
-        my $uid=$entry->get_value('uid');
-        my $cn=$entry->get_value('cn');
-        my $given=$entry->get_value('givenName');
-        my $sn=$entry->get_value('sn');
-        my $server=$entry->get_value('hostServer');
-        my $mail=$entry->get_value('mail');
-
-        if (not defined $given){
-            $given="";
+    if ($skip_addressbook==1){
+        print "Skipping download of belwue Addressbook:\n";
+    } else {
+        print "Accessing belwue address book:\n";
+        my ($ldap) = &bind_admin();
+        if($Conf::log_level>=2){
+            print "  Searching for data in Belwue address book via ldap\n";
+            print "    SEARCHBASE: $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'}\n";
+            print "    SCOPE: $conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'}\n";
+            print "    FILTER: $conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'}\n";
         }
-        if($Conf::log_level>=3){
-	    print "$num) dn: $dn\n";
-	    print "   * cn:          $cn\n";
-	    print "   * givenName:   $given\n";
-	    print "   * hostServer:  $server\n";
-	    print "   * mail:        $mail\n";
-	    print "   * sn:          $sn\n";
-	    print "   * uid:         $uid\n";
-            print "\n";
+        my $mesg = $ldap->search(
+                       base   => $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'},
+                       scope => $conf{'SCHOOL'}{$school}{'CONNECT'}{'SCOPE'},
+                       filter => $conf{'SCHOOL'}{$school}{'CONNECT'}{'FILTER'},
+                            );
+
+        my $max = $mesg->count; 
+        my $count = $mesg->count;
+        for( my $index = 0 ; $index < $max ; $index++) {
+            my $num=$index+1;
+            my $entry = $mesg->entry($index);
+            my $dn=$entry->dn();
+            my $uid=$entry->get_value('uid');
+            my $cn=$entry->get_value('cn');
+            my $given=$entry->get_value('givenName');
+            my $sn=$entry->get_value('sn');
+            my $server=$entry->get_value('hostServer');
+            my $mail=$entry->get_value('mail');
+
+            if (not defined $given){
+                $given="";
+            }
+            if($Conf::log_level>=3){
+	        print "$num) dn: $dn\n";
+	        print "   * cn:          $cn\n";
+	        print "   * givenName:   $given\n";
+   	        print "   * hostServer:  $server\n";
+	        print "   * mail:        $mail\n";
+	        print "   * sn:          $sn\n";
+	        print "   * uid:         $uid\n";
+                print "\n";
+            }
+            $belwue{'objects'}{$uid}{'CN'}=$cn;
+            $belwue{'objects'}{$uid}{'givenName'}=$given;
+            $belwue{'objects'}{$uid}{'hostServer'}=$server;
+            $belwue{'objects'}{$uid}{'mail'}=$mail;
+            $belwue{'objects'}{$uid}{'sn'}=$sn;
+            $belwue{'objects'}{$uid}{'uid'}=$uid;
         }
-
-        $belwue{'objects'}{$uid}{'CN'}=$cn;
-        $belwue{'objects'}{$uid}{'givenName'}=$given;
-        $belwue{'objects'}{$uid}{'hostServer'}=$server;
-        $belwue{'objects'}{$uid}{'mail'}=$mail;
-        $belwue{'objects'}{$uid}{'sn'}=$sn;
-        $belwue{'objects'}{$uid}{'uid'}=$uid;
-
-
-    }
         #print Dumper(%belwue);
 
-    print "$max entries found via ldaps\n";
-    print "============================================================\n";
-    &unbind_admin($ldap); 
+        print "$max entries found via ldaps\n";
+        print "============================================================\n";
+        &unbind_admin($ldap);
+    } 
     ############################################################
     # downloading objects
     ############################################################ 
