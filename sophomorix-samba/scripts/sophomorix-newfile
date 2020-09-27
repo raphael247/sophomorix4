@@ -247,7 +247,7 @@ my $ref_encoding_check_results;
 if ($filter_script eq "---"){
     print "cp, not filtering\n";
     system("mkdir -p $tmp_dir");
-    system("cp $newfile_abs $tmp")
+    system("cp '$newfile_abs' $tmp")
 } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
     print "\nERROR: The configured Filter is not an executable script:\n";
     print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
@@ -257,9 +257,9 @@ if ($filter_script eq "---"){
     # filter to tmp
     print "filtering, not cp\n";
     system("mkdir -p $tmp_dir");
-    my $command="$filter_script $newfile_abs $tmp";
+    my $command="$filter_script '$newfile_abs' $tmp";
     print "$command\n";
-    system("$filter_script $newfile_abs $tmp");
+    system("$filter_script '$newfile_abs' $tmp");
 }
 
 
