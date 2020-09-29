@@ -4279,7 +4279,9 @@ sub check_config_ini {
                     # value syntax is <type>|<default>
                     my ($opt_type,$opt_default)=split(/\|/,$ref_school->{$section}{$parameter});
                     #print "$section is of type $opt_type, default is $opt_default\n";
-                    if ($opt_type eq "BOOLEAN"){
+                    if ($opt_type eq "BOOLEAN" or
+			($parameter eq "RANDOM_PWD" and $config{$section}{$parameter} ne "birthdate")
+		       ){
                         # value in master is BOOLEAN|<default>
                         my $opt_given=$config{$section}{$parameter};
                         $opt_given=~tr/A-Z/a-z/; # make lowercase

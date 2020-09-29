@@ -480,6 +480,20 @@ if ($analyze_encoding ne ""){
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 &log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
 
+# exit with error message if samba needs longer password than configured
+foreach my $user_file (@filelist){
+    my $filename = basename($user_file);
+    if ($sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'RANDOM_PWD'} eq "TRUE" and
+	$sophomorix_config{'samba'}{'domain_passwordsettings'}{'Minimum_password_length'}>$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PWD_LENGTH'}
+       ){
+        my $error_message="Samba requires a password lenth of $sophomorix_config{'samba'}{'domain_passwordsettings'}{'Minimum_password_length'}. ".
+	                  "You configured PWD_LENGTH=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{'PWD_LENGTH'} for $filename" ;
+        &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+    }
+}
+
+
 ################################################################################
 # Start
 ################################################################################
