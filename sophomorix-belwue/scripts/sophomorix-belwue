@@ -8,6 +8,8 @@
 use strict;
 #use Quota;
 use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
 #use IMAP::Admin;
 #use DBI;
 #use utf8;
@@ -32,12 +34,14 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_add
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
+                                 json_dump
                                  );
 
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_dns_get
+                                 AD_get_AD_for_check
                                     );
 
 my @arguments = @ARGV;
@@ -97,6 +101,10 @@ if ($school eq "default-school"){
     $config_file=$config_path."/".$school."/".$school.".".$config_basename;
 }
 
+# Reading Configuration
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my %conf=&read_config($config_file);
 my %belwue=();
 my @accounts_short=();
@@ -128,8 +136,9 @@ $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/
 $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}="/var/lib/sophomorix/belwue/".$school."/belwue.maillists";
 $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}="/var/lib/sophomorix/belwue/".$school."/belwue.aliases";
 
-#print Dumper(%conf);
-#exit;
+
+# print Dumper(%conf);
+# exit;
 
 # --help
 if ($help==1) {
@@ -143,12 +152,14 @@ sophomorix-belwue
 Options
   -h  / --help
   -i  / --info
+  -j  / --json
   -v  / --verbose
   -vv / --verbose --verbose
 
   --school <schoolname> (defaut is default-school)
 
   --dump-belwue-data (download and parse)
+    --skip-addressbook to avoid connectibg via port 636 to belwue (i. e. if your port is closed)
   --parse-belwue-data (parse already downloaded data)
   --show-object <object_name>
 
@@ -555,17 +566,19 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     # printout data/write data into files
     ############################################################
     open (BOX, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}");
+    print BOX "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
     open (ALIAS, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}");
     open (LIST, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}");
+    print "HERE $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}\n";
 
-    @multi_mailboxes = sort @multi_mailboxes;
-    print "\nMultiMailboxen:\n";
-    my $num_mbox=1;
-    foreach my $uid (@multi_mailboxes){
-        print BOX "$uid\n";
-        print "   $num_mbox) $uid\n";
-        $num_mbox++;
-    }
+#    @multi_mailboxes = sort @multi_mailboxes;
+#    print "\nMultiMailboxen:\n";
+#    my $num_mbox=1;
+#    foreach my $uid (@multi_mailboxes){
+#        print BOX "$uid\n";
+#        print "   $num_mbox) $uid\n";
+#        $num_mbox++;
+#    }
 
     @maillists = sort @maillists;
     print "\nMailing Listen:\n";
@@ -592,14 +605,109 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
         $num++
     }
 
+
+    &json_dump({json => $json,
+                jsoninfo => "BELWUE",
+                jsoncomment => "Data dumped from BelWue",
+                log_level => $Conf::log_level,
+                hash_ref=>\%belwue,
+                sophomorix_config=>\%sophomorix_config,
+               });
+
+    # fetch AD data
+    my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                               root_dse=>$root_dse,
+                                               root_dns=>$root_dns,
+                                               admins=>"FALSE",
+                                               sophomorix_config=>\%sophomorix_config,
+                                             });
+
+    #print Dumper($ref_AD_check);
+    my %Action;
+
+
+    # CALCULATE REQUIRED_MAILBOXES
+    my (@adminclasses) = split(/,/,$conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'ADMINCLASS'});
+    foreach my $adminclass (@adminclasses){
+         $adminclass=&Sophomorix::SophomorixBase::remove_embracing_whitespace($adminclass);
+	 $conf{'SCHOOL'}{$school}{'MAILBOX'}{'CONF'}{'ADMINCLASS'}{$adminclass}="from conf";
+    }
+    my (@users) = split(/,/,$conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'USERS'});
+    foreach my $user (@users){
+         $user=&Sophomorix::SophomorixBase::remove_embracing_whitespace($user);
+	 $conf{'SCHOOL'}{$school}{'MAILBOX'}{'CONF'}{'USERS'}{$user}="from conf";
+    }
+    my (@onlymailboxes) = split(/,/,$conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'ONLYMAILBOX'});
+    foreach my $onlymailbox (@onlymailboxes){
+         $onlymailbox=&Sophomorix::SophomorixBase::remove_embracing_whitespace($onlymailbox);
+	 $conf{'SCHOOL'}{$school}{'MAILBOX'}{'CONF'}{'ONLYMAILBOX'}{$onlymailbox}="from conf";
+    }
+    foreach my $sam ( keys %{ $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sAMAccountName'} } ) {
+	if ($ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSchoolname'} eq $school){
+	    # ADMINCLASS
+	    if (exists $conf{'SCHOOL'}{$school}{'MAILBOX'}{'CONF'}{'ADMINCLASS'}{$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}}){
+		$Action{$school}{'REQUIRED_MAILBOXES'}{$sam}{'ADMINCLASS'}="TRUE";
+	    }
+            # USERS
+	    if (exists $conf{'SCHOOL'}{$school}{'MAILBOX'}{'CONF'}{'USERS'}{$sam}){
+		$Action{$school}{'REQUIRED_MAILBOXES'}{$sam}{'USERS'}="TRUE";
+	    }
+	}
+    }
+    # add onlymailbox
+    foreach my $sam ( keys %{ $conf{'SCHOOL'}{$school}{'MAILBOX'}{'CONF'}{'ONLYMAILBOX'} } ) {
+        $Action{$school}{'REQUIRED_MAILBOXES'}{$sam}{'ONLYMAILBOX'}="TRUE";
+    }
+
+    # calculate mailboxes to add
+    foreach my $sam ( keys %{ $Action{$school}{'REQUIRED_MAILBOXES'} } ) {
+	if (exists $belwue{'multimailbox'}{$sam}){
+            # nothing to do
+	} else {
+            $Action{$school}{'ADD_MAILBOXES'}{$sam}{'ADD'}="TRUE";
+	    my $sur="s";
+	    my $last="s";
+	    my $plain_password="x?s";
+	    my $type="MultiMailbox";
+	    my $mailquota="10";
+	    my $alias="s.l";
+	    my $line="$sam\t$sur $last\t$type\t$plain_password\t${mailquota}M\t$alias\n";
+
+	    print BOX "$line";
+	}
+    }
+
+    # calculate mailboxes to delete
+    foreach my $sam ( keys %{ $belwue{'multimailbox'} } ) {
+	if (exists $Action{$school}{'REQUIRED_MAILBOXES'}{$sam} ){
+            # nothing to do
+	} else {
+            $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'DELETE'}="TRUE";
+	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'group_membership'} } ) {
+              $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'GROUP_MEMBERSHIP'}{$group}="$sam is group member";  
+	    }
+	    print Dumper($belwue{'multimailbox'}{$sam});
+	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'maillist_membership'} } ) {
+              $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'MAILLIST_MEMBERSHIP'}{$group}="$sam is maillist member";  
+	    }
+	}
+    }
+
+
+#print Dumper(%conf);
+print Dumper(%Action);
+#print Dumper(%belwue);
+
     close(BOX);
     close(ALIAS);
     close(LIST);
 
-    if($Conf::log_level>=2){
-        print Dumper(\%belwue);
-        my $ref_belwue=\%belwue;
-    }
+    exit;
+
+    #if($Conf::log_level>=2){
+    #    print Dumper(\%belwue);
+    #    my $ref_belwue=\%belwue;
+    #}
     if ($show_object ne ""){
         #print Dumper($belwue{'objects'}{$show_object});
         # pretty output
