@@ -625,8 +625,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     #print Dumper($ref_AD_check);
     my %Action;
 
-
-    # CALCULATE REQUIRED_MAILBOXES
+    ############################################################
+    # CALCULATE REQUIRED_MAILBOXES from belwue.conf
+    ############################################################
     my (@adminclasses) = split(/,/,$conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'ADMINCLASS'});
     foreach my $adminclass (@adminclasses){
          $adminclass=&Sophomorix::SophomorixBase::remove_embracing_whitespace($adminclass);
@@ -659,7 +660,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
         $Action{$school}{'REQUIRED_MAILBOXES'}{$sam}{'ONLYMAILBOX'}="TRUE";
     }
 
+    ############################################################
     # calculate mailboxes to add
+    ############################################################
     foreach my $sam ( keys %{ $Action{$school}{'REQUIRED_MAILBOXES'} } ) {
 	if (exists $belwue{'multimailbox'}{$sam}){
             # nothing to do
@@ -672,12 +675,13 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 	    my $mailquota="10";
 	    my $alias="s.l";
 	    my $line="$sam\t$sur $last\t$type\t$plain_password\t${mailquota}M\t$alias\n";
-
 	    print BOX "$line";
 	}
     }
 
+    ############################################################
     # calculate mailboxes to delete
+    ############################################################
     foreach my $sam ( keys %{ $belwue{'multimailbox'} } ) {
 	if (exists $Action{$school}{'REQUIRED_MAILBOXES'}{$sam} ){
             # nothing to do
@@ -686,7 +690,6 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'group_membership'} } ) {
               $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'GROUP_MEMBERSHIP'}{$group}="$sam is group member";  
 	    }
-	    print Dumper($belwue{'multimailbox'}{$sam});
 	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'maillist_membership'} } ) {
               $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'MAILLIST_MEMBERSHIP'}{$group}="$sam is maillist member";  
 	    }
@@ -694,16 +697,149 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     }
 
 
-#print Dumper(%conf);
-print Dumper(%Action);
-#print Dumper(%belwue);
+    ############################################################
+    # CALCULATE MANAGED MAILLISTS from belwue.conf
+    ############################################################
+    my (@entries) = split(/,/,$conf{'SCHOOL'}{$school}{$config_basename}{'MAILLIST'}{'MANAGED_ADMINCLASS_LIST'});
+    foreach my $entry (@entries){
+	my ($item,$maillist)=split(/=/,$entry);
+	my (@adminclasses)=split(/\|/,$item);
+	foreach my $adminclass (@adminclasses){
+	    $adminclass=&Sophomorix::SophomorixBase::remove_embracing_whitespace($adminclass);
+	    if (not defined $maillist){
+                $maillist=$adminclass;
+	    } else {
+    	        $maillist=&Sophomorix::SophomorixBase::remove_embracing_whitespace($maillist);
+	    }
+	    $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'MAILLIST_by_ADMINCLASS'}{$adminclass}{$maillist}="member";
+	    $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'ADMINCLASS_by_MAILLIST'}{$maillist}{$adminclass}="member";
+	}
+    }
+
+    foreach my $maillist ( keys %{ $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'ADMINCLASS_by_MAILLIST'} }){
+        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'UPDATE'}="FALSE";
+    }
+
+    ############################################################
+    # calculate maillist memberships to add/maillists to modify 
+    ############################################################
+    # decide which users to add to maillist
+    foreach my $sam ( keys %{ $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sAMAccountName'} } ) {
+	my $adminclass=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'};
+	if (exists $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'MAILLIST_by_ADMINCLASS'}{$adminclass}){
+	    foreach my $maillist ( keys %{ $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'MAILLIST_by_ADMINCLASS'}{$adminclass} }){
+	        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'MEMBERS'}{$sam}="REASON: Adminclass $adminclass";
+                # check if member already
+	        if (exists $belwue{'objects'}{$sam}{'maillist_membership'}{$maillist}){
+                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'KEEP'}{$sam}="$sam is already correct member";
+	        } else {
+		    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'UPDATE'}="TRUE";
+                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'ADD'}{$sam}="ADD $sam to $maillist, REASON: member of $adminclass";
+  	        }
+	    }
+	}
+    }
+
+    # decide which users to delete from maillist
+    foreach my $maillist ( keys %{ $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'ADMINCLASS_by_MAILLIST'} }){
+	foreach my $member ( @{ $belwue{'maillist'}{$maillist}{'memberlist'} }){
+            my $sam=$member;
+	    # remove trailing MAILDOMAIN to get sAMAccountName
+            $sam=~s/\@$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'}$//g;
+	    if ($sam eq $member){
+		# do not care about users in another MAILDOMAIN
+                next;
+	    }
+            if (exists $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'MEMBERS'}{$sam}){
+                # OK members are aleady configured, exit if not
+		if (not exists $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'KEEP'}{$sam}){
+                    print "Strange things happen to $sam in $maillist\n";
+		    exit;
+		}
+	    } else {
+		$Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'UPDATE'}="TRUE";
+                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'REMOVE'}{$sam}="REMOVE $sam from $maillist";
+	    }
+	}
+    }
+
+    foreach my $maillist ( keys %{ $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'ADMINCLASS_by_MAILLIST'} }){
+	my @keys=("MEMBERS","ADD","REMOVE","KEEP");
+	foreach my $key (@keys){
+	    my @list=();
+	    foreach my $item ( keys %{ $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{$key} }){
+		push @list,$item;
+	    }
+	    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{$key}=$#list+1;
+	}
+    }
+
+    
+#    print Dumper(%Action);
+#    exit;
+#   print Dumper(%conf);
+#   print Dumper(%belwue);
 
     close(BOX);
     close(ALIAS);
     close(LIST);
 
-    exit;
+    ############################################################
+    # SUMMARY
+    ############################################################
+    print "\nSUMMARY OF WHAT TO DO:\n";
+    ############################################################
+    # MAILBOXES
+    ############################################################
+    my @add_mailboxes=();
+    foreach my $add_mailboxes (keys %{ $Action{$school}{'ADD_MAILBOXES'} }){
+        push @add_mailboxes, $add_mailboxes;
+    }
+    @add_mailboxes = sort @add_mailboxes;
+    my $add_mailbox_count=$#add_mailboxes+1;
+    print "Add $add_mailbox_count Mailboxes:\n";
+    foreach my $sam (@add_mailboxes){
+        print "   * $sam\n";
+    }
 
+    my @delete_mailboxes=();
+    foreach my $delete_mailboxes (keys %{ $Action{$school}{'DELETE_MAILBOXES'} }){
+        push @delete_mailboxes, $delete_mailboxes;
+    }
+    @delete_mailboxes = sort @delete_mailboxes;
+    my $delete_mailbox_count=$#delete_mailboxes+1;
+    print "Delete $delete_mailbox_count Mailboxes:\n";
+    foreach my $sam (@delete_mailboxes){
+        print "   * $sam\n";
+    }
+
+    print "\n";
+    print "Update the following Maillists by uploading the members file:\n";
+    my $line="+---------------------------+---------+--------+--------+--------+\n";
+    my @update_maillists=();
+    foreach my $maillist ( keys %{ $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'} }){
+	if ($Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'UPDATE'} eq "TRUE"){
+            push @update_maillists,$maillist;
+	}
+    }
+
+    @update_maillists = sort @update_maillists;
+    
+    print $line;
+    print    "| Maillist                  | MEMBERS |    ADD | REMOVE |   KEEP |\n";
+    print $line;
+    foreach my $maillist (@update_maillists){
+	printf "| %-26s|%8s |%7s |%7s |%7s |\n",$maillist,
+		                                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'MEMBERS'},
+		                                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'ADD'},
+		                                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'REMOVE'},
+	                                        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'KEEP'} ;
+    }
+    print $line;
+
+    
+    #print Dumper (%Action);
+    
     #if($Conf::log_level>=2){
     #    print Dumper(\%belwue);
     #    my $ref_belwue=\%belwue;
