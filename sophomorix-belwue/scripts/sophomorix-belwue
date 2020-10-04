@@ -62,11 +62,15 @@ my $no_ldap_fetch=0;
 my $copy_to_teachershare=0;
 my $create_login_data="";
 
-my $dump_belwue_data=0;
+my $dump_belwue_html=0;
 my $skip_addressbook=0;
 my $parse_belwue_data=0;
 my $school="default-school";
 my $show_object="";
+
+my $dump_config=0;
+my $dump_belwue=0;
+my $dump_action=0;
 
 my $config_path="/etc/linuxmuster/sophomorix";
 my $config_basename="belwue-mail.conf";
@@ -83,11 +87,14 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
-           "dump-belwue-data" => \$dump_belwue_data,
+           "dump-belwue-html" => \$dump_belwue_html,
            "skip-addressbook" => \$skip_addressbook,
            "parse-belwue-data" => \$parse_belwue_data,
            "create-login-data=s" => \$create_login_data,
            "show-object=s" => \$show_object,
+           "dump-config" => \$dump_config,
+           "dump-belwue" => \$dump_belwue,
+           "dump-action" => \$dump_action,
            "copy-to-teachershare" => \$copy_to_teachershare,
            "school=s" => \$school,
           );
@@ -109,6 +116,7 @@ my $root_dns=&AD_dns_get($root_dse);
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
 my %conf=&read_config($config_file);
 my %belwue=();
+my %Action=();
 my @accounts_short=();
 
 my @multi_mailboxes=();
@@ -158,10 +166,15 @@ Options
 
   --school <schoolname> (defaut is default-school)
 
-  --dump-belwue-data (download and parse)
+  --dump-belwue-html (download and parse)
     --skip-addressbook to avoid connectibg via port 636 to belwue (i. e. if your port is closed)
   --parse-belwue-data (parse already downloaded data)
   --show-object <object_name>
+
+  Dumping data as JSON Object for debugging:
+  --dump-config -j    (dump processed configuration)
+  --dump-belwue -j    (dump data parsed from downloaded html files)
+  --dump-action -j    (dump what to do)
 
   Todo:
   --create-login-data /path/to/file
@@ -173,7 +186,7 @@ Quick introduction:
      to see what config file you need.
   2) Create configfile and change password (other config stuff should be OK)
   3) Run:
-     sophomorix-belwue --school <schoolname> --dump-belwue-data
+     sophomorix-belwue --school <schoolname> --dump-belwue-html
      This downloads data from belwue: 
         A) The ldap adressbook at belwue 
         B) Downloads html pages from the CommuniGate admin webinterface
@@ -203,8 +216,8 @@ if ($info==1) {
 my @password_chars=&get_passwd_charlist();
 
 
-# --dump-belwue-data / --parse-belwue-data
-if ($dump_belwue_data==1 or $parse_belwue_data){
+# --dump-belwue-html / --parse-belwue-data
+if ($dump_belwue_html==1 or $parse_belwue_data){
     ############################################################
     # ldap address book
     ############################################################ 
@@ -233,7 +246,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             my $num=$index+1;
             my $entry = $mesg->entry($index);
             my $dn=$entry->dn();
-            my $uid=$entry->get_value('uid');
+            my $uid=$entry->get_value('UID');
             my $cn=$entry->get_value('cn');
             my $given=$entry->get_value('givenName');
             my $sn=$entry->get_value('sn');
@@ -258,7 +271,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             $belwue{'objects'}{$uid}{'hostServer'}=$server;
             $belwue{'objects'}{$uid}{'mail'}=$mail;
             $belwue{'objects'}{$uid}{'sn'}=$sn;
-            $belwue{'objects'}{$uid}{'uid'}=$uid;
+            $belwue{'objects'}{$uid}{'UID'}=$uid;
         }
         #print Dumper(%belwue);
 
@@ -315,18 +328,18 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             $storage="none";
         } else {
 	    if ($type eq "Multi-Mailbox"){
-		$belwue{'objects'}{$object}{'quota_used'}=$storage;
+		$belwue{'objects'}{$object}{'QUOTA_USED'}=$storage;
 	    } elsif ($type eq "Alias") {
-		$belwue{'objects'}{$object}{'uid'}=$storage;
+		$belwue{'objects'}{$object}{'UID'}=$storage;
 	    } elsif ($type eq "Gruppe") {
-		$belwue{'objects'}{$object}{'member_count'}=$storage;
+		$belwue{'objects'}{$object}{'MEMBER_COUNT'}=$storage;
 	    }
 	}
         if (not defined $access){
             $access="never";
         } else {
 	    if ($type eq "Multi-Mailbox"){
-		$belwue{'objects'}{$object}{'last_access'}=$access;
+		$belwue{'objects'}{$object}{'LAST_ACCESS'}=$access;
 	    } elsif ($type eq "Alias") {
                 # nothing to do
 	    } elsif ($type eq "Gruppe") {
@@ -334,10 +347,10 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 	    }
 	}
 	#print "   * Extracted row: $object  $type  $storage  $access\n";
-        $belwue{'objects'}{$object}{'type'}=$type;
+        $belwue{'objects'}{$object}{'TYPE'}=$type;
         # add to types
         if ($type eq "Mailingliste"){
-            $belwue{'maillist'}{$object}{'type'}=$type;
+            $belwue{'maillist'}{$object}{'TYPE'}=$type;
             push @maillists, $object;
             ############################################################
             # downloading maillist data
@@ -391,19 +404,19 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                 my ($uid,$domain)=split(/\@/,$member_email);
 
                 if ($type ne "Abonnement aufheben"){
-                    $belwue{'maillist'}{$object}{'members'}{$member_email}="member";
+                    $belwue{'maillist'}{$object}{'MEMBERS'}{$member_email}="member";
                     if ($domain eq $conf{'SCHOOL'}{$school}{'CONNECT'}{'MAILDOMAIN'}){
-			$belwue{'objects'}{$uid}{'maillist_membership'}{$object}=$type;
-			$belwue{'objects'}{$object}{'members'}{$uid}=$type;
+			$belwue{'objects'}{$uid}{'MAILLIST_MEMBERSHIP'}{$object}=$type;
+			$belwue{'objects'}{$object}{'MEMBERS'}{$uid}=$type;
 		    } else {
 			# foreign domain, nothing to do
 		    }
-                    push @{ $belwue{'maillist'}{$object}{'memberlist'} }, $member_email;
+                    push @{ $belwue{'maillist'}{$object}{'MEMBERLIST'} }, $member_email;
                 } else {
-		    $belwue{'warnings'}{$uid}{'maillist_membership_warning'}{$object}=$type;
+		    $belwue{'warnings'}{$uid}{'MAILLIST_MEMBERSHIP_WARNING'}{$object}=$type;
 		}
-		$belwue{'objects'}{$uid}{'maillist_membership_created'}{$object}=$time;
-		$belwue{'objects'}{$uid}{'maillist_messages_bounced'}{$object}=$bounced;
+		$belwue{'objects'}{$uid}{'MAILLIST_MEMBERSHIP_CREATED'}{$object}=$time;
+		$belwue{'objects'}{$uid}{'MAILLIST_MESSAGES_BOUNCED'}{$object}=$bounced;
             }
 	    if ($empty_row==0){
 		print "  * $row_count rows parsed\n";
@@ -411,11 +424,11 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 		print "  * $row_count empty row parsed\n";
 	    }
             # sort the memberlist if not empty
-            if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
-                 @{ $belwue{'maillist'}{$object}{'memberlist'} } = sort @{ $belwue{'maillist'}{$object}{'memberlist'}  };
+            if ( not  $#{ $belwue{'maillist'}{$object}{'MEMBERLIST'} }==-1 ){
+                 @{ $belwue{'maillist'}{$object}{'MEMBERLIST'} } = sort @{ $belwue{'maillist'}{$object}{'MEMBERLIST'}  };
             }
         } elsif ($type eq "Gruppe"){
-            $belwue{'group'}{$object}{'type'}=$type;
+            $belwue{'GROUP'}{$object}{'TYPE'}=$type;
             push @groups, $object;
             ############################################################
             # downloading group data
@@ -458,22 +471,22 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 		    if (not defined $domain or
                         $domain eq $conf{'SCHOOL'}{$school}{'CONNECT'}{'MAILDOMAIN'}
                        ){
-                        $belwue{'objects'}{$uid}{'group_membership'}{$object}=$type;
-                        $belwue{'objects'}{$object}{'members'}{$uid}="member";
+                        $belwue{'objects'}{$uid}{'GROUP_MEMBERSHIP'}{$object}=$type;
+                        $belwue{'objects'}{$object}{'MEMBERS'}{$uid}="member";
                     } else {
-                        $belwue{'objects'}{$object}{'members'}{$member_mail}="member";
+                        $belwue{'objects'}{$object}{'MEMBERS'}{$member_mail}="member";
                     }
 		}
 	    }
         } elsif ($type eq "Alias"){
-            $belwue{'alias'}{$object}=$storage;
-            $belwue{'alias_reverse'}{$storage}=$object;
+            $belwue{'ALIAS'}{$object}=$storage;
+            $belwue{'ALIAS_REVERSE'}{$storage}=$object;
             # aliases are in storage
-            $belwue{'objects'}{$storage}{'alias'}=$object;
+            $belwue{'objects'}{$storage}{'ALIAS'}=$object;
         } elsif ($type eq "Multi-Mailbox"){
-            $belwue{'multimailbox'}{$object}{'type'}="Multi-Mailbox";
-            $belwue{'multimailbox'}{$object}{'storage'}=$storage;
-            $belwue{'multimailbox'}{$object}{'access'}=$access;
+            $belwue{'multimailbox'}{$object}{'TYPE'}="Multi-Mailbox";
+            $belwue{'multimailbox'}{$object}{'STORAGE'}=$storage;
+            $belwue{'multimailbox'}{$object}{'ACCESS'}=$access;
             push @multi_mailboxes, $object;
 
             ############################################################
@@ -586,7 +599,6 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                                              });
 
     #print Dumper($ref_AD_check);
-    my %Action;
 
     ############################################################
     # CALCULATE REQUIRED_MAILBOXES from belwue.conf
@@ -683,10 +695,10 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             # nothing to do
 	} else {
             $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'DELETE'}="TRUE";
-	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'group_membership'} } ) {
+	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'GROUP_MEMBERSHIP'} } ) {
               $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'GROUP_MEMBERSHIP'}{$group}="$sam is group member";  
 	    }
-	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'maillist_membership'} } ) {
+	    foreach my $group ( keys %{ $belwue{'objects'}{$sam}{'MAILLIST_MEMBERSHIP'} } ) {
               $Action{$school}{'DELETE_MAILBOXES'}{$sam}{'MAILLIST_MEMBERSHIP'}{$group}="$sam is maillist member";  
 	    }
 	}
@@ -726,7 +738,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 	    foreach my $maillist ( keys %{ $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'MAILLIST_by_ADMINCLASS'}{$adminclass} }){
 	        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'MEMBERS'}{$sam}="REASON: Adminclass $adminclass";
                 # check if member already
-	        if (exists $belwue{'objects'}{$sam}{'maillist_membership'}{$maillist}){
+	        if (exists $belwue{'objects'}{$sam}{'MAILLIST_MEMBERSHIP'}{$maillist}){
                     $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'KEEP'}{$sam}="$sam is already correct member";
 	        } else {
 		    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'UPDATE'}="TRUE";
@@ -738,7 +750,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 
     # decide which users to delete from maillist
     foreach my $maillist ( keys %{ $conf{'SCHOOL'}{$school}{'MAILLIST'}{'CONF'}{'ADMINCLASS_by_MAILLIST'} }){
-	foreach my $member ( @{ $belwue{'maillist'}{$maillist}{'memberlist'} }){
+	foreach my $member ( @{ $belwue{'maillist'}{$maillist}{'MEMBERLIST'} }){
             my $sam=$member;
 	    # remove trailing MAILDOMAIN to get sAMAccountName
             $sam=~s/\@$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'}$//g;
@@ -943,9 +955,40 @@ if($copy_to_teachershare){
 }
 
 
-if($Conf::log_level>=2){
-#    print Dumper(%conf);
+# --dump-config
+if ($dump_config==1){
+    &json_dump({json => $json,
+                jsoninfo => "CONFIG",
+                jsoncomment => "The Config hash",
+                log_level => $Conf::log_level,
+                hash_ref=>\%conf,
+                sophomorix_config=>\%sophomorix_config,
+              });
 }
+
+# --dump-belwue
+if ($dump_belwue==1){
+    &json_dump({json => $json,
+                jsoninfo => "BELWUE",
+                jsoncomment => "BelWue data dump",
+                log_level => $Conf::log_level,
+                hash_ref=>\%belwue,
+                sophomorix_config=>\%sophomorix_config,
+              });
+}
+
+# --dump-action
+if ($dump_action==1){
+    &json_dump({json => $json,
+                jsoninfo => "ACTION",
+                jsoncomment => "The Action hash",
+                log_level => $Conf::log_level,
+                hash_ref=>\%Action,
+                sophomorix_config=>\%sophomorix_config,
+              });
+}
+
+
 
 
 
