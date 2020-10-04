@@ -112,7 +112,6 @@ my %belwue=();
 my @accounts_short=();
 
 my @multi_mailboxes=();
-my @aliases=();
 my @maillists=();
 my @groups=();
 
@@ -134,9 +133,8 @@ $conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'}=$conf{'SCHOOL'}{$school}{'be
 
 # calculate paths
 $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}="/var/lib/sophomorix/belwue/".$school."/downloads";
-$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/belwue_multimailboxes_utf8.txt";
-$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}="/var/lib/sophomorix/belwue/".$school."/belwue.maillists";
-$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}="/var/lib/sophomorix/belwue/".$school."/belwue.aliases";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}="/var/lib/sophomorix/belwue/".$school."/results";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/results/belwue_multimailboxes_utf8.txt";
 
 
 # print Dumper(%conf);
@@ -300,7 +298,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 
     # file to parse
     my $html_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/objects.html";
-    print "   * Parsing $html_doc:\n\n";
+    print "* Parsing all objects $html_doc:\n";
 
     # list of headers
     my $table_headers = [ 'Objekt', 'Typ','Speicher','Letzter Zugriff' ];
@@ -335,7 +333,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
                 # nothing to do
 	    }
 	}
-	print "   * Extracted row: $object  $type  $storage  $access\n";
+	#print "   * Extracted row: $object  $type  $storage  $access\n";
         $belwue{'objects'}{$object}{'type'}=$type;
         # add to types
         if ($type eq "Mailingliste"){
@@ -368,7 +366,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             # parsing maillist data
             ############################################################
             my $html_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html";
-            print "   * Parsing $html_doc\n";
+            print "* Parsing object $html_doc\n";
 
             # list of headers
             # Umlaut in header does nor work
@@ -408,9 +406,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 		$belwue{'objects'}{$uid}{'maillist_messages_bounced'}{$object}=$bounced;
             }
 	    if ($empty_row==0){
-		print "   * $row_count rows parsed\n";
+		print "  * $row_count rows parsed\n";
 	    } else {
-		print "   * $row_count empty row parsed\n";
+		print "  * $row_count empty row parsed\n";
 	    }
             # sort the memberlist if not empty
             if ( not  $#{ $belwue{'maillist'}{$object}{'memberlist'} }==-1 ){
@@ -446,7 +444,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             # parsing group data
             ############################################################
             my $html_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object.html";
-            print "   * Parsing $html_doc\n";
+            print "* Parsing group file $html_doc\n";
 
             my $string=`cat $html_doc | grep input | grep Members | grep value`;
             my (@lines)=split(/\n/,$string);
@@ -454,7 +452,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 		my ($unused1,$used)=split("value=",$line);
 		my ($member_mail,$unused2)=split(" ",$used);
 		$member_mail=~s/"//g;
-                print "<$member_mail>\n";
+                #print "<$member_mail>\n";
 		if ($member_mail ne ""){
                     my ($uid,$domain)=split(/\@/,$member_mail);
 		    if (not defined $domain or
@@ -472,7 +470,6 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
             $belwue{'alias_reverse'}{$storage}=$object;
             # aliases are in storage
             $belwue{'objects'}{$storage}{'alias'}=$object;
-            push @aliases, $object;
         } elsif ($type eq "Multi-Mailbox"){
             $belwue{'multimailbox'}{$object}{'type'}="Multi-Mailbox";
             $belwue{'multimailbox'}{$object}{'storage'}=$storage;
@@ -564,50 +561,13 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
         } else {
             print "Unknown object $type\n";
         }
-	print "\n";
     }
     ############################################################
     # printout data/write data into files
     ############################################################
-    open (BOX, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}");
-    print BOX "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
-    open (ALIAS, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}");
-    open (LIST, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}");
-
-#    @multi_mailboxes = sort @multi_mailboxes;
-#    print "\nMultiMailboxen:\n";
-#    my $num_mbox=1;
-#    foreach my $uid (@multi_mailboxes){
-#        print BOX "$uid\n";
-#        print "   $num_mbox) $uid\n";
-#        $num_mbox++;
-#    }
-
-    @maillists = sort @maillists;
-    print "\nMailing Listen:\n";
-    foreach my $list (@maillists){
-        my $member_string=join(",",@{ $belwue{'maillist'}{$list}{'memberlist'} });
-        print LIST "$list:$member_string\n";
-        print "   * $list\n";
-        my $num_list=1;
-        foreach my $member ( @{ $belwue{'maillist'}{$list}{'memberlist'} } ){
-            if (not defined $member){
-                next;
-            } 
-            print "     $num_list) --> $member\n";
-            $num_list++;
-        }
-    }
-
-    @aliases = sort @aliases;
-    print "\nMail aliases:\n";
-    my $num=1;
-    foreach my $alias (@aliases){
-        print ALIAS "$alias:$belwue{'alias'}{$alias}\n";
-        print "   $num) $alias --> $belwue{'alias'}{$alias}\n";
-        $num++
-    }
-
+    system("mkdir -p $conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}");
+    open (MULTIMAILBOX, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}");
+    print MULTIMAILBOX "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
 
     &json_dump({json => $json,
                 jsoninfo => "BELWUE",
@@ -711,7 +671,7 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 	  	      $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
 	    $alias=~tr/A-Z/a-z/; # make lowercase
 	    my $line="$sam\t$given $last\t$type\t$plain_password\t${mailquota}\t$alias\n";
-	    print BOX "$line";
+	    print MULTIMAILBOX "$line";
 	}
     }
 
@@ -813,12 +773,10 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     
 #    print Dumper(%Action);
 #    exit;
-   print Dumper(%conf);
+#   print Dumper(%conf);
 #   print Dumper(%belwue);
-    exit;
-    close(BOX);
-    close(ALIAS);
-    close(LIST);
+#    exit;
+    close(MULTIMAILBOX);
 
     ############################################################
     # SUMMARY
@@ -849,8 +807,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
         print "   * $sam\n";
     }
 
-    print "\n";
-    print "Update the following Maillists by uploading the members file:\n";
+    ############################################################
+    # SHOW MAILLISTS
+    ############################################################
     my $line="+---------------------------+---------+--------+--------+--------+\n";
     my @update_maillists=();
     foreach my $maillist ( keys %{ $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'} }){
@@ -860,18 +819,59 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     }
 
     @update_maillists = sort @update_maillists;
-    
-    print $line;
-    print    "| Maillist                  | MEMBERS |    ADD | REMOVE |   KEEP |\n";
-    print $line;
-    foreach my $maillist (@update_maillists){
-	printf "| %-26s|%8s |%7s |%7s |%7s |\n",$maillist,
-		                                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'MEMBERS'},
-		                                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'ADD'},
-		                                $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'REMOVE'},
-	                                        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'KEEP'} ;
+
+    print "\n";
+    print "Update the following Maillists by uploading the members file:\n";
+    if($Conf::log_level>=2){
+        foreach my $maillist (@update_maillists){
+            print "------------------------------------------------------------\n";
+            print " Maillist: $maillist:\n";
+            print "------------------------------------------------------------\n";
+	    my @keys=("MEMBERS","ADD","REMOVE","KEEP");
+	    foreach my $key (@keys){
+	        my @list=();
+	        foreach my $item ( keys %{ $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{$key} }){
+		    push @list,$item;
+	        }
+                @list = sort @list;
+		print "   ${key}:\n";
+		foreach my $item (@list){
+                    print "     * ".$item."@".$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'}."\n";
+		}
+	    }
+	}
+    } else {
+        print $line;
+        print    "| Maillist                  | MEMBERS |    ADD | REMOVE |   KEEP |\n";
+        print $line;
+        foreach my $maillist (@update_maillists){
+	    printf "| %-26s|%8s |%7s |%7s |%7s |\n",$maillist,
+	   	                                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'MEMBERS'},
+		                                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'ADD'},
+		                                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'REMOVE'},
+	                                            $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'KEEP'} ;
+        }
+        print $line;
     }
-    print $line;
+
+    ############################################################
+    # CREATE MAILLIST FILES
+    ############################################################
+    foreach my $maillist (@update_maillists){
+	# create file
+        my $maillist_file=$conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}."/maillist_".$maillist.".txt";
+	my @members=();
+	open (MAILLIST, ">$maillist_file");
+	foreach my $member ( keys %{ $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'MEMBERS'} }){
+	    push @members,$member;
+	}
+        @members = sort @members;
+	foreach my $member (@members){
+            print MAILLIST $member."@".$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'}."\n";
+	}
+        close(MAILLIST);
+
+    }
 
     
     #print Dumper (%Action);
@@ -944,7 +944,7 @@ if($copy_to_teachershare){
 
 
 if($Conf::log_level>=2){
-    print Dumper(%conf);
+#    print Dumper(%conf);
 }
 
 

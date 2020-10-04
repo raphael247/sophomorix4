@@ -6005,10 +6005,10 @@ sub create_plain_password {
             for ($i=1;$i<=$num;$i++){
                 $password=$password.$password_chars[int (rand $#password_chars)];
             }
-	    print "Password to test: $password\n";
+	    #print "Password to test: $password\n";
         }
     }
-    print "Password OK: $password\n";
+    #print "Password OK: $password\n";
     return $password;
 }
 
