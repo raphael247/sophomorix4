@@ -4956,6 +4956,7 @@ sub AD_get_AD_for_check {
 				'homeDirectory',
                                 'sophomorixSurnameInitial',
                                 'sophomorixFirstnameInitial',
+                                'sophomorixFirstPassword',
                                 'sophomorixAdminFile',
                                 'sophomorixAdminClass',
                                 'sophomorixRole',
@@ -5011,6 +5012,7 @@ sub AD_get_AD_for_check {
                    $AD{'sAMAccountName'}{$sam}{'homeDirectory'}=$entry->get_value('homeDirectory');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixSurnameInitial'}=$entry->get_value('sophomorixSurnameInitial');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstnameInitial'}=$entry->get_value('sophomorixFirstnameInitial');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixFirstPassword'}=$entry->get_value('sophomorixFirstPassword');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$file;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');

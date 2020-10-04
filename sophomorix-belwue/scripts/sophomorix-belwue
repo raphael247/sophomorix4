@@ -29,6 +29,8 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_end
                                  log_script_exit
                                  check_options
+                                 get_passwd_charlist
+                                 get_plain_password
                                  config_sophomorix_read
                                  result_sophomorix_init
                                  result_sophomorix_add
@@ -132,7 +134,7 @@ $conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'}=$conf{'SCHOOL'}{$school}{'be
 
 # calculate paths
 $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}="/var/lib/sophomorix/belwue/".$school."/downloads";
-$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/belwue.multimailboxes";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/belwue_multimailboxes_utf8.txt";
 $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}="/var/lib/sophomorix/belwue/".$school."/belwue.maillists";
 $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}="/var/lib/sophomorix/belwue/".$school."/belwue.aliases";
 
@@ -200,6 +202,8 @@ if ($info==1) {
 ##################################################
 # Script starts here
 ##################################################
+my @password_chars=&get_passwd_charlist();
+
 
 # --dump-belwue-data / --parse-belwue-data
 if ($dump_belwue_data==1 or $parse_belwue_data){
@@ -569,7 +573,6 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     print BOX "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
     open (ALIAS, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_ALIASES'}");
     open (LIST, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MAILLISTS'}");
-    print "HERE $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}\n";
 
 #    @multi_mailboxes = sort @multi_mailboxes;
 #    print "\nMultiMailboxen:\n";
@@ -667,14 +670,47 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
 	if (exists $belwue{'multimailbox'}{$sam}){
             # nothing to do
 	} else {
+	    if (exists $Action{$school}{'REQUIRED_MAILBOXES'}{$sam}{'ONLYMAILBOX'} and
+		$Action{$school}{'REQUIRED_MAILBOXES'}{$sam}{'ONLYMAILBOX'} eq "TRUE"){
+                # skip this user, should be created with the WEBUI of belwue
+                next;
+	    }
             $Action{$school}{'ADD_MAILBOXES'}{$sam}{'ADD'}="TRUE";
-	    my $sur="s";
-	    my $last="s";
-	    my $plain_password="x?s";
+	    my $last=$ref_AD_check->{'sAMAccountName'}{$sam}{'sn'};
+	    my $given=$ref_AD_check->{'sAMAccountName'}{$sam}{'givenName'};
+	    my $plain_password;
+	    if ($conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'PASSWORD'} eq "sophomorixFirstPassword"){
+		$plain_password=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstPassword'};
+	    } elsif ($conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'PASSWORD'}>6) {
+                $plain_password=&get_plain_password(
+                        "teacher",
+                        "",
+                        "TRUE", # TRUE/FALSE/birthday
+                        $conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'PASSWORD'}, # length of random pwd
+                        "",
+                        \%sophomorix_config,
+                        @password_chars);
+
+	    } else {
+                print "Misconfigured [MAILBOX]-> PASSWORD (must be sophomorixFirstPassword|number larger than 6)\n";
+		exit;
+	    }
 	    my $type="MultiMailbox";
-	    my $mailquota="10";
-	    my $alias="s.l";
-	    my $line="$sam\t$sur $last\t$type\t$plain_password\t${mailquota}M\t$alias\n";
+	    my $mailquota=$conf{'SCHOOL'}{$school}{$config_basename}{'MAILBOX'}{'MAILQUOTA'};
+	    if (not defined $sam or
+		not defined $given or
+                not defined $last or
+                not defined $type or
+                not defined $plain_password or
+                not defined $mailquota
+		){
+                next;
+	    }
+	    my $alias=$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixFirstnameASCII'}.
+		      ".".
+	  	      $ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixSurnameASCII'};
+	    $alias=~tr/A-Z/a-z/; # make lowercase
+	    my $line="$sam\t$given $last\t$type\t$plain_password\t${mailquota}\t$alias\n";
 	    print BOX "$line";
 	}
     }
@@ -777,9 +813,9 @@ if ($dump_belwue_data==1 or $parse_belwue_data){
     
 #    print Dumper(%Action);
 #    exit;
-#   print Dumper(%conf);
+   print Dumper(%conf);
 #   print Dumper(%belwue);
-
+    exit;
     close(BOX);
     close(ALIAS);
     close(LIST);
