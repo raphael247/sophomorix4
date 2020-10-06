@@ -45,6 +45,7 @@ use Sophomorix::SophomorixBase qw(
                                  result_sophomorix_init
                                  result_sophomorix_add
                                  result_sophomorix_add_summary
+                                 result_sophomorix_add_log
                                  result_sophomorix_check_exit
                                  result_sophomorix_print
                                  filelist_fetch
@@ -605,7 +606,6 @@ foreach my $inject (@injectlines){
 }
 
 
-
 # --dump-files
 if ($dump_files==1){
     &json_dump({json => $json,
@@ -629,6 +629,26 @@ if ($follow ne ""){
     } else {
         print "   * LINE ORIG: $users_file{$follow_file}{'identifier_ascii'}{$identifier}{LINE_OLD}\n";
         print "   * LINE UTF8: $users_file{$follow_file}{'identifier_ascii'}{$identifier}{LINE_NEW}\n";
+    }
+}
+
+# set WARNING to exit if multile identifiers exist
+foreach my $school (@opt_schoollist){
+    foreach my $identifier_ascii (keys %{ $users_file{'LOOKUP'}{$school}{'identifier_ascii'} } ) {
+	my $count=$users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{'COUNT'};
+	my @list=();
+	if ($count>1){
+	    for (my $i=1;$i<=$count;$i++){
+		my $file=$users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{$i}{'FILE'};
+		my $class=$users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{$i}{'CLASS'};
+		my $item="FILE:".$file."|CLASS:".$class;
+		push @list,$item;
+	    }
+	    my $appendix=join(",",@list);
+            my $message="Identifier ".$identifier_ascii." seen ".$count." times in school ".$school.
+                        ": $appendix (please fix this in your files)";
+            &result_sophomorix_add(\%sophomorix_result,"WARNING",-1,\@arguments,$message);
+	}
     }
 }
 
@@ -689,7 +709,6 @@ if ($dump_login_avoid==1){
 #    $users_file{$school}{'file_dynamic_identifiers_utf8'}
 # and populated from AD by subs (AD identifiers): 
 # $Match{$school}{'ad_dynamic_identifiers_ascii'} $Match{$school}{'ad_dynamic_identifiers_utf8'}
-
 foreach my $school (@opt_schoollist) {
     # no migration
     #&populate_ad_dynamic_identifiers_utf8();
@@ -723,6 +742,7 @@ foreach my $school (@opt_schoollist) {
             &write_add_file($school,$line_new);
         }
     }
+
     ############################################################
     # Users in AD: sophomorix.update/sophomorix.kill/sophomorix.nochange
     ############################################################
@@ -943,6 +963,7 @@ foreach my $school (@opt_schoollist) {
     }
     &print_title("## School $school ... Done!");
 }
+
 
 
 close(ADD);
@@ -1689,13 +1710,14 @@ sub write_add_file {
         $status="U";
     }
 
-    my ($login,$error_message)=&create_test_login($school,$Match{$school}{'ACTION'}{$line_add}{'identifier_ascii'}, # user data
-        $Match{$school}{'ACTION'}{$line_add}{'filename'}, # filename for password length
-        $Match{$school}{'ACTION'}{$line_add}{'login'}, # proposed login (will be tested)
-        $ref_AD_check, # forbidden logins
-        $ref_login_avoid, # logins to avoid
-        $Match{$school}{'ACTION'}{$line_add}{'line_count'},
-        \%users_file,
+    my ($login,$error_message)=&create_test_login($school,
+						  $Match{$school}{'ACTION'}{$line_add}{'identifier_ascii'}, # user data
+                                                  $Match{$school}{'ACTION'}{$line_add}{'filename'}, # filename for password length
+                                                  $Match{$school}{'ACTION'}{$line_add}{'login'}, # proposed login (will be tested)
+                                                  $ref_AD_check, # forbidden logins
+                                                  $ref_login_avoid, # logins to avoid
+                                                  $Match{$school}{'ACTION'}{$line_add}{'line_count'},
+                                                  \%users_file,
 						  \%sophomorix_config);
     my $mail=&AD_create_new_mail($login,
                                  \@arguments,
@@ -2180,6 +2202,7 @@ sub analyze_user_line {
         # identifier
         my $identifier_utf8=join(";", ($last_utf8,$first_utf8,$birthdate));
         my $identifier_ascii=join(";", ($last_ascii,$first_ascii,$birthdate));
+
         # corrected line
         my $line_new=join(";", ($class,$last_utf8,$first_utf8,$birthdate,$unid));
         print USERSUTF8 $line_new."\n";
@@ -2189,9 +2212,26 @@ sub analyze_user_line {
             # remember the line
             $ref_lines_seen->{'LINES'}{$line_new}="seen";
 	} else {
-            # ignore this line
+            # ignore this line with WARNING
+	    &result_sophomorix_add_log(\%sophomorix_result,"WARNING: LINE $line_new is multiple in $filename (ignoring double line)");
             return;
 	}
+
+	# do not ignore first identifier of multiple identifiers within a school
+	if (exists $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}){
+            my $count=$users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{'COUNT'};
+	    $count++;
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{$count}{'CLASS'}=$class;
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{$count}{'FILE'}=$filename;
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{$count}{'UNID'}=$unid;
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{'COUNT'}=$count;
+	    return;
+	} else {
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{'1'}{'CLASS'}=$class;
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{'1'}{'FILE'}=$filename;
+	    $users_file{'LOOKUP'}{$school}{'identifier_ascii'}{$identifier_ascii}{'COUNT'}=1;
+        }
+
 
         # by schoolname
         $users_file{$school}{'identifier_ascii'}{$identifier_ascii}{LINE_OLD}=$line;
