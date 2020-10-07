@@ -57,6 +57,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_get_passwd
                                  AD_get_groups_v
                                  AD_get_full_groupdata
+                                 AD_get_AD_for_check
                                     );
 my @arguments = @ARGV;
 
@@ -89,7 +90,7 @@ $options{'CONFIG'}{'ACTION'}{'GROUP'}="create,".
                                       "removemembers";
 # define which options deliver which object
 $options{'CONFIG'}{'ONE_OF'}{'GROUP'}="class";
-$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes,delete-all-teacheronly-classes,update-maildomain";
+$options{'CONFIG'}{'SINGLE'}{'ACTION'}="delete-all-empty-classes,delete-all-teacheronly-classes,update-maildomain,remove-student-admins-from-class";
 # define option that can modify which object
 $options{'CONFIG'}{'MAYBE'}{'GROUP'}="all,".
                                      "teacherclass,".
@@ -134,6 +135,7 @@ my $testopt=GetOptions(\%options,
                        "delete-all-empty-classes",
                        "delete-all-teacheronly-classes",
                        "update-maildomain",
+		       "remove-student-admins-from-class",
                       );    
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-class");
@@ -212,6 +214,10 @@ Changing one/multiple admin-/extra-/teacherclass:
     --addadmins user1,user2,user3, ...
     --removeadmins user1,user2,user3, ...
 
+    For administrators:
+    --remove-student-admins-from-class --info   (show which users are removed as admin)
+    --remove-student-admins-from-class --info   (do it)
+
 Updating changes from school.conf
     --update-maildomain  (for all schools)
 
@@ -222,7 +228,6 @@ This is for migration/testing/fixing only (only one class allowed as option):
   --members user1,user2,user3, ... 
   --addmembers user1,user2,user3, ...
   --removemembers user1,user2,user3, ...
-
 
 
 Be careful with this commands:
@@ -252,7 +257,10 @@ my @opt_schoollist=&create_schoollist($options{'school'},\%sophomorix_config);
 
 # --info
 # show all class when no specific class is given
-if ($options{'info'}==1 and not defined $options{'class'}){
+if ($options{'info'}==1 and not
+    defined $options{'class'} and not
+    defined $options{'remove-student-admins-from-class'}
+   ){
     my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
                                    root_dse=>$root_dse,
                                    root_dns=>$root_dns,
@@ -491,6 +499,59 @@ if (defined $options{'delete-all-empty-classes'} or defined $options{'delete-all
 }
 
 
+# --remove-student-admins-from-class
+if (defined $options{'remove-student-admins-from-class'}){
+    my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+                                   root_dse=>$root_dse,
+                                   root_dns=>$root_dns,
+                                   school=>$options{'school'},
+                                   sophomorix_config=>\%sophomorix_config,
+				     });
+
+    # fetch AD data
+    my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           admins=>"FALSE",
+                                           sophomorix_config=>\%sophomorix_config,
+                                         });
+
+    foreach my $school (@opt_schoollist){
+	print "##################################################################################\n";
+        print "##### Looking for students as class-admins in school $school #####\n";
+	print "##################################################################################\n";
+        foreach my $adminclass (@{ $ref_group_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'adminclass'} }){
+            my $ref_groups=&AD_get_full_groupdata({ldap=>$ldap,
+                                                   root_dse=>$root_dse,
+                                                   root_dns=>$root_dns,
+                                                   grouplist=>$adminclass,
+                                                   sophomorix_config=>\%sophomorix_config,
+						  });
+	    foreach my $admin ( @{ $ref_groups->{'GROUPS'}{$adminclass}{'sophomorixAdmins'} }){
+		my $role=$ref_AD_check->{'sAMAccountName'}{$admin}{'sophomorixRole'};
+		my $display_name=$ref_AD_check->{'sAMAccountName'}{$admin}{'displayName'};
+		if ($role eq "student"){
+		    my $command="sophomorix-class --removeadmins $admin -c $adminclass";
+		    if ($options{'info'}==0){
+			my $return=system("$command > /dev/null");
+			if ($return==0){
+			    print "  * SUCCESS: $command\n";
+			} else {
+			    print "  * FAILED: $command\n";
+			}
+		    } else {
+			print "  INFO: student $admin must be removed from $adminclass: $command\n";
+		    }
+		}
+	    }
+	}
+	print "##################################################################################\n";
+    }
+
+    #print Dumper ($ref_group_v);
+    &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$options{'json'});
+}
 
 
 
