@@ -1297,7 +1297,7 @@ if (defined $custom_multi_5 and $user ne ""){
 
 
 # --clear-unid
-if ($user ne "" and defined $clear_unid){
+if ($user ne "" and $clear_unid==1){
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
@@ -1313,7 +1313,7 @@ if ($user ne "" and defined $clear_unid){
 
 
 # --set-unid <unid>
-if ($user ne "" and defined $set_unid){
+if ($user ne "" and $set_unid ne ""){
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
