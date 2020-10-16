@@ -85,6 +85,8 @@ my $add_webui_permissions;
 my $remove_webui_permissions;
 
 my $comment;
+my $clear_unid=0;
+my $set_unid="";
 my $set_proxy_addresses;
 my $add_proxy_addresses;
 my $remove_proxy_addresses;
@@ -177,6 +179,8 @@ my $testopt=GetOptions(
        "school=s" => \$school,
        "u|user=s" => \$user,
        "comment=s" => \$comment,
+       "clear-unid" => \$clear_unid,
+       "set-unid=s" => \$set_unid,
        "set-single-value-attribute=s" => \$set_single_value_attribute,
        "set-multi-value-attribute=s" => \$set_multi_value_attribute,
        "add-multi-value-attribute=s" => \$add_multi_value_attribute,
@@ -324,6 +328,10 @@ MailQuota:
         --quota <linuxmuster-global>:<number(MiB)>:<comment>,
                 <share1>:<quota1 in MiB>:<comment1>,...
         --mailquota <mailquota in MiB)>:<comment>
+
+Updating unid of a user:
+  --user <user> --set-unid <unid>   (set unit to <unid>)
+  --user <user> --clear-unid        (prepare for upload of a unid from students file)
 
 Updating comment of a user:
   --user <user> --comment "This is the comment"
@@ -1286,14 +1294,47 @@ if (defined $custom_multi_5 and $user ne ""){
                     });
 }
 
+
+
+# --clear-unid
+if ($user ne "" and defined $clear_unid){
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     unid=>"---",
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+
+# --set-unid <unid>
+if ($user ne "" and defined $set_unid){
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     unid=>$set_unid,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
 # --set-single-value-attribute <attribute> --entry <entry>
 if ($user ne "" and defined $set_single_value_attribute and defined $entry ){
     &AD_user_update({ldap=>$ldap,
                      root_dse=>$root_dse,
                      dn=>$dn,
                      user=>$user,
-                   single_value_set=>$set_single_value_attribute,
-                   single_value_entry=>$entry,
+                     single_value_set=>$set_single_value_attribute,
+                     single_value_entry=>$entry,
                      user_count=>"",
                      max_user_count=>"-",
                      json=>$json,
