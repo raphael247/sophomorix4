@@ -520,7 +520,32 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             ############################################################
             # parsing Multi-Mailbox Settings
             ############################################################
-            # nothing so far
+            my $html_object_settings = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object-settings.html";
+            print "* Parsing htmp page $html_object_settings \n";
+
+	    # extract maillist admin box from table
+            my $te = HTML::TableExtract->new( depth => 5, count => 10 );
+	    $te->utf8_mode(1);
+            $te->parse_file($html_object_settings);
+            foreach my $ts ($te->tables) {
+                #print "Table found at ", join(',', $ts->coords), ":\n";
+		my $row_count=0;
+                foreach my $row ($ts->rows) {
+		    $row_count++;
+		    my ($maillist)=@$row;
+		    $maillist=&Sophomorix::SophomorixBase::remove_embracing_whitespace($maillist);
+		    if ($maillist eq "Name" or $maillist eq ""){
+                        next;
+		    } else {
+			push @{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} }, $maillist;
+			$belwue{'objects'}{$maillist}{'ADMINS'}{$object}="$object is admin of $maillist";
+		    }
+                }
+            }
+	    @{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} } =
+		sort @{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} };
+            $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'COUNT'} =
+		$#{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} }+1;
 	    
             ############################################################
             # downloading Multi-Mailbox Mail Settings
@@ -574,7 +599,6 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             ############################################################
             # parsing Multi-Mailbox Mail Rules
             ############################################################
-            # nothing so far
             my $html_settings_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object-mailrules.html";
             print "* Parsing htmp page $html_settings_doc \n";
 
@@ -593,7 +617,7 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 		    foreach my $target (@lines){
 			$line_count++;
 			if (defined $target and $target ne "" and $row_count==1){
-			    print "   row: $row_count line of $object: $line_count ---$target---\n";
+			    #print "   row: $row_count line of $object: $line_count ---$target---\n";
 			    push @{ $belwue{'objects'}{$object}{'MAILFORWARDING'}{'LIST'} }, $target;
 			}
 		    }
