@@ -67,6 +67,7 @@ my $skip_addressbook=0;
 my $parse_belwue_data=0;
 my $school="default-school";
 my $show_object="";
+my $show_mailforwarding=0;
 
 my $dump_config=0;
 my $dump_belwue=0;
@@ -92,6 +93,7 @@ my $testopt=GetOptions(
            "parse-belwue-data" => \$parse_belwue_data,
            "create-login-data=s" => \$create_login_data,
            "show-object=s" => \$show_object,
+           "show-mailforwarding" => \$show_mailforwarding,
            "dump-config" => \$dump_config,
            "dump-belwue" => \$dump_belwue,
            "dump-action" => \$dump_action,
@@ -169,7 +171,8 @@ Options
   --dump-belwue-html (download and parse)
     --skip-addressbook to avoid connectibg via port 636 to belwue (i. e. if your port is closed)
   --parse-belwue-data (parse already downloaded data)
-  --show-object <object_name>
+  --show-object <object_name>   (object can be mailbox, maillist, ....)
+  --show-mailforwarding         (overview to counteract mailforwarding to UNsafe harbor, UNprivacy shield)
 
   Dumping data as JSON Object for debugging:
   --dump-config -j    (dump processed configuration)
@@ -328,11 +331,14 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             $storage="none";
         } else {
 	    if ($type eq "Multi-Mailbox"){
+		push @{ $belwue{'LISTS'}{'Multi-Mailbox'} }, $object;
 		$belwue{'objects'}{$object}{'QUOTA_USED'}=$storage;
 	    } elsif ($type eq "Alias") {
 		$belwue{'objects'}{$object}{'UID'}=$storage;
+		push @{ $belwue{'LISTS'}{'Alias'} }, $object;
 	    } elsif ($type eq "Gruppe") {
 		$belwue{'objects'}{$object}{'MEMBER_COUNT'}=$storage;
+		push @{ $belwue{'LISTS'}{'Gruppe'} }, $object;
 	    }
 	}
         if (not defined $access){
@@ -922,12 +928,35 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
     #    print Dumper(\%belwue);
     #    my $ref_belwue=\%belwue;
     #}
+
+    # sort lists
+    @{ $belwue{'LISTS'}{'Multi-Mailbox'} } = sort @{ $belwue{'LISTS'}{'Multi-Mailbox'} };
+    @{ $belwue{'LISTS'}{'Alias'} } = sort @{ $belwue{'LISTS'}{'Alias'} };
+    @{ $belwue{'LISTS'}{'Gruppe'} } = sort @{ $belwue{'LISTS'}{'Gruppe'} };
+
+
     if ($show_object ne ""){
         #print Dumper($belwue{'objects'}{$show_object});
         # pretty output
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $belwue{'objects'}{$show_object} );
         print "$utf8_pretty_printed\n";
+    }
+
+    #print Dumper(\%belwue{'LISTS'});
+    if ($show_mailforwarding==1){
+        print "================================================================================\n";
+        my $entry=0;
+	foreach my $mailbox (@{ $belwue{'LISTS'}{'Multi-Mailbox'} }){
+	    if ($belwue{'objects'}{$mailbox}{'MAILFORWARDING'}{'COUNT'}>0){
+                $entry++;
+		print "$entry) $mailbox ($belwue{'objects'}{$mailbox}{'CN'})\n";
+		foreach my $forward (@{ $belwue{'objects'}{$mailbox}{'MAILFORWARDING'}{'LIST'} }){
+                    print "   $mailbox  --> $forward\n";
+		}
+	    }
+	}
+        print "================================================================================\n";
     }
 } 
 
