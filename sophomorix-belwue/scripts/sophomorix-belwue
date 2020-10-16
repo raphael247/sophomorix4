@@ -382,7 +382,7 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             print "* Parsing object $html_doc\n";
 
             # list of headers
-            # Umlaut in header does nor work
+            # Umlaut in header does not work
             my $table_headers = [ 'Email',
                                   'Zustellungsart',
                                   'Anmeldezeit',
@@ -569,8 +569,38 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             # parsing Multi-Mailbox Mail Rules
             ############################################################
             # nothing so far
+            my $html_settings_doc = $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}."/$object-mailrules.html";
+            print "* Parsing htmp page $html_settings_doc \n";
 
-	    
+            # extract forwarding box from table
+            my $te = HTML::TableExtract->new( depth => 5, count => 3 );
+	    $te->utf8_mode(1);
+            $te->parse_file($html_settings_doc);
+            foreach my $ts ($te->tables) {
+                #print "Table found at ", join(',', $ts->coords), ":\n";
+		my $row_count=0;
+                foreach my $row ($ts->rows) {
+		    $row_count++;
+		    my ($text,@unneeded)=@$row;
+		    my @lines=split(/\s+/,$text);
+		    my $line_count=0;
+		    foreach my $target (@lines){
+			$line_count++;
+			if (defined $target and $target ne "" and $row_count==1){
+			    print "   row: $row_count line of $object: $line_count ---$target---\n";
+			    push @{ $belwue{'objects'}{$object}{'MAILFORWARDING'}{'LIST'} }, $target;
+			}
+		    }
+		    # show the row
+                    #print "EXTRACT   ", join(',', @$row), "\n";
+                }
+            }
+	    if (exists $belwue{'objects'}{$object}{'MAILFORWARDING'}{'LIST'}){
+                $belwue{'objects'}{$object}{'MAILFORWARDING'}{'COUNT'}=
+		    $#{ $belwue{'objects'}{$object}{'MAILFORWARDING'}{'LIST'} }+1;
+	    } else {
+                $belwue{'objects'}{$object}{'MAILFORWARDING'}{'COUNT'}=0;
+	    }
         } else {
             print "Unknown object $type\n";
         }
