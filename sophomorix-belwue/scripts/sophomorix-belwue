@@ -61,7 +61,6 @@ my $info=0;
 my $json=0;
 my $school="default-school";
 
-
 my $dump_belwue_html=0;
 my $skip_addressbook=0;
 
@@ -76,6 +75,11 @@ my $dump_config=0;
 my $dump_belwue=0;
 my $dump_action=0;
 
+# data hashes
+my %belwue=();
+my %Action=();
+
+# paths
 my $config_path="/etc/linuxmuster/sophomorix";
 my $config_basename="belwue-mail.conf";
 
@@ -134,6 +138,10 @@ if ($caller_copy ne ""){
         print "\nERROR: User $caller_copy does not exist\n\n";
         exit 88;
     }
+    if ($school ne $school_AD){
+        print "\nERROR: User $caller_copy is in school $school_AD, not $school\n\n";
+        exit 88;        
+    }
     $school_AD_caller=$school_AD;
     $home_directory_AD_caller=$home_directory_AD;
 }
@@ -144,9 +152,6 @@ my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
                                      $DevelConf::secret_file_sophomorix_file_admin);
 # read belwue conf
 my %conf=&read_config($config_file);
-
-my %belwue=();
-my %Action=();
 
 # calculate connect data
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'}="CN=".$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'};
