@@ -57,17 +57,18 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
-my $ldap_fetch=1;
-my $no_ldap_fetch=0;
-my $copy_to_teachershare=0;
-my $create_login_data="";
+my $school="default-school";
+
 
 my $dump_belwue_html=0;
 my $skip_addressbook=0;
+
 my $parse_belwue_data=0;
-my $school="default-school";
+
+
 my $show_object="";
 my $show_mailforwarding=0;
+my $show_maillist_admins=0;
 
 my $dump_config=0;
 my $dump_belwue=0;
@@ -75,10 +76,6 @@ my $dump_action=0;
 
 my $config_path="/etc/linuxmuster/sophomorix";
 my $config_basename="belwue-mail.conf";
-
-# copy-to-teachershare
-my $targetdir="/var/lib/sophomorix/belwue-copy-to-teachershare";
-my $targetsubdir="/var/lib/sophomorix/belwue-copy-to-teachershare/logindata";
 
 system("mkdir -p /var/lib/sophomorix/belwue"); 
 
@@ -91,13 +88,12 @@ my $testopt=GetOptions(
            "dump-belwue-html" => \$dump_belwue_html,
            "skip-addressbook" => \$skip_addressbook,
            "parse-belwue-data" => \$parse_belwue_data,
-           "create-login-data=s" => \$create_login_data,
            "show-object=s" => \$show_object,
            "show-mailforwarding" => \$show_mailforwarding,
+           "show-maillist-admins" => \$show_maillist_admins,
            "dump-config" => \$dump_config,
            "dump-belwue" => \$dump_belwue,
            "dump-action" => \$dump_action,
-           "copy-to-teachershare" => \$copy_to_teachershare,
            "school=s" => \$school,
           );
 
@@ -119,11 +115,6 @@ my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_resul
 my %conf=&read_config($config_file);
 my %belwue=();
 my %Action=();
-my @accounts_short=();
-
-my @multi_mailboxes=();
-my @maillists=();
-my @groups=();
 
 # calculate connect data
 $conf{'SCHOOL'}{$school}{'CONNECT'}{'BASE'}="CN=".$conf{'SCHOOL'}{$school}{'belwue-mail.conf'}{'ADRESSBOOK'}{'BASE'};
@@ -144,7 +135,7 @@ $conf{'SCHOOL'}{$school}{'CONNECT'}{'WGET_OPTIONS'}=$conf{'SCHOOL'}{$school}{'be
 # calculate paths
 $conf{'SCHOOL'}{$school}{'PATHS'}{'DOWNLOADS'}="/var/lib/sophomorix/belwue/".$school."/downloads";
 $conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}="/var/lib/sophomorix/belwue/".$school."/results";
-$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/results/belwue_multimailboxes_utf8.txt";
+$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/results/multimailboxes_utf8.txt";
 
 
 # print Dumper(%conf);
@@ -168,20 +159,30 @@ Options
 
   --school <schoolname> (defaut is default-school)
 
-  --dump-belwue-html (download and parse)
-    --skip-addressbook to avoid connectibg via port 636 to belwue (i. e. if your port is closed)
-  --parse-belwue-data (parse already downloaded data)
+  Download data to /var/lib/sophomorix/belwue/<school>/downloads/:
+    --dump-belwue-html (download and parse: port 9010/636 needs to be open)
+      --skip-addressbook (i. e. if port 636 is closed)
+
+  Parse downloaded data OFFLINE and create results in /var/lib/sophomorix/belwue/<school>/results/:
+  --parse-belwue-data (parse already downloaded data, and show what to do)
+    This results in the following files:
+      * multimailboxes_utf8.txt  
+        (ONE file to create missing mailboxes at belwue: Admin-Login -> Obkjekte -> Konten importieren)
+      * maillist_<name>.txt
+        (ONE file per maillist to update mailist members: Mailingliste -> Tab:Mitglieder -> Importieren)
+  --caller-copy <user>
+    (copy the result files in the home of a user <user>)
+
+  Analyze data further and show specific output:  
   --show-object <object_name>   (object can be mailbox, maillist, ....)
   --show-mailforwarding         (overview to counteract mailforwarding to UNsafe harbor, UNprivacy shield)
+  --show-maillist-admins        (overview to find the admin of a mailinglist)
 
   Dumping data as JSON Object for debugging:
   --dump-config -j    (dump processed configuration)
   --dump-belwue -j    (dump data parsed from downloaded html files)
   --dump-action -j    (dump what to do)
 
-  Todo:
-  --create-login-data /path/to/file
-  --copy-to-teachershare
 
 Quick introduction:
   1) Run: 
@@ -191,12 +192,12 @@ Quick introduction:
   3) Run:
      sophomorix-belwue --school <schoolname> --dump-belwue-html
      This downloads data from belwue: 
-        A) The ldap adressbook at belwue 
-        B) Downloads html pages from the CommuniGate admin webinterface
-  4) You can analyze and access the downloaded data offline with:
-     sophomorix-belwue --school <schoolname> --parse-belwue-data --show-object <object_name>
-  5) Todo:
-     Show nonsynchonized data, create files to create accounts, ...
+        A) The ldap adressbook at belwue (via port 636)
+        B) Downloads html pages from the CommuniGate admin webinterface (via port 9010)
+  4) You can analyze and access the downloaded data OFFLINE with:
+     sophomorix-belwue --school <schoolname> --parse-belwue-data
+  5) For specic output use the options above
+
 
 
 Please see the sophomorix-belwue(8) man pages for full documentation
@@ -330,16 +331,18 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         if (not defined $storage){
             $storage="none";
         } else {
-	    if ($type eq "Multi-Mailbox"){
-		push @{ $belwue{'LISTS'}{'Multi-Mailbox'} }, $object;
-		$belwue{'objects'}{$object}{'QUOTA_USED'}=$storage;
-	    } elsif ($type eq "Alias") {
-		$belwue{'objects'}{$object}{'UID'}=$storage;
-		push @{ $belwue{'LISTS'}{'Alias'} }, $object;
-	    } elsif ($type eq "Gruppe") {
-		$belwue{'objects'}{$object}{'MEMBER_COUNT'}=$storage;
-		push @{ $belwue{'LISTS'}{'Gruppe'} }, $object;
-	    }
+#	    if ($type eq "Multi-Mailbox"){
+#		push @{ $belwue{'LISTS'}{'Multi-Mailbox'} }, $object;
+#		$belwue{'objects'}{$object}{'QUOTA_USED'}=$storage;
+#	    } elsif ($type eq "Alias") {
+#		$belwue{'objects'}{$object}{'UID'}=$storage;
+#		push @{ $belwue{'LISTS'}{'Alias'} }, $object;
+#	    } elsif ($type eq "Gruppe") {
+#		$belwue{'objects'}{$object}{'MEMBER_COUNT'}=$storage;
+#		push @{ $belwue{'LISTS'}{'Gruppe'} }, $object;
+#	    } elsif ($type eq "Mailingliste") {
+#		push @{ $belwue{'LISTS'}{'Mailingliste'} }, $object;
+#	    }
 	}
         if (not defined $access){
             $access="never";
@@ -357,7 +360,8 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         # add to types
         if ($type eq "Mailingliste"){
             $belwue{'maillist'}{$object}{'TYPE'}=$type;
-            push @maillists, $object;
+	    push @{ $belwue{'LISTS'}{'Mailingliste'} }, $object;
+            #push @maillists, $object;
             ############################################################
             # downloading maillist data
             ############################################################
@@ -418,6 +422,7 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 			# foreign domain, nothing to do
 		    }
                     push @{ $belwue{'maillist'}{$object}{'MEMBERLIST'} }, $member_email;
+                    push @{ $belwue{'objects'}{$object}{'MEMBER'}{'LIST'} }, $member_email;
                 } else {
 		    $belwue{'warnings'}{$uid}{'MAILLIST_MEMBERSHIP_WARNING'}{$object}=$type;
 		}
@@ -433,9 +438,15 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             if ( not  $#{ $belwue{'maillist'}{$object}{'MEMBERLIST'} }==-1 ){
                  @{ $belwue{'maillist'}{$object}{'MEMBERLIST'} } = sort @{ $belwue{'maillist'}{$object}{'MEMBERLIST'}  };
             }
+            if ( not  $#{ $belwue{'objects'}{$object}{'MEMBER'}{'LIST'} }==-1 ){
+		@{ $belwue{'objects'}{$object}{'MEMBER'}{'LIST'} } = sort @{ $belwue{'objects'}{$object}{'MEMBER'}{'LIST'}  };
+		$belwue{'objects'}{$object}{'MEMBER'}{'COUNT'} = $#{ $belwue{'objects'}{$object}{'MEMBER'}{'LIST'} };
+            }
+	    
         } elsif ($type eq "Gruppe"){
             $belwue{'GROUP'}{$object}{'TYPE'}=$type;
-            push @groups, $object;
+	    push @{ $belwue{'LISTS'}{'Gruppe'} }, $object;
+	    $belwue{'objects'}{$object}{'MEMBER_COUNT'}=$storage;
             ############################################################
             # downloading group data
             ############################################################
@@ -471,7 +482,6 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 		my ($unused1,$used)=split("value=",$line);
 		my ($member_mail,$unused2)=split(" ",$used);
 		$member_mail=~s/"//g;
-                #print "<$member_mail>\n";
 		if ($member_mail ne ""){
                     my ($uid,$domain)=split(/\@/,$member_mail);
 		    if (not defined $domain or
@@ -487,13 +497,18 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         } elsif ($type eq "Alias"){
             $belwue{'ALIAS'}{$object}=$storage;
             $belwue{'ALIAS_REVERSE'}{$storage}=$object;
-            # aliases are in storage
+            # aliases are in storage column
             $belwue{'objects'}{$storage}{'ALIAS'}=$object;
-        } elsif ($type eq "Multi-Mailbox"){
+		$belwue{'objects'}{$object}{'UID'}=$storage;
+		push @{ $belwue{'LISTS'}{'Alias'} }, $object;
+
+
+	} elsif ($type eq "Multi-Mailbox"){
             $belwue{'multimailbox'}{$object}{'TYPE'}="Multi-Mailbox";
             $belwue{'multimailbox'}{$object}{'STORAGE'}=$storage;
             $belwue{'multimailbox'}{$object}{'ACCESS'}=$access;
-            push @multi_mailboxes, $object;
+	    $belwue{'objects'}{$object}{'UID'}=$storage;
+	    push @{ $belwue{'LISTS'}{'Multi-Mailbox'} }, $object;
 
             ############################################################
             # downloading Multi-Mailbox Settings
@@ -538,7 +553,7 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
                         next;
 		    } else {
 			push @{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} }, $maillist;
-			$belwue{'objects'}{$maillist}{'ADMINS'}{$object}="$object is admin of $maillist";
+			$belwue{'objects'}{$maillist}{'ADMIN'}=$object;
 		    }
                 }
             }
@@ -546,7 +561,7 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 		sort @{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} };
             $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'COUNT'} =
 		$#{ $belwue{'objects'}{$object}{'ADMINISTRATED_MAILLIST'}{'LIST'} }+1;
-	    
+
             ############################################################
             # downloading Multi-Mailbox Mail Settings
             ############################################################
@@ -603,10 +618,10 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             print "* Parsing htmp page $html_settings_doc \n";
 
             # extract forwarding box from table
-            my $te = HTML::TableExtract->new( depth => 5, count => 3 );
-	    $te->utf8_mode(1);
-            $te->parse_file($html_settings_doc);
-            foreach my $ts ($te->tables) {
+            my $te2 = HTML::TableExtract->new( depth => 5, count => 3 );
+	    $te2->utf8_mode(1);
+            $te2->parse_file($html_settings_doc);
+            foreach my $ts ($te2->tables) {
                 #print "Table found at ", join(',', $ts->coords), ":\n";
 		my $row_count=0;
                 foreach my $row ($ts->rows) {
@@ -617,7 +632,6 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 		    foreach my $target (@lines){
 			$line_count++;
 			if (defined $target and $target ne "" and $row_count==1){
-			    #print "   row: $row_count line of $object: $line_count ---$target---\n";
 			    push @{ $belwue{'objects'}{$object}{'MAILFORWARDING'}{'LIST'} }, $target;
 			}
 		    }
@@ -635,10 +649,13 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
             print "Unknown object $type\n";
         }
     }
+    
     ############################################################
     # printout data/write data into files
     ############################################################
     system("mkdir -p $conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}");
+    # cleaning up previous result
+    system("rm $conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}/*");
     open (MULTIMAILBOX, ">$conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}");
     print MULTIMAILBOX "Name\tRealname\tType\tPassword\tStorage\tAliases\n";
 
@@ -945,19 +962,12 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 
     }
 
-    
-    #print Dumper (%Action);
-    
-    #if($Conf::log_level>=2){
-    #    print Dumper(\%belwue);
-    #    my $ref_belwue=\%belwue;
-    #}
 
     # sort lists
     @{ $belwue{'LISTS'}{'Multi-Mailbox'} } = sort @{ $belwue{'LISTS'}{'Multi-Mailbox'} };
     @{ $belwue{'LISTS'}{'Alias'} } = sort @{ $belwue{'LISTS'}{'Alias'} };
     @{ $belwue{'LISTS'}{'Gruppe'} } = sort @{ $belwue{'LISTS'}{'Gruppe'} };
-
+    @{ $belwue{'LISTS'}{'Mailingliste'} } = sort @{ $belwue{'LISTS'}{'Mailingliste'} };
 
     if ($show_object ne ""){
         #print Dumper($belwue{'objects'}{$show_object});
@@ -967,7 +977,6 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         print "$utf8_pretty_printed\n";
     }
 
-    #print Dumper(\%belwue{'LISTS'});
     if ($show_mailforwarding==1){
         print "================================================================================\n";
         my $entry=0;
@@ -982,60 +991,31 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 	}
         print "================================================================================\n";
     }
+
+    if ($show_maillist_admins==1){
+	print "\n\nMailinglisten-Admins:\n";
+	my $line="+-------+-----+---------------------------------------------------------------+\n";
+        print $line;
+	printf "| %-6s| %3s | %-62s|\n","Admin","n","Mailingliste";
+        print $line;
+	
+        my $entry=0;
+	foreach my $maillist (@{ $belwue{'LISTS'}{'Mailingliste'} }){
+	    printf "| %-6s| %3s | %-62s|\n",$belwue{'objects'}{$maillist}{'ADMIN'},"n",$maillist;
+	}
+        print $line;
+    }
+
+    
+    # print Dumper (%Action);
+    # print Dumper(\%belwue{'LISTS'});
+    
+    #if($Conf::log_level>=2){
+    #    print Dumper(\%belwue);
+    #    my $ref_belwue=\%belwue;
+    #}
 } 
 
-
-
-
-# --create-login-data
-if($create_login_data ne ""){
-    # remove old data        
-    system("rm -rf $targetdir"); 
-    system("mkdir -p $targetdir"); 
-
-    open(FILE,"$create_login_data") || 
-              die "ERROR: $create_login_data not found!";
-    while(<FILE>){
-        chomp();
-        my ($uid,$realname,$type,$pass,$storage,$alias)=split(/\t/);
-        if ($uid eq "Name" and $realname eq "Realname"){
-            next;
-        }
-        print "   * $uid\n";
-        system("mkdir -p $targetdir/${uid}");
-        open(USER,">$targetdir/${uid}/${uid}-mail-login.txt") || 
-              die "ERROR: $targetdir not found!";
-        print USER "\n";
-        print USER "Zugangsdaten für die Emailadresse: ${uid}\@$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\n";
-        print USER "                            Alias: $alias\@$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\n";
-        print USER "\n";
-        print USER "Belwue-Mail-URL:  https://$conf{'SCHOOL'}{$school}{'CONNECT'}{'SERVER'}\n";
-        print USER "Benutzername:     ${uid}\@$conf{'SCHOOL'}{$school}{'CONNECT'}{'BASESIMPLE'}\n";
-        print USER "Erst-Password:    $pass\n";
-        print USER "Erst-Mailquota:   $storage\n";
-        print USER "Mailbox-Typ:      $type\n";
-        print USER "Adressbuch-Name:  $realname\n";
-        print USER "\n";
-        close(USER);
-        system("chown ${uid}.root $targetdir/${uid}");
-        system("chmod 0700 $targetdir/${uid}");
-        system("chown ${uid}.root $targetdir/${uid}/${uid}-mail-login.txt");
-        system("chmod 0600 $targetdir/${uid}/${uid}-mail-login.txt");
-    }
-    close(FILE);
-    print "Login-Data created in $targetdir\n";
-}
-
-
-# --copy-to-teachershare
-if($copy_to_teachershare){
-	my $copy_command="rsync -av ${targetdir}/ ".
-          "$conf{'config'}{TEACHERUSER}\@".
-          "$conf{'config'}{TEACHERSERVER}:".
-          "$conf{'config'}{TEACHERSERVERDIR}";
-    print "$copy_command\n";
-    #system($copy_command);
-}
 
 
 # --dump-config
