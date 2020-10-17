@@ -43,7 +43,9 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
                                  AD_unbind_admin
                                  AD_dns_get
+                                 AD_get_user
                                  AD_get_AD_for_check
+                                 AD_get_passwd
                                     );
 
 my @arguments = @ARGV;
@@ -64,7 +66,7 @@ my $dump_belwue_html=0;
 my $skip_addressbook=0;
 
 my $parse_belwue_data=0;
-
+my $caller_copy="";
 
 my $show_object="";
 my $show_mailforwarding=0;
@@ -88,6 +90,7 @@ my $testopt=GetOptions(
            "dump-belwue-html" => \$dump_belwue_html,
            "skip-addressbook" => \$skip_addressbook,
            "parse-belwue-data" => \$parse_belwue_data,
+           "caller-copy|callercopy=s" => \$caller_copy,
            "show-object=s" => \$show_object,
            "show-mailforwarding" => \$show_mailforwarding,
            "show-maillist-admins" => \$show_maillist_admins,
@@ -108,11 +111,40 @@ if ($school eq "default-school"){
     $config_file=$config_path."/".$school."/".$school.".".$config_basename;
 }
 
+
+############################################################
 # Reading Configuration
+############################################################
 my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
 my $root_dns=&AD_dns_get($root_dse);
+
+# exit if user does not exist
+my $school_AD_caller;
+my $home_directory_AD_caller;
+if ($caller_copy ne ""){
+    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,$deactivation_date_AD,
+        $school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+    &AD_get_user({ldap=>$ldap,
+                  root_dse=>$root_dse,
+                  root_dns=>$root_dns,
+                  user=>$caller_copy,
+                });
+    if ($existing_AD eq "FALSE"){
+        print "\nERROR: User $caller_copy does not exist\n\n";
+        exit 88;
+    }
+    $school_AD_caller=$school_AD;
+    $home_directory_AD_caller=$home_directory_AD;
+}
+
+# read sophomorix conf
 my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+my ($smb_admin_pass)=&AD_get_passwd($DevelConf::sophomorix_file_admin,
+                                     $DevelConf::secret_file_sophomorix_file_admin);
+# read belwue conf
 my %conf=&read_config($config_file);
+
 my %belwue=();
 my %Action=();
 
@@ -138,10 +170,9 @@ $conf{'SCHOOL'}{$school}{'PATHS'}{'RESULTS'}="/var/lib/sophomorix/belwue/".$scho
 $conf{'SCHOOL'}{$school}{'PATHS'}{'UPLOAD_MULTIMAILBOXES'}="/var/lib/sophomorix/belwue/".$school."/results/multimailboxes_utf8.txt";
 
 
-# print Dumper(%conf);
-# exit;
-
+############################################################
 # --help
+############################################################
 if ($help==1) {
    # Scriptname ermitteln
    my @list = split(/\//,$0);
@@ -223,7 +254,7 @@ my @password_chars=&get_passwd_charlist();
 # --dump-belwue-html / --parse-belwue-data
 if ($dump_belwue_html==1 or $parse_belwue_data){
     ############################################################
-    # ldap address book
+    # get ldap address book
     ############################################################ 
     print "\n";
     print "============================================================\n";
@@ -934,11 +965,12 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         print    "| Maillist                  | MEMBERS |    ADD | REMOVE |   KEEP |\n";
         print $line;
         foreach my $maillist (@update_maillists){
-	    printf "| %-26s|%8s |%7s |%7s |%7s |\n",$maillist,
-	   	                                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'MEMBERS'},
-		                                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'ADD'},
-		                                    $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'REMOVE'},
-	                                            $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'KEEP'} ;
+	    printf "| %-26s|%8s |%7s |%7s |%7s |\n",
+		$maillist,
+	   	$Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'MEMBERS'},
+	        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'ADD'},
+		$Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'REMOVE'},
+	        $Action{$school}{'REQUIRED_MAILLIST_MEMBERSHIPS'}{$maillist}{'COUNT'}{'KEEP'} ;
         }
         print $line;
     }
@@ -963,6 +995,31 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
     }
 
 
+    
+    ############################################################
+    # COPY RESULTS TO USER
+    ############################################################
+    # --caller-copy (do the copy stuff)
+    if ($caller_copy ne ""){
+	print "\n";
+        &print_title("Copying files to user $caller_copy in school $school_AD_caller");
+        my $smb_dir_home=$home_directory_AD_caller;
+        $smb_dir_home=~s/\\/\//g;
+        my ($string1,$rel_path_home)=split(/$school_AD_caller/,$smb_dir_home); # to home
+        $rel_path_home=$rel_path_home."/sophomorix-belwue";
+	my $lcd="/var/lib/sophomorix/belwue/".$school_AD_caller."/results/";
+        my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
+        " -U ".$DevelConf::sophomorix_file_admin."%'******'".
+        " //$root_dns/$school_AD_caller ".
+        " -c 'md \"$rel_path_home\"; cd \"$rel_path_home\"; lcd \"$lcd\";".
+        " prompt; mput *.txt; exit;'";
+        &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
+	print "\n";
+    }
+
+    ############################################################
+    # DISPLAY SPECIFIC RESULTS
+    ############################################################
     # sort lists
     @{ $belwue{'LISTS'}{'Multi-Mailbox'} } = sort @{ $belwue{'LISTS'}{'Multi-Mailbox'} };
     @{ $belwue{'LISTS'}{'Alias'} } = sort @{ $belwue{'LISTS'}{'Alias'} };
@@ -1017,6 +1074,9 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
 } 
 
 
+############################################################
+# DEBUGGING OUTPUT
+############################################################
 
 # --dump-config
 if ($dump_config==1){
@@ -1091,26 +1151,6 @@ sub unbind_admin {
 
 
 ######################################################################
-# error, when options are not given correctly
-#sub  check_options{
-#   my ($parse_ergebnis) = @_;
-#   if (not $parse_ergebnis==1){
-#      my @list = split(/\//,$0);
-#      my $scriptname = pop @list;
-#      print "\nYou have made a mistake, when specifying options.\n"; 
-#      print "See error message above. \n\n";
-#      print "... $scriptname is terminating.\n\n";
-#      exit;
-#   } else {
-#      if($Conf::log_level>=3){
-#         print "All options  were recognized.\n";
-#      }
-#   }
-#}
-
-
-
-######################################################################
 sub wget_return {
     my ($command,$return,$object,$file)=@_;
     if ($return==0){
@@ -1136,7 +1176,6 @@ sub read_config {
             );
     } else {
         print "\n\nConfig file $file must be created with:\n\n";
-
         system ("cat /usr/share/sophomorix-belwue/config-templates/belwue-mail.conf.template.ini");
         exit;
     }
