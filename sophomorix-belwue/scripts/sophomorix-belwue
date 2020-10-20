@@ -1031,6 +1031,9 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
     @{ $belwue{'LISTS'}{'Gruppe'} } = sort @{ $belwue{'LISTS'}{'Gruppe'} };
     @{ $belwue{'LISTS'}{'Mailingliste'} } = sort @{ $belwue{'LISTS'}{'Mailingliste'} };
 
+    ############################################################
+    # --show-object
+    ############################################################
     if ($show_object ne ""){
         #print Dumper($belwue{'objects'}{$show_object});
         # pretty output
@@ -1039,13 +1042,31 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         print "$utf8_pretty_printed\n";
     }
 
+    ############################################################
+    # --show-mailforwarding
+    ############################################################
     if ($show_mailforwarding==1){
         print "================================================================================\n";
         my $entry=0;
 	foreach my $mailbox (@{ $belwue{'LISTS'}{'Multi-Mailbox'} }){
 	    if ($belwue{'objects'}{$mailbox}{'MAILFORWARDING'}{'COUNT'}>0){
                 $entry++;
-		print "$entry) $mailbox ($belwue{'objects'}{$mailbox}{'CN'})\n";
+		my $adminclass;
+		if (defined $ref_AD_check->{'sAMAccountName'}{$mailbox}{'sophomorixAdminClass'}){
+                    $adminclass=$ref_AD_check->{'sAMAccountName'}{$mailbox}{'sophomorixAdminClass'};
+		} else {
+                    $adminclass="not in AD";
+		}
+		my $name;
+		if (defined $belwue{'objects'}{$mailbox}{'CN'}){
+                    $name=$belwue{'objects'}{$mailbox}{'CN'};
+		} elsif (defined $belwue{'objects'}{$mailbox}{'ALIAS'}){
+                    $name=$belwue{'objects'}{$mailbox}{'ALIAS'};
+		} else {
+                    $name="no CN/alias at belwue";
+		}
+
+		print "$entry) $mailbox ($name, AD: $adminclass)\n";
 		foreach my $forward (@{ $belwue{'objects'}{$mailbox}{'MAILFORWARDING'}{'LIST'} }){
                     print "   $mailbox  --> $forward\n";
 		}
@@ -1054,6 +1075,9 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         print "================================================================================\n";
     }
 
+    ############################################################
+    # --show-maillist-admins
+    ############################################################
     if ($show_maillist_admins==1){
 	print "\n\nMailinglisten-Admins:\n";
 	my $line="+-------+-----+---------------------------------------------------------------+\n";
@@ -1068,7 +1092,7 @@ if ($dump_belwue_html==1 or $parse_belwue_data){
         print $line;
     }
 
-    
+    #print Dumper ($ref_AD_check);
     # print Dumper (%Action);
     # print Dumper(\%belwue{'LISTS'});
     
