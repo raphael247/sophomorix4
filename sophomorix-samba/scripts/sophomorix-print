@@ -708,6 +708,9 @@ sub create_csv_files {
         my $webuntis=$data[5].";".$data[0].";".$data[1].";".$data[2].";".$data[6].", ".$data[7].";".$data[10].";";
         print WEBUNIXCSV $webuntis."\n";
         print WEBCSV $webuntis."\l\r";
+	my $examplix=$data[0].", ".$data[1].":---:---:".$data[5]."==".
+	             $data[0].", ".$data[1].":---:---:".$data[5];
+	print EXAMPLIX $examplix."\n";
     }
 }
 
@@ -852,6 +855,10 @@ sub open_output_files {
     $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}."_WebUntis-unix.csv";
     &print_title("WEBUNTIS-UNIX-RESULT: $file");
     open(WEBUNIXCSV,">$file") || die "Error: $!";
+    # examplix Linux
+    $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}."_examplix.cfg";
+    &print_title("EXAMPLIX-RESULT: $file");
+    open(EXAMPLIX,">$file") || die "Error: $!";
 }
 
 
@@ -862,4 +869,5 @@ sub close_output_files {
     close(UNIXCSV);
     close(WEBCSV);
     close(WEBUNIXCSV);
+    close(EXAMPLIX);
 }
