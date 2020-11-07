@@ -600,6 +600,7 @@ sub latex {
     system("rm -f $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.dvi $dev_null");
 
     &print_title("TEX-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.tex");
+    &print_title("PS-RESULT:  $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.ps");
     &print_title("PDF-RESULT: $sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/$output_file_basename.pdf");
 }
 
@@ -832,15 +833,25 @@ sub latex_from_template_and_datablock {
 
 
 sub open_output_files {
-    open(LATEX,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.tex") || die "Error: $!";
+    my $file;
+    $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}.".tex";
+    open(LATEX,">$file") || die "Error: $!";
     # CSV Windows
+    $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}.".csv";
+    &print_title("CSV-RESULT: $file");
     open(CSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}.csv") || die "Error: $!";
     # CSV Linux
-    open(UNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}-unix.csv") || die "Error: $!";
+    $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}."-unix.csv";
+    &print_title("CSV-UNIX-RESULT: $file");
+    open(UNIXCSV,">$file") || die "Error: $!";
     # Webuntis CSV Windows
-    open(WEBCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis.csv") || die "Error: $!";
+    $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}."_WebUntis.csv";
+    &print_title("WEBUNTIS-RESULT: $file");
+    open(WEBCSV,">$file") || die "Error: $!";
     # Webuntis CSV Linux
-    open(WEBUNIXCSV,">$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}/${output_file_basename}_WebUntis-unix.csv") || die "Error: $!";
+    $file=$sophomorix_config{'INI'}{'LATEX'}{'PRINT_PATH'}."/".${output_file_basename}."_WebUntis-unix.csv";
+    &print_title("WEBUNTIS-UNIX-RESULT: $file");
+    open(WEBUNIXCSV,">$file") || die "Error: $!";
 }
 
 
