@@ -11,6 +11,11 @@ Getopt::Long::Configure ("bundling");
 use Sophomorix::SophomorixConfig;
 use Net::LDAP;
 use JSON;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
@@ -30,6 +35,7 @@ use Sophomorix::SophomorixBase qw(
                                  run_hook_scripts
                                  json_dump
                                  read_sophomorix_kill
+                                 remove_from_list
                                  );
 use Sophomorix::SophomorixSambaAD qw(
                                  AD_bind_admin
@@ -38,6 +44,9 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_user_kill
                                  AD_get_passwd
                                  AD_get_name_tokened
+                                 AD_get_AD_for_check
+                                 AD_get_sessions
+                                 AD_session_manage
                                     );
 
 my @arguments = @ARGV;
@@ -107,22 +116,24 @@ Options
   -u  user / --user user
   --lock / --unlock
 
+Deleting users shown by sophomorix-kill -i:
 
-Kill all users:
-  sophomorix-kill
+  Delete all users:
+    sophomorix-kill
 
-Kill users from some schools only:
-  sophomorix-kill --school <schoolname1>,<schoolname2>, ...
+  Delete users from some schools only:
+    sophomorix-kill --school <schoolname1>,<schoolname2>, ...
 
-Kill some users only:
-  sophomorix-kill --user <user1>,<user2>, ...
+  Delete some users only:
+    sophomorix-kill --user <user1>,<user2>, ...
 
-Kill users in some classes only:
-  sophomorix-kill --class <class1>,<class2>, ...
+  Delete users in some classes only:
+    sophomorix-kill --class <class1>,<class2>, ...
 
+Deleting users by force:
 
-Kill a user by force:
-  --killuser user (Kill a user, even if she is not in sophomorix.kill)
+  Delete a user by force (must not deleletable):
+    --killuser user (Kill a user, even if she is not in sophomorix.kill)
 
 Please see the sophomorix-kill(8) man pages for full documentation
 ');
@@ -306,6 +317,42 @@ if ($killuser ne ""){
     close(KILL);
     close(STILLTOKILL);
 }
+
+
+
+# remove nonexisting users from sessions
+&print_title("START: Removing nonexisting users from sessions");
+my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all","allsupervisors",$smb_admin_pass,\%sophomorix_config);
+#print Dumper(%sessions{'NONEXISTING_PARTICIPANTS_by_session'});
+if (defined $sessions{'NONEXISTING_PARTICIPANTS_by_session'}){
+    foreach my $session ( keys %{ $sessions{'NONEXISTING_PARTICIPANTS_by_session'} }){
+        my $supervisor=$sessions{'NONEXISTING_PARTICIPANTS_by_session'}{$session}{'SUPERVISOR'};
+
+	# create new list of participants without the nonexisting users
+        my @participants_old=split(/,/,$sessions{'ID'}{$session}{'PARTICIPANTSTRING'});
+        my @participants_new = @participants_old;
+        foreach my $user ( keys %{ $sessions{'NONEXISTING_PARTICIPANTS_by_session'}{$session}{'PARTICIPANTS'} }){
+            @participants_new = &remove_from_list($user,@participants_new);
+        }
+        my $participants_new=join(",",@participants_new);
+
+        # update the requested session
+        &AD_session_manage({ldap=>$ldap,
+                            root_dse=>$root_dse,
+                            supervisor=>$supervisor,
+                            create=>"FALSE",
+                            kill=>"FALSE",
+                            session=>$session,
+                            participants=>$participants_new,
+                            sessions_ref=>\%sessions,
+                            sophomorix_config=>\%sophomorix_config,
+                        });
+    }
+} else {
+    print "   * no users to remove from sesssions\n";
+}
+&print_title("END: Removing nonexisting users from sessions.");
+
 
 
 # logging sophomorix.kill

@@ -4438,6 +4438,9 @@ sub AD_get_sessions {
 				     });
 		    if ($existing_AD eq "FALSE"){
  		        print "WARNING: User $participant nonexisting but part of session $id\n";
+			$sessions{'NONEXISTING_PARTICIPANTS_by_session'}{$id}{'PARTICIPANTS'}{$participant}="NONEXISTING";
+			$sessions{'NONEXISTING_PARTICIPANTS_by_session'}{$id}{'SUPERVISOR'}=$supervisor;
+
                         $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
                         $sessions{'SUPERVISOR'}{$supervisor}{'sophomorixSessions'}{$id}{'PARTICIPANTS'}
                              {$participant}{'user_existing'}=$existing_AD;
