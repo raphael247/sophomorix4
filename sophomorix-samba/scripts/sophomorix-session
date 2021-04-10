@@ -76,6 +76,7 @@ my $json=0;
 my $create=0;
 my $kill=0;
 my $kill_all_sessions=0;
+my $kill_all_auto_generated_sessions=0;
 my $supervisor="";
 my $session="";
 my $developer_session="";
@@ -93,6 +94,7 @@ my $testopt=GetOptions(
            "create|c" => \$create,
            "kill" => \$kill,
            "kill-all-sessions" => \$kill_all_sessions,
+           "kill-all-auto-generated-sessions" => \$kill_all_auto_generated_sessions,
            "supervisor=s" => \$supervisor,
            "session|s=s" => \$session,
            "comment=s" => \$comment,
@@ -148,6 +150,7 @@ Options:
   --create (user current time as session-id)
   --kill -s <session-id>
   --kill-all-sessions
+  --kill-all-auto-generated-sessions (created by schulkonsole)
 
 Create a session with the current time:
   sophomorix-session --create --supervisor <user>
@@ -259,6 +262,21 @@ if ($kill_all_sessions==1){
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
+
+
+if ($kill_all_auto_generated_sessions==1){
+    foreach my $session (keys %{ $sessions{'AUTO_GENERATED_by_session'} }) {
+        &AD_session_manage({ldap=>$ldap,
+                            root_dse=>$root_dse,
+                            session=>$session,
+                            kill=>"TRUE",
+                            create=>"FALSE",
+                            sessions_ref=>\%sessions,
+                            sophomorix_config=>\%sophomorix_config,
+                           });
+    }
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
 
 
 if ($session ne "" and $kill==1){

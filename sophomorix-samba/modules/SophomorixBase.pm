@@ -431,12 +431,22 @@ sub json_dump {
 
 sub _console_print_sessions {
     my ($ref_sessions,$log_level,$ref_sophomorix_config)=@_;
-    print "LogLevel: $log_level\n";
+    my $line="+---------------------+------------+-----------------------------------------\n";
     print "$ref_sessions->{'SESSIONCOUNT'} sessions by Session-Name:\n";
-        foreach my $session (@{ $ref_sessions->{'ID_LIST'} }){
-            print "  $session   $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}   ",
-                  "$ref_sessions->{'ID'}{$session}{'sophomorixSessions'}\n";
+    print $line;
+    printf "| %-20s|%11s | %-80s\n",
+                "Session-ID", 
+                " supervisor",
+                "sophomorixSessions";
+    print $line;
+    foreach my $session (@{ $ref_sessions->{'ID_LIST'} }){
+        printf "| %-20s|%11s | %-80s\n",
+                $session, 
+                $ref_sessions->{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'},
+                $ref_sessions->{'ID'}{$session}{'sophomorixSessions'};
         }
+    print $line;
+    print "$ref_sessions->{'SESSIONCOUNT'} sessions in total\n";
 }
 
 
