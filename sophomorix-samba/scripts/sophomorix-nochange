@@ -1,2 +1,5 @@
 #!/bin/sh
-cat /var/lib/sophomorix/check-result/sophomorix.nochange
+PATH=/var/lib/sophomorix/check-result/sophomorix.nochange
+echo "Content of ${PATH}:"
+/bin/cat ${PATH} 2>/dev/null || echo " * No file ${PATH}"
+
