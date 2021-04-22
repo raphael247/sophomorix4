@@ -246,11 +246,11 @@ if ($killuser ne ""){
     if (not -f $kill_file){
         &result_sophomorix_add(\%sophomorix_result,"ERROR",-1,"",$kill_file." not found!");
         &result_sophomorix_add_summary({
-            NAME=>"ADDED", 
+            NAME=>"KILLED", 
             RESULT=>0, 
             RESULT_TYPE => "integer",
-            DESCRIPTION_POST => "users added", 
-            DESCRIPTION_PRE => "added users", 
+            DESCRIPTION_POST => "users killed", 
+            DESCRIPTION_PRE => "killed users", 
             FORMAT_TYPE => 1,
             sophomorix_result=>\%sophomorix_result,
 	    });
