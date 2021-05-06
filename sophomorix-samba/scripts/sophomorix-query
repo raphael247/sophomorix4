@@ -61,6 +61,7 @@ my $testopt=GetOptions(\%options,
                         "sophomorix-group",
                         "room",
                         "printergroup",
+                        "school-list",
                         "schoolbase=s",
                         "user-minimal",
                         "user-basic",
@@ -118,10 +119,12 @@ If you use the following wildcardcharacters, put them in quotation marks:
 Options
   -h  / --help
   -v  / --verbose
-  show the search
+  show the search filter, searchbase 
 
   -i  / --info
-  --filter: show the filter that is used
+
+Search for schools:
+--school-list
 
 Search attribute(s) to find a user/group/computer:
 (multiple options are connected with & to narrow down the search)
@@ -268,9 +271,56 @@ $search{'COUNTERS'}{'GROUP'}=0;
 $search{'COUNTERS'}{'ROOM'}=0;
 $search{'COUNTERS'}{'USER'}=0;
 $search{'COUNTERS'}{'COMPUTER'}=0;
+$search{'COUNTERS'}{'SCHOOL'}=0;
 
 my $max;
 my $mesg;
+
+
+############################################################
+# search for schools
+############################################################
+if (defined $options{'school-list'}){
+    $base="OU=SCHOOLS,".$root_dse;
+    $scope="one";
+    $filter="(name=*)";
+    if (defined $options{'verbose'} and $options{'verbose'}==1){
+        print "\n";
+        print "Search parameters:\n";
+        print "  BASE:       $base\n";
+        print "  SCOPE:      $scope\n";
+        print "  FILTER:     $filter\n";
+	print "\n";
+    }
+    $mesg = $ldap->search(
+                   base   => $base,
+                   scope => $scope,
+                   filter => $filter,
+                  # attrs => $query_attrs, # query all attributes
+	);
+    $max = $mesg->count;
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn = $entry->dn();
+        my $name = $entry->get_value('name');
+        if ($name eq "SCHOOLS"){
+            next;
+        }
+	push @{ $search{'LISTS'}{'SCHOOL'} }, $name;
+	$search{'SCHOOL'}{$name}{'name'}=$name;
+	$search{'SCHOOL'}{$name}{'DN'}=$dn;
+    }
+    @{ $search{'LISTS'}{'SCHOOL'} } = sort @{ $search{'LISTS'}{'SCHOOL'} };
+    $search{'COUNTERS'}{'SCHOOL'}=$#{ $search{'LISTS'}{'SCHOOL'} }+1;
+    #print Dumper(\%search);
+
+    # print JSON Object
+    &json_printout($options{'json'},\%search);
+
+    # disconnect
+    &AD_unbind_admin($ldap);
+    exit;
+}
 
 
 ############################################################
@@ -894,11 +944,8 @@ if ($search_object eq "all"){
 }
 
 
-
-
 # display debugging info
-if (defined $options{'verbose'} and $options{'verbose'}==1){
-    print "\n";
+if (defined $options{'verbose'} and $options{'verbose'}==1){  
     print "Option hash:\n";
     print Dumper (\%options);
     print "\n";
@@ -1210,6 +1257,20 @@ sub json_printout {
     my ($json,$ref_search)=@_;
     if ($json==0){
         my $line="--------------------------------------------------\n";
+        # SCHOOL
+        if ($#{ $ref_search->{'LISTS'}{'SCHOOL'} }>-1){
+            my $counter=0;
+            print $line;
+            print "$ref_search->{'COUNTERS'}{'SCHOOL'} SCHOOLS:\n";
+            foreach my $school (@{ $ref_search->{'LISTS'}{'SCHOOL'} }){
+                $counter++;
+                printf "  %4s:  %-60s\n",$counter,$school;
+            }
+            print "$ref_search->{'COUNTERS'}{'SCHOOL'} SCHOOLS\n";
+        } else {
+            print $line;
+            print "   * No SCHOOLS found\n";
+        }
         # GROUP
         if ($#{ $ref_search->{'LISTS'}{'GROUP'} }>-1){
             my $counter=0;
