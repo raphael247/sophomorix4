@@ -31,6 +31,44 @@ Host fleischsalat
 
 Todo:
 ------------------------------------------------------------
+gpo update
+siehe Beispieldateien, drives.xml: jetzt zügig fixen
+
+
+was mach ich mit der proxy gpo:
+  muss da einfach nur die Datei rein?
+  firewall.linuxmuster.lan, port ist vordefiniert
+
+Frage xml, leerer Registry block
+Registry key zeile muss raus im template
+
+samba-tool: registry zeugs tut nicht auf focal:
+bitte prüfen auf anderen focal systemen
+
+
+
+#101/#124 sophomorix.ini, info an Andy dass nach Paketupdate nachkonfigurieren muss
+
+ist datei ein file?
+bei sophomorix-newfile, returnwert, #66 
+
+
+# 133Reihenfolge output checken
+rooms/projects/classes user/computer zu Druckergruppen hinzufügen
+
+Dateien austeilen, parallelisieren (perl parallel)
+Folgender Befehl
+--scopy
+
+views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--scopy', '--from-user', sender, '--to-user', receiversCSV, '--from-path', 'transfer/'+File, '--to-path', 'transfer/'+sender+'_'+session+'/']
+views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--scopy', '--from-user', sendersCSV, '--to-user', receiver, '--from-path', 'transfer/'+receiver+'_'+session, '--to-path', 'transfer/collected/'+now+'-'+session+'/', '--to-path-addon', 'fullinfo', '--no-target-directory']
+views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--scopy', '--from-user', sendersCSV, '--to-user', receiver, '--from-path', 'transfer/'+receiver+'_'+session+'/'+File, '--to-path', 'transfer/collected/'+now+'-'+session+'/', '--to-path-addon', 'fullinfo']
+views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--move', '--keep-source-directory', '--from-user', sendersCSV, '--to-user', receiver, '--from-path', 'transfer/'+receiver+'_'+session, '--to-path', 'transfer/collected/'+now+'-'+session+'/', '--to-path-addon', 'fullinfo', '--no-target-directory']
+views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--move', '--from-user', sendersCSV, '--to-user', receiver, '--from-path', 'transfer/'+receiver+'_'+session+'/'+File, '--to-path', 'transfer/collected/'+now+'-'+session+'/', '--to-path-addon', 'fullinfo']
+
+
+
+
 bei sophomorix-update -i: vorname/Nachname/Klasse zu school/role dazu
 
 Neu für Nextcloud:
@@ -173,6 +211,7 @@ Fragen
 ------------------------------------------------------------
 
 Was ist neu ab 3.90.0:
+  * fixed #112: sophomorix-query displays schools
   * fixed #130 remove userd from sessions, when delete
   * fixed gpo issue #129
   * Option to change unid of a user added
