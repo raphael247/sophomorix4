@@ -5742,6 +5742,12 @@ sub smb_file_rewrite {
         my ($fh,$tmp) = tempfile( DIR => $ref_sophomorix_config->{'PATHS'}{'TMP_SMB'}, UNLINK =>  1 );
         my $tmp_dir  = dirname($tmp);
         my $tmp_file  = basename($tmp);
+	my $teachergroup;
+	if ($school eq $DevelConf::name_default_school){
+            $teachergroup="teachers";
+	} else {
+            $teachergroup=$school."-teachers";
+	}
 
         open(SOURCE, "<$unix_path") or die "File $unix_path not found";
         open(TMP, ">$tmp") or die "File $tmp not found";
@@ -5751,6 +5757,7 @@ sub smb_file_rewrite {
             $line=~s/\@\@SCHOOL\@\@/$school/g; 
             $line=~s/\@\@ROOTDNS\@\@/$root_dns/g; 
             $line=~s/\@\@SERVER\@\@/$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}/g; 
+            $line=~s/\@\@TEACHERGROUP\@\@/$teachergroup/g; 
             print TMP "$line";
         }
 
