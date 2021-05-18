@@ -4950,7 +4950,7 @@ sub smbclient_dirlist {
 
     if (defined $home_dir and defined $home_subdir){
         # append subdir
-	$share_subdir=$share_subdir."".$home_subdir;
+	$share_subdir=$share_subdir."\\".$home_subdir;
     }
 
     
@@ -4980,7 +4980,12 @@ sub smbclient_dirlist {
     
     foreach my $status (@out_lines){
         my $smb_name="";
-	#print "$status\n";
+
+        # check if a directory was found
+	if ($status=~m/cd/ and $status=~m/NT_STATUS_OBJECT_NAME_NOT_FOUND/){
+	    $tree{'ERROR'}="NT_STATUS_OBJECT_NAME_NOT_FOUND: Could not cd into SMB_PATH";
+	    last;
+	}
         # simple and works, but fails with  " D ", ... in filename
         #my (@list_tmp)=split(/( D | N | A )/,$status); # split with 1 chars of space before/after
 

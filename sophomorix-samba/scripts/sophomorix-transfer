@@ -348,36 +348,40 @@ if ($clean_home_dir ne ""){
 
 # --list-home-dir
 if ($list_home_dir ne ""){
-    if (defined $subdir){
-        &print_title("Listing homedir of $list_home_dir (subdir $subdir)");
-    } else {
-        &print_title("Listing homedir of $list_home_dir");
-    }
-
     my %dirlist=();
     my $ref_dirlist=\%dirlist;
+    my @users=split(/,/,$list_home_dir);
+    foreach my $user (@users){
+        if (defined $subdir){
+            &print_title("Listing homedir of $user (subdir $subdir)");
+        } else {
+            &print_title("Listing homedir of $user");
+        }
 
-    my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-        $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-        $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
-        &Sophomorix::SophomorixSambaAD::AD_get_user({ldap=>$ldap,
-                      root_dse=>$root_dse,
-                      root_dns=>$root_dns,
-                      user=>$list_home_dir,
-                    });
 
-    my $ref_tree=&smbclient_dirlist({sharename=>$school_AD,
-                                 smb_admin_pass=>$smb_admin_pass,
-                                 user=>$list_home_dir,
-                                 home_dir=>$home_directory_AD,
-                                 home_subdir=>$subdir,
-                                 json=>$json,
-                                 sophomorix_config=>\%sophomorix_config,
-                                 sophomorix_result=>\%sophomorix_result,
-                               });
+        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+            $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+            &Sophomorix::SophomorixSambaAD::AD_get_user({ldap=>$ldap,
+                                                         root_dse=>$root_dse,
+                                                         root_dns=>$root_dns,
+                                                         user=>$user,
+                                                        });
 
-    # append result to dirlist
-    $ref_dirlist->{'sAMAccountName'}{$list_home_dir}=$ref_tree;    
+        my $ref_tree=&smbclient_dirlist({sharename=>$school_AD,
+                                         smb_admin_pass=>$smb_admin_pass,
+                                         user=>$user,
+                                         home_dir=>$home_directory_AD,
+                                         home_subdir=>$subdir,
+                                         json=>$json,
+                                         sophomorix_config=>\%sophomorix_config,
+                                         sophomorix_result=>\%sophomorix_result,
+                                         });
+
+        # append result to dirlist
+        $ref_dirlist->{'sAMAccountName'}{$user}=$ref_tree;
+    }
+
     my $jsoninfo="DIRLISTING";
     my $jsoncomment="Listing of subdirs in homes";
     &json_dump({json => $json,
@@ -393,7 +397,7 @@ if ($list_home_dir ne ""){
     #                    root_dse=>$root_dse,
     #                    root_dns=>$root_dns,
     #                    smb_admin_pass=>$smb_admin_pass,
-    #                    userstring=>$list_home_dir,
+    #                    userstring=>$user,
     #                    subdir=>$subdir,
     #                    json=>$json,
     #                    sophomorix_config=>\%sophomorix_config,
