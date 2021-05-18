@@ -39,13 +39,15 @@ was mach ich mit der proxy gpo:
   muss da einfach nur die Datei rein?
   firewall.linuxmuster.lan, port ist vordefiniert
 Fragen:
-welche Zeilen in InternetSettings.xml müssen raus?
+welche Zeilen in InternetSettings.xml müssen raus? Keine mehr
 Was muss ersetzt werden?
-Muss diese Datei in einer neuen GPO hängen?
+   firewall.schule.lan --> firewall bleibt
+Muss diese Datei in einer neuen GPO hängen? JA
 - neue option in sophomorix-samba die neue option erzeugt
-  --gpo-create <school:proxy>
+  --gpo-create <sophomorix:proxy:<schulname>
 - neues subdir, ...
 Muss die gpo wieder gelöscht werden können on/off?
+Komplett entfernen (Pfad und GPO mit samba-tool)
 
 Frage xml, leerer Registry block
 Registry key zeile muss raus im template
