@@ -77,7 +77,10 @@ views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--move', '--keep-s
 views.py: sophomorixCommand = ['sophomorix-transfer', '-jj', '--move', '--from-user', sendersCSV, '--to-user', receiver, '--from-path', 'transfer/'+receiver+'_'+session+'/'+File, '--to-path', 'transfer/collected/'+now+'-'+session+'/', '--to-path-addon', 'fullinfo']
 
 
-
+sophomorix-transfer --list-home-dir user1,user2
+--> hier auch parallelisieren
+Bug:  geht nicht für mehrere User, kommasepariert
+Bug: bei subdir (ohne / zwischen user und subdir) falscher Pfad "SMB_PATH" : "smb://majestix/default-school\\teachers\\bztransfer"
 
 bei sophomorix-update -i: vorname/Nachname/Klasse zu school/role dazu
 
