@@ -350,38 +350,91 @@ if ($clean_home_dir ne ""){
 if ($list_home_dir ne ""){
     my %dirlist=();
     my $ref_dirlist=\%dirlist;
+    #my $ref_dirlist;
     my @users=split(/,/,$list_home_dir);
-    foreach my $user (@users){
-        if (defined $subdir){
-            &print_title("Listing homedir of $user (subdir $subdir)");
-        } else {
-            &print_title("Listing homedir of $user");
+
+    my $parallel=0; # switch parallel listing on=1/off=0
+    if ($parallel==0){
+        foreach my $user (@users){
+            if (defined $subdir){
+                &print_title("Listing homedir of $user (subdir $subdir)");
+            } else {
+                &print_title("Listing homedir of $user");
+            }
+
+            my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
+                $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
+                $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
+                &Sophomorix::SophomorixSambaAD::AD_get_user({ldap=>$ldap,
+                                                             root_dse=>$root_dse,
+                                                             root_dns=>$root_dns,
+                                                             user=>$user,
+                                                            });
+
+            my $ref_tree=&smbclient_dirlist({sharename=>$school_AD,
+                                             smb_admin_pass=>$smb_admin_pass,
+                                             user=>$user,
+                                             home_dir=>$home_directory_AD,
+                                             home_subdir=>$subdir,
+                                             json=>$json,
+                                             sophomorix_config=>\%sophomorix_config,
+                                             sophomorix_result=>\%sophomorix_result,
+                                             });
+
+            # append result to dirlist
+            $ref_dirlist->{'sAMAccountName'}{$user}=$ref_tree;
+        }
+    } else {
+	# collect user data
+        my $ref_user;
+        foreach my $user (@users) {
+            $ref_user = &Sophomorix::SophomorixSambaAD::AD_get_user_return_hash({
+	        ldap=>$ldap,
+                root_dse=>$root_dse,
+                root_dns=>$root_dns,
+	        user=>$user,
+	        hash_ref=>$ref_user,
+                });
         }
 
+	# run the parallel processes
+	use Parallel::ForkManager;
+	my $pm = Parallel::ForkManager->new(2);
 
-        my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-            $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
-            &Sophomorix::SophomorixSambaAD::AD_get_user({ldap=>$ldap,
-                                                         root_dse=>$root_dse,
-                                                         root_dns=>$root_dns,
-                                                         user=>$user,
-                                                        });
+        $pm -> run_on_finish ( # called BEFORE the first call to start()
+            sub {
+                my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_structure_reference) = @_;
+                if (not defined $ident){
+	            $ident="";
+                }
+                #print Dumper ($data_structure_reference);
+		$ref_dirlist->{'sAMAccountName'}{$data_structure_reference->{'USER'}}=$data_structure_reference;
+            }
+        );
 
-        my $ref_tree=&smbclient_dirlist({sharename=>$school_AD,
-                                         smb_admin_pass=>$smb_admin_pass,
-                                         user=>$user,
-                                         home_dir=>$home_directory_AD,
-                                         home_subdir=>$subdir,
-                                         json=>$json,
-                                         sophomorix_config=>\%sophomorix_config,
-                                         sophomorix_result=>\%sophomorix_result,
-                                         });
+        USERS:
+        foreach my $user (@users) {
+            my $pid = $pm->start() and next USERS;
 
-        # append result to dirlist
-        $ref_dirlist->{'sAMAccountName'}{$user}=$ref_tree;
+            my %child_return=();
+
+            my $ref_tree=&smbclient_dirlist({sharename=>$ref_user->{$user}{'sophomorixSchoolname'},
+                                             smb_admin_pass=>$smb_admin_pass,
+                                             user=>$user,
+                                             home_dir=>$ref_user->{$user}{'homeDirectory'},
+                                             home_subdir=>$subdir,
+                                             json=>$json,
+                                             sophomorix_config=>\%sophomorix_config,
+                                             sophomorix_result=>\%sophomorix_result,
+                                             });
+
+            # add entry to recognise listing
+            $ref_tree->{'USER'}=$user;
+            # send it back to the parent process
+            $pm->finish(0, $ref_tree);  # note that it's a scalar REFERENCE, not the scalar itself
+        }
+        $pm->wait_all_children;
     }
-
     my $jsoninfo="DIRLISTING";
     my $jsoncomment="Listing of subdirs in homes";
     &json_dump({json => $json,
@@ -403,6 +456,7 @@ if ($list_home_dir ne ""){
     #                    sophomorix_config=>\%sophomorix_config,
     #                    sophomorix_result=>\%sophomorix_result,
     #                   });
+    
     exit;
 }
 
