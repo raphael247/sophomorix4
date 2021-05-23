@@ -50,6 +50,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_school_create
                                  AD_bind_admin
                                  AD_get_user
+                                 AD_get_user_return_hash
                                  AD_user_kill
                                  AD_remove_sam_from_sophomorix_attributes
                                  AD_dns_get
@@ -152,28 +153,34 @@ $pm -> run_on_finish ( # called BEFORE the first call to start()
 my @users=("wu42","oe42","blackmri42");
 
 
+
+# collect data
+my $ref_user;
+foreach my $user (@users) {
+    $ref_user = &Sophomorix::SophomorixSambaAD::AD_get_user_return_hash({
+	ldap=>$ldap,
+        root_dse=>$root_dse,
+        root_dns=>$root_dns,
+	user=>$user,
+	hash_ref=>$ref_user,
+        });
+}
+
+print Dumper ($ref_user);
+
 # run the parallel processes
 PERSONS:
 foreach my $user (@users) {
-   my ($firstname_utf8_AD,$lastname_utf8_AD,$adminclass_AD,$existing_AD,$exammode_AD,$role_AD,
-            $home_directory_AD,$user_account_control_AD,$toleration_date_AD,
-            $deactivation_date_AD,$school_AD,$status_AD,$firstpassword_AD,$unid_AD)=
-            &Sophomorix::SophomorixSambaAD::AD_get_user({ldap=>$ldap,
-                                                         root_dse=>$root_dse,
-                                                         root_dns=>$root_dns,
-                                                         user=>$user,
-                                                        });
-	
-  my %child_return=();
-  my $pid = $pm->start() and next PERSONS;
+    my $pid = $pm->start() and next PERSONS;
+
+    my %child_return=();
+
+    $child_return{'FIRSTNAME'}=$ref_user->{$user}{'givenName'};
+    $child_return{'LASTNAME'}=$ref_user->{$user}{'sn'};
+    $child_return{'USER'}=$user;
    
-  $child_return{'FIRSTNAME'}=$firstname_utf8_AD;
-  $child_return{'LASTNAME'}=$lastname_utf8_AD;
-  $child_return{'USER'}=$user;
-   $child_return{'PID'}=$pid;
-   
-  # send it back to the parent process
-  $pm->finish(0, \%child_return);  # note that it's a scalar REFERENCE, not the scalar itself
+    # send it back to the parent process
+    $pm->finish(0, \%child_return);  # note that it's a scalar REFERENCE, not the scalar itself
 }
 $pm->wait_all_children;
 
