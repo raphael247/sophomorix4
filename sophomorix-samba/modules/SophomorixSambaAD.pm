@@ -46,6 +46,7 @@ $Data::Dumper::Terse = 1;
             AD_user_getquota_usage
             AD_user_setquota
             AD_get_user
+            AD_get_user_return_hash
             AD_get_group
             AD_computer_create
             AD_computer_kill
@@ -3502,6 +3503,75 @@ sub AD_get_user {
                 $firstname_ASCII,$lastname_ASCII,
                 $firstname_initial,$lastname_initial,$user_token,$file,$birthdate);
     }
+}
+
+
+sub AD_get_user_return_hash {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $user = $arg_ref->{user};
+    my $ref_result=$arg_ref->{hash_ref};
+    #my %result=();
+    my $filter="(&(objectClass=user) (sAMAccountName=".$user."))";
+    #my $filter="(sAMAccountName=".$user.")";
+     $mesg = $ldap->search( # perform a search
+                    base   => $root_dse,
+                    scope => 'sub',
+                    filter => $filter,
+                    attrs => ['sAMAccountName',
+                              'sophomorixAdminClass',
+                              'sophomorixExamMode',
+                              'sophomorixRole',
+                              'givenName',
+                              'sn',
+                              'homeDirectory',
+                              'userAccountControl',
+                              'sophomorixTolerationDate',
+                              'sophomorixDeactivationDate',
+                              'sophomorixSchoolname',
+                              'sophomorixStatus',
+                              'sophomorixFirstPassword',
+                              'sophomorixUnid',
+			      'sophomorixFirstnameASCII',
+			      'sophomorixSurnameASCII',
+                              'sophomorixFirstnameInitial',
+			      'sophomorixSurnameInitial',
+			      'sophomorixUserToken',
+			      'sophomorixAdminFile',
+			      'sophomorixBirthdate',
+                             ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+
+    my $max_user = $mesg->count;
+    my $entry = $mesg->entry(0);
+    if (not defined $entry){
+        $ref_result->{$user}{'EXISTING'}="FALSE";
+    } else {
+        $ref_result->{$user}{'EXISTING'}="TRUE";
+	$ref_result->{$user}{'givenName'} = $entry->get_value('givenName');
+	$ref_result->{$user}{'sn'} = $entry->get_value('sn');
+	$ref_result->{$user}{'sophomorixFirstnameASCII'} = $entry->get_value('sophomorixFirstnameASCII');
+	$ref_result->{$user}{'sophomorixSurnameASCII'} = $entry->get_value('sophomorixSurnameASCII');
+	$ref_result->{$user}{'sophomorixFirstnameInitial'} = $entry->get_value('sophomorixFirstnameInitial');
+	$ref_result->{$user}{'sophomorixSurnameInitial'} = $entry->get_value('sophomorixSurnameInitial');
+	$ref_result->{$user}{'sophomorixAdminClass'} = $entry->get_value('sophomorixAdminClass');
+	$ref_result->{$user}{'sophomorixRole'} = $entry->get_value('sophomorixRole');
+	$ref_result->{$user}{'sophomorixExamMode'} = $entry->get_value('sophomorixExamMode');
+	$ref_result->{$user}{'homeDirectory'} = $entry->get_value('homeDirectory');
+	$ref_result->{$user}{'userAccountControl'} = $entry->get_value('userAccountControl');
+	$ref_result->{$user}{'sophomorixTolerationDate'} = $entry->get_value('sophomorixTolerationDate');
+	$ref_result->{$user}{'sophomorixDeactivationDate'} = $entry->get_value('sophomorixDeactivationDate');
+	$ref_result->{$user}{'sophomorixSchoolname'} = $entry->get_value('sophomorixSchoolname');
+	$ref_result->{$user}{'sophomorixStatus'} = $entry->get_value('sophomorixStatus');
+	$ref_result->{$user}{'sophomorixFirstPassword'} = $entry->get_value('sophomorixFirstPassword');
+	$ref_result->{$user}{'sophomorixUnid'} = $entry->get_value('sophomorixUnid');
+	$ref_result->{$user}{'sophomorixUserToken'} = $entry->get_value('sophomorixUserToken');
+	$ref_result->{$user}{'sophomorixAdminFile'} = $entry->get_value('sophomorixAdminFile');
+	$ref_result->{$user}{'sophomorixBirthdate'} = $entry->get_value('sophomorixBirthdate');
+    }
+    return $ref_result;
 }
 
 
