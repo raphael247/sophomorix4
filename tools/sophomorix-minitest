@@ -113,7 +113,11 @@ use Parallel::ForkManager;
 
 
 my $pm = Parallel::ForkManager->new(2);
- 
+my %common_hash=();
+my $ref_common_hash=\%common_hash;
+$ref_common_hash->{'START'}="start";
+#my $ref_common_hash;
+
 # data structure retrieval and handling
 $pm -> run_on_finish ( # called BEFORE the first call to start()
   sub {
@@ -131,7 +135,12 @@ $pm -> run_on_finish ( # called BEFORE the first call to start()
       print "IDENT:  $ident\n";
       print "SIG:    $exit_signal\n";
       print "CORE:   $core_dump\n";
-      print "REF:    ${$data_structure_reference}\n";
+    #print "REF:    ${$data_structure_reference}\n";
+    print Dumper ($data_structure_reference);
+
+    $ref_common_hash->{$data_structure_reference->{'USER'}}=$data_structure_reference;
+    #$ref_common_hash->{'KEY'}=$data_structure_reference;
+     #$ref_common_hash= ($ref_common_hash, $data_structure_reference);
 #    }
 #    else {  # problems occurring during storage or retrieval will throw a warning
 #      print qq|No message received from child process $pid!\n|;
@@ -139,12 +148,9 @@ $pm -> run_on_finish ( # called BEFORE the first call to start()
   }
 );
  
-# prep random statement components
-my @foods = ('chocolate', 'ice cream', 'peanut butter', 'pickles', 'pizza', 'bacon', 'pancakes', 'spaghetti', 'cookies');
-my @preferences = ('loves', q|can't stand|, 'always wants more', 'will walk 100 miles for', 'only eats', 'would starve rather than eat');
-
 
 my @users=("wu42","oe42","blackmri42");
+
 
 # run the parallel processes
 PERSONS:
@@ -158,18 +164,23 @@ foreach my $user (@users) {
                                                          user=>$user,
                                                         });
 	
-  $pm->start() and next PERSONS;
-  sleep 1;
-  # generate a random statement about food preferences
-
-  
-  my $statement = $user . ' ' .$firstname_utf8_AD . ' ' . $lastname_utf8_AD;
- 
+  my %child_return=();
+  my $pid = $pm->start() and next PERSONS;
+   
+  $child_return{'FIRSTNAME'}=$firstname_utf8_AD;
+  $child_return{'LASTNAME'}=$lastname_utf8_AD;
+  $child_return{'USER'}=$user;
+   $child_return{'PID'}=$pid;
+   
   # send it back to the parent process
-  $pm->finish(0, \$statement);  # note that it's a scalar REFERENCE, not the scalar itself
+  $pm->finish(0, \%child_return);  # note that it's a scalar REFERENCE, not the scalar itself
 }
 $pm->wait_all_children;
 
+
+
+print "HERE\n";
+print Dumper($ref_common_hash);
 print "HERE\n";
 
 
