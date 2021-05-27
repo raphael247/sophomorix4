@@ -209,10 +209,10 @@ if ($info==1) {
                 sophomorix_config => \%sophomorix_config,
                });
 
-    if ($session ne "" and exists $sessions{'ID'}{$session}{'SUPERVISOR'}{'name'}){
+    if ($session ne "" and exists $sessions{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}){
         print "\n";
         &Sophomorix::SophomorixBase::print_title("Session $session:");
-        print "     *         supervisor:  $sessions{'ID'}{$session}{'SUPERVISOR'}{'name'}  (supervisor of the session)\n";
+        print "     *         supervisor:  $sessions{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}  (supervisor of the session)\n";
         print "     *       participants:  $sessions{'ID'}{$session}{'PARTICIPANTSTRING'}  (participants of the session)\n";
         print "     * sophomorixSessions:  $sessions{'ID'}{$session}{'sophomorixSessions'}\n";
     } 
@@ -231,7 +231,7 @@ if ($info==1) {
         foreach my $session (@ordered_list ){
             $count++;
             print "  $count) Supervisor $supervisor session: $session\n";
-            print "     *         supervisor:  $sessions{'ID'}{$session}{'SUPERVISOR'}{'name'}  (supervisor of the session)\n";
+            print "     *         supervisor:  $sessions{'ID'}{$session}{'SUPERVISOR'}{'sAMAccountName'}  (supervisor of the session)\n";
             print "     *       participants:  $sessions{'ID'}{$session}{'PARTICIPANTSTRING'}  (participants of the session)\n";
             print "     * sophomorixSessions:  $sessions{'ID'}{$session}{'sophomorixSessions'}\n";
         }
