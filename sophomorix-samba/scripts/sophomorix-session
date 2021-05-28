@@ -147,7 +147,7 @@ Options:
     --participants ""                     # clear participant list
   --add-participants <user1>,<user2>, ...
   --remove-participants <user1>,<user2>, ...
-  --create (user current time as session-id)
+  --create (use current time as session-id)
   --kill -s <session-id>
   --kill-all-sessions
   --kill-all-auto-generated-sessions (created by schulkonsole)
@@ -159,15 +159,18 @@ Create a session with the current time:
 Update the participants of a running session:
   sophomorix-session --session <session_id> --participants <user1>,<user2>, ...
 
+
+
 Dumping data:  
-  -ij                              (dump sessions)  
+  -ij                              (dump all sessions)
+  -ij --supervisor <user>          (dump all sessions of user <user>)
+  -ij --session <session>          (dump the session <session>)
   
   -j / --json                      (dump as a nice json object)
   -jj / --json --json              (dump as a compact json object)
   -jjj / --json --json --json      (dump as a perl hash)
 
 
- 
 Please see the sophomorix-session(8) man pages for full documentation
 ');
    print "\n";
