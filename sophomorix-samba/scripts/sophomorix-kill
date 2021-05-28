@@ -322,7 +322,7 @@ if ($killuser ne ""){
 
 # remove nonexisting users from sessions
 &print_title("START: Removing nonexisting users from sessions");
-my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all","allsupervisors",$smb_admin_pass,\%sophomorix_config);
+my %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all","allsupervisors",$smb_admin_pass,0,0,\%sophomorix_config);
 #print Dumper(%sessions{'NONEXISTING_PARTICIPANTS_by_session'});
 if (defined $sessions{'NONEXISTING_PARTICIPANTS_by_session'}){
     foreach my $session ( keys %{ $sessions{'NONEXISTING_PARTICIPANTS_by_session'} }){

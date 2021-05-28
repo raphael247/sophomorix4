@@ -84,6 +84,8 @@ my $comment;;
 my $participants; # undef: do not change participants
 my $add_participants="";
 my $remove_participants="";
+my $list_transfer_dirs=0;
+my $list_quota=0;
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -102,6 +104,8 @@ my $testopt=GetOptions(
            "add-participants=s" => \$add_participants,
            "remove-participants=s" => \$remove_participants,
            "developer-session=s" => \$developer_session,
+           "list-transfer-dirs" => \$list_transfer_dirs,
+           "list-quota" => \$list_quota,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-session");
@@ -162,9 +166,12 @@ Update the participants of a running session:
 
 
 Dumping data:  
-  -ij                              (dump all sessions)
-  -ij --supervisor <user>          (dump all sessions of user <user>)
-  -ij --session <session>          (dump the session <session>)
+  -ij                                          (dump all sessions)
+  -ij --supervisor <user>                      (dump all sessions of user <user>)
+  -ij --session <session>                      (dump the session <session>)
+  -ij --session <session> --list-transfer-dir  (dump the session <session> and list transfer dirs)
+  -ij --session <session> --list-transfer-dir --list-quota  
+       (dump the session <session>, list transfer dirs and quota)
   
   -j / --json                      (dump as a nice json object)
   -jj / --json --json              (dump as a compact json object)
@@ -179,13 +186,13 @@ Please see the sophomorix-session(8) man pages for full documentation
 
 if ($supervisor ne ""){
     # get all sessions of user $supervisor 
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all",$supervisor,$smb_admin_pass,\%sophomorix_config);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all",$supervisor,$smb_admin_pass,$list_transfer_dirs,$list_quota,\%sophomorix_config);
 } elsif ($session ne ""){
     # get the session $session
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$session,"allsupervisors",$smb_admin_pass,\%sophomorix_config);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,$session,"allsupervisors",$smb_admin_pass,$list_transfer_dirs,$list_quota,\%sophomorix_config);
 } else {
     # get all sessions of all supervisors
-    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all","allsupervisors",$smb_admin_pass,\%sophomorix_config);
+    %sessions=&AD_get_sessions($ldap,$root_dse,$root_dns,$json,"all","allsupervisors",$smb_admin_pass,$list_transfer_dirs,$list_quota,\%sophomorix_config);
 }
 
 

@@ -64,6 +64,8 @@ sub AD_test_session_count {
                                                                  "all",
                                                                  "allsupervisors",
                                                                  $smb_admin_pass,
+								 1,
+								 1,
                                                                  $ref_sophomorix_config);
     my $count=$sessions{'SESSIONCOUNT'};
     is ($count,$should,"  * There exist $should sessions");

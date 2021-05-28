@@ -4353,11 +4353,20 @@ sub AD_object_search {
 
 
 sub AD_get_sessions {
-    my ($ldap,$root_dse,$root_dns,$json,$show_session,$show_supervisor,$smb_admin_pass,$ref_sophomorix_config)=@_;
+    my ($ldap,
+	$root_dse,
+	$root_dns,
+	$json,
+	$show_session,
+	$show_supervisor,
+	$smb_admin_pass,
+	$list_transfer_dirs,
+	$list_quota,
+	$ref_sophomorix_config)=@_;
     my %sessions=();
     my %management=();
     my $session_count=0;
-    { # begin bock
+    { # begin block
 	my $filter="(& (objectClass=group) (| ";
         foreach my $grouptype (@{ $ref_sophomorix_config->{'INI'}{'EXAMMODE'}{'MANAGEMENTGROUPLIST'} }){
             $filter=$filter."(sophomorixType=".$grouptype.")";
@@ -4368,11 +4377,11 @@ sub AD_get_sessions {
                           scope => 'sub',
                           filter => $filter,
                           attrs => ['sAMAccountName',
-                                  'sophomorixSchoolname',
-                                  'sophomorixStatus',
-                                  'sophomorixType',
-                                  'member',
-                                 ]);
+                                    'sophomorixSchoolname',
+                                    'sophomorixStatus',
+                                    'sophomorixType',
+                                    'member',
+                                   ]);
         my $max_mangroups = $mesg->count;
         &Sophomorix::SophomorixBase::print_title("$max_mangroups managementgroups found in AD");
         for( my $index = 0 ; $index < $max_mangroups ; $index++) {
@@ -4622,41 +4631,46 @@ sub AD_get_sessions {
                                   user=>$sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
                                 });
 
-                    &Sophomorix::SophomorixBase::dir_listing_user($root_dns,
-                                                                  $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
-                                                                  $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'SMBhomeDirectory'},
-                                                                  $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sophomorixSchoolname'},
-                                                                  $smb_admin_pass,
-                                                                  \%sessions,
-                                                                  $ref_sophomorix_config,
-                                                                  $school_AD,
-                                                                 );
+                    if ($list_transfer_dirs==1){
+                        &Sophomorix::SophomorixBase::dir_listing_user($root_dns,
+                                                                      $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sAMAccountName'},
+                                                                      $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'SMBhomeDirectory'},
+                                                                      $sessions{'ID'}{$show_session}{'SUPERVISOR'}{'sophomorixSchoolname'},
+                                                                      $smb_admin_pass,
+                                                                      \%sessions,
+                                                                      $ref_sophomorix_config,
+                                                                      $school_AD,
+                                                                     );
+		    }
 
                     # participants
                     foreach my $participant (keys %{$sessions{'ID'}{$id}{'PARTICIPANTS'}}) {
                         # managementgroups
 
-#                        $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'}=$existing_AD;
                         if ($sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'user_existing'} eq "FALSE"){
  		            print "WARNING: $participant nonexisting (Skipping  dirlisting and quota)\n";
                             next;
 			}
 
-                        # transfer directory of participants 
-                        &Sophomorix::SophomorixBase::dir_listing_user(
-                                       $root_dns,
-                                       $participant,
-                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'},
-                                       $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'},
-                                       $smb_admin_pass,
-                                       \%sessions,
-                                       $ref_sophomorix_config,
-                                       );
-                        # quota
-                        &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,
-                                                                                       $show_session,
-                                                                                       $supervisor,
-                                                                                       \%sessions);
+			if ($list_transfer_dirs==1){
+                            # transfer directory of participants
+                            &Sophomorix::SophomorixBase::dir_listing_user(
+                                $root_dns,
+                                $participant,
+                                $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'SMBhomeDirectory'},
+                                $sessions{'ID'}{$id}{'PARTICIPANTS'}{$participant}{'sophomorixSchoolname'},
+                                $smb_admin_pass,
+                                \%sessions,
+                                $ref_sophomorix_config,
+			    );
+			}
+			if ($list_quota==1){
+                            # quota
+                            &Sophomorix::SophomorixBase::quota_listing_session_participant($participant,
+                                                                                           $show_session,
+                                                                                           $supervisor,
+                                                                                           \%sessions);
+			}
                     }
                 }         
             } else { #neither all nor the requested session
