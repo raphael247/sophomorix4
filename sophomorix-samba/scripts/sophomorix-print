@@ -702,7 +702,7 @@ sub create_csv_files {
     @{ $ref_printlist } = sort @{ $ref_printlist };
     foreach my $item ( @{ $ref_printlist } ){
         my @data=split(/;/,$item);
-        my $csv=$data[1]." ".$data[0].";".$data[5].";".$data[2].";".$data[3].";";
+        my $csv=$data[1]." ".$data[0].";".$data[5].";".$data[2].";".$data[3].";".$data[10].";";
         print CSV $csv."\l\r";
         print UNIXCSV $csv."\n";
         my $webuntis=$data[5].";".$data[0].";".$data[1].";".$data[2].";".$data[6].", ".$data[7].";".$data[10].";";
