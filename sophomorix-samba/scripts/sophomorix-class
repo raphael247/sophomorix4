@@ -205,7 +205,7 @@ Changing one/multiple admin-/extra-/teacherclass:
     --mailquota <mailquota in MiB>:<Comment>
     --mailalias, --nomailalias
     --maillist, --nomaillist 
-    --status <P,M> (Permanent or Managed)
+    --status <P,M> (P=Permanent or M=Managed)
     --join,  --nojoin
     --hide,  --nohide
     --maxmembers number
@@ -231,11 +231,11 @@ This is for migration/testing/fixing only (only one class allowed as option):
 
 
 Be careful with this commands:
-  Delete empty classes (no students and no teachers):
+  Delete empty (no students and no teachers) classes (status must be M):
     --delete-all-empty-classes
-  Delete classes with only teachers as members (no students):
+  Delete classes with only teachers (no students) as members (class status must be M):
     --delete-all-teacheronly-classes
-  Delete a class unconditionally:
+  Delete a class unconditionally (This deletes a class even if the status is P):
     --kill --class <class>,<class2>,...
 
 
