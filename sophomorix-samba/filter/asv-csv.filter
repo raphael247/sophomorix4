@@ -1,0 +1,128 @@
+#!/usr/bin/perl -w
+# This script converts the cvs dump of ASV-BW 
+# to the students.csv format for linuxmuster.net 7
+#
+# Fetch data from ASV-BW the following way:
+# as described in https://github.com/linuxmuster/sophomorix4/wiki/Export-and-Filters
+
+# call this script with /abs/path/asv-csv.filter  /source/file  /target/file
+
+############################################################
+# Start configure 
+############################################################
+
+my $source=$ARGV[0];
+my $target=$ARGV[1];
+
+my $tmp="/var/lib/sophomorix/tmp/students.csv.filter.tmp-asv-csv.filter";
+
+my %unid_store=();
+my $linecount=0;
+my $filtercount=0;
+
+
+############################################################
+# Filter
+############################################################
+
+open(SOURCE, "<$source") || die "Error: $! $source not found!"; 
+open(TMP, ">$tmp") || die "Error: $! $tmp not found!";
+print TMP "# created by filterscript\n";
+print TMP "# $0\n";
+print TMP "# @ARGV\n";
+
+
+
+while (<SOURCE>){
+    chomp();
+    $linecount++;
+
+    # skip empty lines    
+    if ($_ eq ""){
+        next;
+    }
+
+    # split items in line
+    my ($class,
+        $surname,
+        $firstname,
+        $birthday,
+        $unid,
+        $gender,
+       )=split(";");
+
+    # remove quotes
+    #$class=&remove_quote($class);
+    #$surname=&remove_quote($surname);
+    #$firstname=&remove_quote($firstname);
+    #$birthday=&remove_quote($birthday);
+    #$unid=&remove_quote($unid);
+    #$schoolyear=&remove_quote($schoolyear);
+
+    # skip header
+    if ($class eq "Klasse" and $surname eq "Familienname"){
+        print "Next Line\n";
+        next;
+    }
+
+    # skip classes beginning with _
+    if ($class=~m/^_/){
+        next;
+    }
+
+    # skip classes beginning with "Abgang "
+    if ($class=~m/^Abgang /){
+        next;
+    }
+
+    # display LINE
+    print "LINE $linecount:\n";
+    print "   Class:       >$class<\n";
+    print "   Surname:     >$surname<\n";
+    print "   Firstname:   >$firstname<\n";
+    print "   birthday:    >$birthday<\n";
+    print "   Unid:        >$unid<\n";
+    print "   Gender:      >$gender<\n";
+
+    # exit if line seems suspicious
+    my $semicolons_per_line=tr/;//;
+    if (not $semicolons_per_line==5){
+        print "Line $linecount: Number of Semicolons is $semicolons_per_line\n";
+        exit;
+    }
+
+    # exit if ID is double
+    if (exists $unid_store{$unid}){
+        print "########## $unid is double ##########\n";
+        exit;
+    } else {
+        $unid_store{$unid}="seen";
+    }
+
+    # create line
+    $filtercount++;
+    my $filtered_line=$class.";".$surname.";".$firstname.";".$birthday.";".$unid.";";
+    print "  -> Filtered to $filtercount: $filtered_line\n";    
+    print TMP $filtered_line."\n";
+}
+close(SOURCE);
+close(TMP);
+
+
+# if all worked well: copy file to final location
+system("cp $tmp $target");
+system("rm $tmp");
+
+
+############################################################
+# subs
+############################################################
+
+sub remove_quote {
+    my ($string)=@_;
+    $string=~s/^"//g;
+    $string=~s/"$//g;
+    $string=~s/^ //g;
+    $string=~s/ $//g;
+    return $string;
+}
