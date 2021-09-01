@@ -1060,8 +1060,12 @@ sub _console_print_updatefile {
                               ", ".
                               $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_NEW'};
             printf " %-82s\n", "User ".$count."/".$ref_updatefile->{'COUNTER'}{'TOTAL'}.": ".
-                               $sam.
-                               " (current school/role: ".
+		               $sam.
+                               " (current name/school/role: ".
+		               $ref_updatefile->{'USER'}{$sam}{'SURNAME_UTF8_OLD'}.
+		               ", ".
+                               $ref_updatefile->{'USER'}{$sam}{'FIRSTNAME_UTF8_OLD'}.
+                               "/".
                                $ref_updatefile->{'USER'}{$sam}{'SCHOOL_OLD'}.
                                "/".
                                $ref_updatefile->{'USER'}{$sam}{'ROLE_OLD'}.
