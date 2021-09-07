@@ -1,0 +1,148 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SCHOOL.CONF 5 "SEPTEMBER 07, 2021"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+
+Konfigurationsdateien für Schulen bei sophomorix4:
+
+default-school:
+.br
+/etc/linuxmuster/sophomorix/default-school/school.conf
+
+Andere <school>:
+.br
+/etc/linuxmuster/sophomorix/<school>/<school>.school.conf
+
+.SH DESCRIPTION
+Die schulweite(n) Konfigurationsdatei(en) wird/werden von jedem sophomorix-script eingelesen.
+
+Beim erstellen einer Schule wird als Template benutzt: /usr/share/sophomorix/config-templates/school.conf.template.ini
+
+ALLE erlaubten Parameter findet man in: /usr/share/sophomorix/devel/master/school.conf.master
+
+Es können folgende Parameter eingestellt werden (Auswahl):
+
+Bei der default-school ist der Gruppenname immer 'teachers', egal was
+in Feld 1 steht.
+.br
+Bei anderen Schulen ist er immer: '<school>-teachers', egal was in
+Feld 1 steht.
+
+sophomorixType dieser Klassen ist 'teacherclass'.
+.PP
+.SH Section [school]:
+.B ADMINS_PRINT
+
+Text
+
+.B SCHOOL_LONGNAME
+
+Text
+
+.B PRINTSERVER
+
+Text
+
+.SH Section [role.<userrole>]:
+
+.B QUOTA_DEFAULT_GLOBAL
+
+Text
+
+.B QUOTA_DEFAULT_SCHOOL
+
+Text
+
+.B CLOUDQUOTA_PERCENTAGE
+
+Text
+
+.B MAILQUOTA_DEFAULT
+
+Text
+
+.B WEBUI_PERMISSIONS
+
+Text
+
+.B MAILDOMAIN
+
+Text
+
+.B
+
+.B MAIL_LOCAL_PART_SCHEME
+
+Text
+
+.B MAIL_LOCAL_PART_MAP
+
+Text
+
+.SH Section [type.<grouptype>]:
+
+.B MAILDOMAIN
+
+Text
+
+.SH Section [userfile.<filename_without_school_prefix>]:
+
+.B FILTERSCRIPT
+
+Text
+
+.B ENCODING
+
+Text
+
+.B ENCODING_FORCE
+
+Text
+
+.B SURNAME_CHARS
+
+Text
+
+.B FIRSTNAME_CHARS
+
+Text
+
+.B SURNAME_FIRSTNAME_REVERSE
+
+Text
+
+.B RANDOM_PWD
+
+Text
+
+.B PWD_LENGTH
+
+Text
+
+.B TOLERATION_TIME
+
+Text
+
+.B DEACTIVATION_TIME
+
+.SH Section [devicefile.devices.csv]:
+
+In dieser Section gibt es momentan keine Parameter.
+
+.
+.SH AUTHOR
+Written by <jeffbeck@web.de>.
