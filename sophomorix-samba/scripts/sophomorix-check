@@ -1904,7 +1904,8 @@ sub find_ascii_approx_matches {
             }
         }
     }
-    &print_title("approxMATCH: $line_count_school CHECKED in $school, MATCH: $matched_count_school","slim");
+    &print_title("approxMATCH: $line_count_school CHECKED in $school, MATCH: $matched_count_school (Edit distance: $max_edit_distance)",
+		 "slim");
     return (-1,$line_count_school,$school,$matched_count_school,$not_matched_count_school);
 }
 
