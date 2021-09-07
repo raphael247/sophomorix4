@@ -2,14 +2,12 @@
 # This script converts the cvs dump of ASV-BW 
 # to the students.csv format for linuxmuster.net 7
 #
-# Fetch data from ASV-BW the following way:
-# as described in https://github.com/linuxmuster/sophomorix4/wiki/Export-and-Filters
 
-# call this script with /abs/path/asv-csv.filter  /source/file  /target/file
-
-############################################################
-# Start configure 
-############################################################
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1;
 
 my $source=$ARGV[0];
 my $target=$ARGV[1];
@@ -17,13 +15,53 @@ my $target=$ARGV[1];
 my $tmp="/var/lib/sophomorix/tmp/students.csv.filter.tmp-asv-csv.filter";
 
 my %unid_store=();
+my %line_store=();
 my $linecount=0;
 my $filtercount=0;
 
+my %header=();
+
+
 
 ############################################################
-# Filter
+# configuration
 ############################################################
+
+# Fetch data from ASV-BW the following way:
+# as described in https://github.com/linuxmuster/sophomorix4/wiki/Export-and-Filters
+
+# call this script with /abs/path/asv-csv.filter  /source/file  /target/file
+
+# your exported files needs headers to work with this filter
+
+# Header names in the analized file
+# Edit ONLY the last, german names
+$header{'known_headers'}{'class'}="Klasse";
+$header{'known_headers'}{'sn'}="Familienname";
+$header{'known_headers'}{'givenName'}="Vornamen";
+$header{'known_headers'}{'birthday'}="Geburtsdatum";
+$header{'known_headers'}{'unid'}="Schueler-ID";
+
+# how many ; has your file?
+$configured_semicolons_per_line=5;
+
+
+
+############################################################
+# Start the script
+############################################################
+
+foreach my $key( keys %{ $header{'known_headers'} }){
+    $header{'configured_headers'}{$header{'known_headers'}{$key}}=$key;
+}
+
+# Order of the Headers in the filtered file
+$header{'output'}{'class'}=1;
+$header{'output'}{'sn'}=2;
+$header{'output'}{'givenName'}=3;
+$header{'output'}{'birthday'}=4;
+$header{'output'}{'unid'}=5;
+
 
 open(SOURCE, "<$source") || die "Error: $! $source not found!"; 
 open(TMP, ">$tmp") || die "Error: $! $tmp not found!";
@@ -43,13 +81,7 @@ while (<SOURCE>){
     }
 
     # split items in line
-    my ($class,
-        $surname,
-        $firstname,
-        $birthday,
-        $unid,
-        $gender,
-       )=split(";");
+    my @items=split(";");
 
     # remove quotes
     #$class=&remove_quote($class);
@@ -59,11 +91,28 @@ while (<SOURCE>){
     #$unid=&remove_quote($unid);
     #$schoolyear=&remove_quote($schoolyear);
 
-    # skip header
-    if ($class eq "Klasse" and $surname eq "Familienname"){
-        print "Next Line\n";
-        next;
+    # find the header
+    if (exists $header{'configured_headers'}{$items[0]} and
+	exists $header{'configured_headers'}{$items[1]} and
+	exists $header{'configured_headers'}{$items[2]}
+       ){
+	print  "This is the header $linecount: $_\n";
+        my $count=0;
+	foreach my $item (@items){
+	    $count++;
+            #my $field="Feld".$count;
+	    $header{'fields_in_input_file'}{$item}=$count;
+	}
+	print Dumper(%header);
+	next;
     }
+
+    # display LINE
+    my $class=$items[$header{'fields_in_input_file'}{$header{'known_headers'}{'class'}}-1];
+    my $sn=$items[$header{'fields_in_input_file'}{$header{'known_headers'}{'sn'}}-1];
+    my $given_name=$items[$header{'fields_in_input_file'}{$header{'known_headers'}{'givenName'}}-1];
+    my $birthday=$items[$header{'fields_in_input_file'}{$header{'known_headers'}{'birthday'}}-1];
+    my $unid=$items[$header{'fields_in_input_file'}{$header{'known_headers'}{'unid'}}-1];
 
     # skip classes beginning with _
     if ($class=~m/^_/){
@@ -75,36 +124,49 @@ while (<SOURCE>){
         next;
     }
 
-    # display LINE
     print "LINE $linecount:\n";
-    print "   Class:       >$class<\n";
-    print "   Surname:     >$surname<\n";
-    print "   Firstname:   >$firstname<\n";
-    print "   birthday:    >$birthday<\n";
-    print "   Unid:        >$unid<\n";
-    print "   Gender:      >$gender<\n";
+    print "   $header{'known_headers'}{'class'}: >$class<\n";
+    print "   $header{'known_headers'}{'sn'}: >$sn<\n";
+    print "   $header{'known_headers'}{'givenName'}: >$given_name<\n";
+    print "   $header{'known_headers'}{'birthday'}: >$birthday<\n";
+    print "   $header{'known_headers'}{'unid'}: >$unid<\n";
 
     # exit if line seems suspicious
     my $semicolons_per_line=tr/;//;
-    if (not $semicolons_per_line==5){
+    if (not $semicolons_per_line==$configured_semicolons_per_line){
         print "Line $linecount: Number of Semicolons is $semicolons_per_line\n";
         exit;
     }
 
+    # ignore if line is double
+    if (exists $line_store{$_}){
+        print "\n# WARNING: line $_ is double (Line $line_store{$_} and $linecount)#\n\n";
+        next;
+    } else {
+        $line_store{$_}=$linecount;
+    }
+
     # exit if ID is double
     if (exists $unid_store{$unid}){
-        print "########## $unid is double ##########\n";
+	print "$_";
+        print "\n# ERROR: unid $unid is double (Line $unid_store{$unid} and $linecount)#\n\n";
         exit;
     } else {
-        $unid_store{$unid}="seen";
+        $unid_store{$unid}=$linecount;
     }
 
     # create line
     $filtercount++;
-    my $filtered_line=$class.";".$surname.";".$firstname.";".$birthday.";".$unid.";";
-    print "  -> Filtered to $filtercount: $filtered_line\n";    
+    my $filtered_line=$class.";".
+	              $sn.";".
+	              $given_name.";".
+	              $birthday.";".
+	              $unid.";";
+    print "  -> Filtered to $filtercount: $filtered_line\n";
     print TMP $filtered_line."\n";
 }
+
+
 close(SOURCE);
 close(TMP);
 
