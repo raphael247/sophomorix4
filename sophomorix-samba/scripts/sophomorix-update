@@ -255,43 +255,42 @@ while(<USERUPDATE>){
         next;
     }
     chomp();
-    $user_count++;
-       my ($user,
-           $unid_old,
-           $unid_new,
-           $surname_ascii_old,
-           $surname_ascii_new,
-           $firstname_ascii_old,
-           $firstname_ascii_new,
-           $birthdate_old,
-           $birthdate_new,
-           $surname_utf8_old,
-           $surname_utf8_new,
-           $firstname_utf8_old,
-           $firstname_utf8_new,
-           $filename_old,
-           $filename_new,
-           $status_old,
-           $status_new,
-           $role_old,
-           $role_new,
-           $class_old,
-           $class_new,
-           $school_old,
-           $school_new,
-           $surname_initial_utf8_old,
-           $surname_initial_utf8_new,
-           $firstname_initial_utf8_old,
-           $firstname_initial_utf8_new,
-           $mail_old,
-           $mail_new,
-           $webui_string_old,
-           $webui_string_new,          
-           $homedirectory_old,
-           $homedirectory_new,          
-           $homedirectory_old_rel,
-           $homedirectory_new_rel,          
-          )=split(/::/);
+    my ($user,
+        $unid_old,
+        $unid_new,
+        $surname_ascii_old,
+        $surname_ascii_new,
+        $firstname_ascii_old,
+        $firstname_ascii_new,
+        $birthdate_old,
+        $birthdate_new,
+        $surname_utf8_old,
+        $surname_utf8_new,
+        $firstname_utf8_old,
+        $firstname_utf8_new,
+        $filename_old,
+        $filename_new,
+        $status_old,
+        $status_new,
+        $role_old,
+        $role_new,
+        $class_old,
+        $class_new,
+        $school_old,
+        $school_new,
+        $surname_initial_utf8_old,
+        $surname_initial_utf8_new,
+        $firstname_initial_utf8_old,
+        $firstname_initial_utf8_new,
+        $mail_old,
+        $mail_new,
+        $webui_string_old,
+        $webui_string_new,
+        $homedirectory_old,
+        $homedirectory_new,
+        $homedirectory_old_rel,
+        $homedirectory_new_rel,
+       )=split(/::/);
 
 
     # deselecting users
@@ -343,6 +342,7 @@ while(<USERUPDATE>){
     }
 
 
+    $user_count++;
     my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
 
     if ($unid_new ne "---" or 
