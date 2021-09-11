@@ -44,7 +44,8 @@ $header{'known_headers'}{'birthday'}="Geburtsdatum";
 $header{'known_headers'}{'unid'}="Schueler-ID";
 
 # how many ; has your file?
-$configured_semicolons_per_line=5;
+$max_configured_semicolons_per_line=15;
+$min_configured_semicolons_per_line=4;
 
 
 
@@ -143,8 +144,10 @@ while (<SOURCE>){
 
     # exit if line seems suspicious
     my $semicolons_per_line=tr/;//;
-    if (not $semicolons_per_line==$configured_semicolons_per_line){
-        print "Line $linecount: Number of Semicolons is $semicolons_per_line\n";
+    if ($semicolons_per_line<$min_configured_semicolons_per_line or
+	$semicolons_per_line>$max_configured_semicolons_per_line ){
+        print "\nSemicolons in line $linecount is not correct: $semicolons_per_line\n";
+        print "    Allowed: $min_configured_semicolons_per_line to $max_configured_semicolons_per_line\n\n";
         exit;
     }
 
