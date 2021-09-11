@@ -5051,6 +5051,7 @@ sub AD_get_AD_for_check {
                                 'sophomorixFirstPassword',
                                 'sophomorixAdminFile',
                                 'sophomorixAdminClass',
+                                'sophomorixExitAdminClass',
                                 'sophomorixRole',
                                 'sophomorixType',
                                 'sophomorixTolerationDate',
@@ -5107,6 +5108,7 @@ sub AD_get_AD_for_check {
                    $AD{'sAMAccountName'}{$sam}{'sophomorixFirstPassword'}=$entry->get_value('sophomorixFirstPassword');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminFile'}=$file;
                    $AD{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+                   $AD{'sAMAccountName'}{$sam}{'sophomorixExitAdminClass'}=$entry->get_value('sophomorixExitAdminClass');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixTolerationDate'}=$entry->get_value('sophomorixTolerationDate');
                    $AD{'sAMAccountName'}{$sam}{'sophomorixDeactivationDate'}=$entry->get_value('sophomorixDeactivationDate');
 
