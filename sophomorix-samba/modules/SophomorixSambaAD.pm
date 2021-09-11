@@ -7284,6 +7284,7 @@ sub AD_get_groups_v {
                                'sophomorixJoinable',
                                'sophomorixMaxMembers',
                                'sophomorixSchoolname',
+                               'sophomorixAdmins',
                                'member',
                               ]);
     &AD_debug_logdump($mesg,2,(caller(0))[3]);
@@ -7327,7 +7328,8 @@ sub AD_get_groups_v {
             $groups{'GROUPS'}{$sam}{'sophomorixMailList'}=$entry->get_value('sophomorixMailList');
             $groups{'GROUPS'}{$sam}{'sophomorixJoinable'}=$entry->get_value('sophomorixJoinable');
             $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
-            # count members
+            @{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }=$entry->get_value('sophomorixAdmins');
+	    # count members
             @{ $groups{'GROUPS'}{$sam}{'member'}{'TOTAL'} }=$entry->get_value('member');
             $groups{'GROUPS'}{$sam}{'member_COUNT'}{'TOTAL'}=$#{ $groups{'GROUPS'}{$sam}{'member'}{'TOTAL'} }+1;
             # sort members into role ????
