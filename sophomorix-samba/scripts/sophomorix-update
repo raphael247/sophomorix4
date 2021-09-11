@@ -42,11 +42,14 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dns_get
                                  AD_unbind_admin
                                  AD_user_update
+                                 AD_get_groups_v
+                                 AD_get_AD_for_check
                                  AD_get_passwd
                                  AD_object_search
                                  AD_get_name_tokened
                                  AD_group_addmember
                                  AD_group_removemember
+                                 AD_group_update
                                     );
 my @arguments = @ARGV;
 
@@ -211,6 +214,8 @@ if ($class_new_opt ne "") {
 
 
 
+
+
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
 
 ################################################################################
@@ -240,6 +245,8 @@ if (not -f $update_file){
 	});
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
+
+
 
 # calulate users to update
 my $max_user_count=`cat $sophomorix_config{'INI'}{'PATHS'}{'CHECK_RESULT'}/sophomorix.update | wc -l`;
@@ -467,7 +474,14 @@ rename("$update_file_new","$update_file");
                      sophomorix_result=>\%sophomorix_result,
 			       });
 
+
+
+&remove_former_teachers_from_classes();
+
+
 &AD_unbind_admin($ldap);
+
+
 
 if ($user_count>0){
     &run_hook_scripts("UPDATE_HOOK_DIR",\%sophomorix_result,\%sophomorix_config,"TRUE");
@@ -476,3 +490,74 @@ if ($user_count>0){
 }
 
 &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+
+
+############################################################
+# subs
+############################################################
+sub remove_former_teachers_from_classes {
+    my $school;
+    if ($school_opt eq ""){
+        $school=$DevelConf::name_default_school;
+    } else {
+        $school=$school_opt;
+    }
+
+    # get all classes
+    my $ref_groups_v=&AD_get_groups_v({ldap=>$ldap,
+                                       root_dse=>$root_dse,
+                                       root_dns=>$root_dns,
+                                       school=>$school_opt,
+                                       sophomorix_config=>\%sophomorix_config,
+                                     });
+
+
+    my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
+                                           root_dse=>$root_dse,
+                                           root_dns=>$root_dns,
+                                           admins=>"FALSE",
+                                           sophomorix_config=>\%sophomorix_config,
+                                         });
+    foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
+        print "Group: $group\n";
+	my @admins = @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} };
+	my $update=0;
+	foreach my $admin ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} }){
+	    my $teachergroup;
+	    if ($ref_AD_check->{'sAMAccountName'}{$admin}{'sophomorixSchoolname'} eq $DevelConf::name_default_school){
+                $teachergroup=${DevelConf::teacher};
+	    } else {
+		$teachergroup=$ref_AD_check->{'sAMAccountName'}{$admin}{'sophomorixSchoolname'}."-".${DevelConf::teacher};
+            }
+            # test if admin is a former teacher
+	    if ($ref_AD_check->{'sAMAccountName'}{$admin}{'sophomorixRole'} eq "student"){
+                # admin is a student
+		if ($ref_AD_check->{'sAMAccountName'}{$admin}{'sophomorixAdminClass'} ne $teachergroup and
+                    $ref_AD_check->{'sAMAccountName'}{$admin}{'sophomorixExitAdminClass'} eq $teachergroup
+		    ) {
+		    # admin was in the teacher group
+                    print "  $admin is an admin in $group, was a teacher but is not a teacher anymore\n";
+		    $update=1;
+                    @admins = &remove_from_list($admin,@admins);
+		}
+
+	    } else {
+		next;
+	    }
+	}
+	if ($update==1){
+	    my $admins=join(",",@admins);
+	    print "Old admins: @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} }\n";
+	    print "New admins: $admins\n";
+	    #print Dumper ($ref_groups_v->{'GROUPS'}{$group});
+            &AD_group_update({ldap=>$ldap,
+                              root_dse=>$root_dse,
+                              dn=>$ref_groups_v->{'GROUPS'}{$group}{'DN'},
+		              school=>$ref_groups_v->{'GROUPS'}{$group}{'sophomorixSchoolname'},
+                              type=>$ref_groups_v->{'GROUPS'}{$group}{'sophomorixType'},
+                              admins=>$admins,
+                              sophomorix_config=>\%sophomorix_config,
+                            });
+	}
+    }
+}

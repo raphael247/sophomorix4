@@ -7330,6 +7330,7 @@ sub AD_get_groups_v {
             $groups{'GROUPS'}{$sam}{'sophomorixMailList'}=$entry->get_value('sophomorixMailList');
             $groups{'GROUPS'}{$sam}{'sophomorixJoinable'}=$entry->get_value('sophomorixJoinable');
             $groups{'GROUPS'}{$sam}{'description'}=$entry->get_value('description');
+            $groups{'GROUPS'}{$sam}{'sophomorixSchoolname'}=$entry->get_value('sophomorixSchoolname');
             @{ $groups{'GROUPS'}{$sam}{'sophomorixAdmins'} }=$entry->get_value('sophomorixAdmins');
 	    # count members
             @{ $groups{'GROUPS'}{$sam}{'member'}{'TOTAL'} }=$entry->get_value('member');
