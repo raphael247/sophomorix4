@@ -496,6 +496,7 @@ if ($user_count>0){
 # subs
 ############################################################
 sub remove_former_teachers_from_classes {
+    &print_title("START: Removing former teachers from classes");
     my $school;
     if ($school_opt eq ""){
         $school=$DevelConf::name_default_school;
@@ -519,7 +520,7 @@ sub remove_former_teachers_from_classes {
                                            sophomorix_config=>\%sophomorix_config,
                                          });
     foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
-        print "Group: $group\n";
+        print "Testing $group for former teachers\n";
 	my @admins = @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} };
 	my $update=0;
 	foreach my $admin ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} }){
@@ -547,8 +548,8 @@ sub remove_former_teachers_from_classes {
 	}
 	if ($update==1){
 	    my $admins=join(",",@admins);
-	    print "Old admins: @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} }\n";
-	    print "New admins: $admins\n";
+	    print "    Old admins of $group: @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} }\n";
+	    print "    New admins of $group: $admins\n";
 	    #print Dumper ($ref_groups_v->{'GROUPS'}{$group});
             &AD_group_update({ldap=>$ldap,
                               root_dse=>$root_dse,
@@ -560,4 +561,5 @@ sub remove_former_teachers_from_classes {
                             });
 	}
     }
+    &print_title("END: Removing former teachers from classes");
 }
