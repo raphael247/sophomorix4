@@ -521,6 +521,7 @@ sub remove_former_teachers_from_classes {
                                          });
     foreach my $group ( @{ $ref_groups_v->{'LISTS'}{'GROUP_by_sophomorixSchoolname'}{$school}{'class'} }){
         print "Testing $group for former teachers\n";
+	@{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} } = sort @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} };
 	my @admins = @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} };
 	my $update=0;
 	foreach my $admin ( @{ $ref_groups_v->{'GROUPS'}{$group}{'sophomorixAdmins'} }){
@@ -540,6 +541,7 @@ sub remove_former_teachers_from_classes {
                     print "  $admin is an admin in $group, was a teacher but is not a teacher anymore\n";
 		    $update=1;
                     @admins = &remove_from_list($admin,@admins);
+		    @admins =sort @admins;
 		}
 
 	    } else {
