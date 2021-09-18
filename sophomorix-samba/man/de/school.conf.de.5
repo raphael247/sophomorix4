@@ -30,9 +30,29 @@ Andere <school>:
 .SH DESCRIPTION
 Die schulweite(n) Konfigurationsdatei(en) wird/werden von jedem sophomorix-script eingelesen.
 
-Beim erstellen einer Schule wird als Template benutzt: /usr/share/sophomorix/config-templates/school.conf.template.ini
+Beim Erstellen einer Schule wird als Template benutzt: /usr/share/sophomorix/config-templates/school.conf.template.ini
 
 ALLE erlaubten Parameter findet man in: /usr/share/sophomorix/devel/master/school.conf.master
+
+Viele Parameter git es mehrfach (z.B. MAILDOMAIN). Je nachdem für
+welche benutzer/Gruppen der Parameter gelten soll, muss er in der entsprechenden
+Sektion gesetzt werden.
+
+User haben EINE Rolle (Attribut sophomorixRole), Gruppen haben EINEN Typ (Attribut sophomorixType).
+
+Einen Überblick über Rollen und Typen kann man sich anzeigen lassen mit:
+
+sophomorix-samba --show-roletype
+
+Welche Dateien von sophomorix zur Konfiguration herangezogen werden, sieht man im output von:
+
+sophomorix-check -i
+
+Und welche Parameter sich sophomorix daraus extrahiert/berechnet zeigt sich im JSON Objekt des Befehls:
+
+sophomorix-check -ij
+
+.SH PARAMETER
 
 Es können folgende Parameter eingestellt werden (Auswahl):
 
@@ -58,6 +78,8 @@ Text
 Text
 
 .SH Section [role.<userrole>]:
+
+Die Einstellungen gelten für die user der entsprechenden <userole> (student, teacher, schooladministrator)
 
 .B QUOTA_DEFAULT_GLOBAL
 
@@ -95,11 +117,20 @@ Text
 
 .SH Section [type.<grouptype>]:
 
+Die Einstellungen gelten für die Gruppen mit entsprechenden <grouptype> (adminclass, teacherclass, room, project, admins)
+
 .B MAILDOMAIN
 
 Text
 
 .SH Section [userfile.<filename_without_school_prefix>]:
+
+Die Einstellungen gelten für den import der Benutzerdateien der Schule, die man konfiguriert, z.B.:
+
+students.csv in school.conf gilt für students.csv der Schule default-school
+
+students.csv in bsz.school.conf gilt für bsz.students.csv der Schule bsz
+
 
 .B FILTERSCRIPT
 
