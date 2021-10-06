@@ -1504,7 +1504,7 @@ sub _console_print_group_full {
             }
             # printout
             print $line2;
-            print "| Admins:                         | Members:                        |\n";
+            print "| sophomorixAdmins:               | sophomorixMembers:              |\n";
             print $line2;
             for (my $i=0;$i<$max;$i++){
 	        # default display values:
@@ -1521,7 +1521,7 @@ sub _console_print_group_full {
 	    }
             print $line2;
             # sum up
-            printf "| Number of Admins:  %12s | Number of Members: %12s |\n",
+            printf "| Number of sophomorixAdmins:%4s | Number of sophomorixMembers:%3s |\n",
                 $ref_groups->{'GROUPS'}{$group}{'sophomorixAdmins_count'},
                 $ref_groups->{'GROUPS'}{$group}{'sophomorixMembers_count'};
             print $line2;
