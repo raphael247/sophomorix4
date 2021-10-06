@@ -8357,7 +8357,12 @@ sub AD_group_create {
 
     my $dn="CN=".$group.",".$target_branch;
     my $mail = $group."\@".$root_dns;
-    my $maildomain_key=$school."-".$type;
+    my $maildomain_key;
+            if ($school eq $DevelConf::name_default_school){
+                $maildomain_key=$type;
+            } else {
+                $maildomain_key=$school."-".$type;
+            }
     if (exists $ref_sophomorix_config->{'TYPES'}{$maildomain_key}{'MAILDOMAIN'}){
         if ($ref_sophomorix_config->{'TYPES'}{$maildomain_key}{'MAILDOMAIN'} ne ""){
             $mail=$group."\@".
