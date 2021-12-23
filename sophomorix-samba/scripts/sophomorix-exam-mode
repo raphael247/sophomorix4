@@ -81,11 +81,13 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
+my $school="---";
 
 my $supervisor="";
 my $participants="";
 my $set_exam_mode=0;
 my $unset_exam_mode=0;
+my $reset_all_exam_mode_users=0;
 
 my $subdir; # for collecting into
 my $subdir_examuser=""; # for creating examusers and OU
@@ -96,20 +98,14 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
-#           "create|c" => \$create,
-#           "kill" => \$kill,
-#           "kill-all-sessions" => \$kill_all_sessions,
+           "reset-all-exam-mode-users" => \$reset_all_exam_mode_users,
+           "school" => \$school,
            "supervisor=s" => \$supervisor,
-#           "session|s=s" => \$session,
-#           "comment=s" => \$comment,
            "participants|m=s" => \$participants,
            "subdir=s" => \$subdir,
            "subdir-examuser=s" => \$subdir_examuser,
-#           "add-participants=s" => \$add_participants,
-#           "remove-participants=s" => \$remove_participants,
            "set-exam-mode|set" => \$set_exam_mode,
            "unset-exam-mode|unset" => \$unset_exam_mode,
-#           "developer-session=s" => \$developer_session,
           );
 
 my %sophomorix_result=&result_sophomorix_init("sophomorix-exam-mode");
@@ -140,6 +136,8 @@ Options:
 
   sophomorix-exam-mode --set --supervisor <supi>  --participants <user1>,<user2>,...
   sophomorix-exam-mode --unset --subdir <subdir> <session> --participants <user1>,<user2>,...
+
+  --reset-all-exam-mode-users
 
 Please see the sophomorix-exam-mode(8) man pages for full documentation
 ');
@@ -289,6 +287,41 @@ if ($unset_exam_mode==1){
                                sophomorix_result=>\%sophomorix_result,
                              });
         }
+    }
+    &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+}
+
+
+
+# --reset-all-exam-mode-users
+if ($reset_all_exam_mode_users==1){
+    my $filter="(&(objectClass=user)".
+               "(sophomorixRole=examuser)".
+               "(!(sophomorixExamMode=---)))";
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attrs => ['sAMAccountName',
+                                'sophomorixExamMode',
+                     ]);
+
+    my $max_user = $mesg->count;
+    my @paritcipants=();
+    for( my $index = 0 ; $index < $max_user ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $sam=$entry->get_value('sAMAccountName');
+        push @paritcipants, $sam;
+    }
+
+    if ($#paritcipants==-1){
+        print "\nWARNING: No users in exam mode found\n\n";
+    } else {
+        my $participants=join(",",@paritcipants);
+        my $command="/usr/sbin/sophomorix-exam-mode --unset --subdir transfer --participants ".$participants;
+        print $command."\n";
+        &call_sophomorix_command($Conf::log_level,$json,$command);
     }
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
