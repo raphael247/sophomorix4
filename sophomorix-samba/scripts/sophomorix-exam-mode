@@ -139,7 +139,7 @@ Options:
   sophomorix-exam-mode --set --supervisor <supi>  --participants <user1>,<user2>,...
   sophomorix-exam-mode --unset --subdir <subdir> <session> --participants <user1>,<user2>,...
 
-  --reset-all-exam-mode-users
+  --reset-all-exam-mode-users --school <school>
 
 Please see the sophomorix-exam-mode(8) man pages for full documentation
 ');
@@ -300,35 +300,25 @@ if ($unset_exam_mode==1){
 
 
 
-# --reset-all-exam-mode-users
+# --reset-all-exam-mode-users (--school <school> )
 if ($reset_all_exam_mode_users==1){
-    my $filter="(&(objectClass=user)".
-               "(sophomorixRole=examuser)".
-               "(!(sophomorixExamMode=---)))";
-    my $mesg = $ldap->search(
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attrs => ['sAMAccountName',
-                                'sophomorixExamMode',
-                     ]);
-
-    my $max_user = $mesg->count;
-    my @paritcipants=();
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
-        push @paritcipants, $sam;
+    if ($school eq ""){
+        $school=$DevelConf::name_default_school;
     }
+    
+    my $ref_examusers=&AD_get_examusers({ldap=>$ldap,
+                                         root_dse=>$root_dse,
+                                         root_dns=>$root_dns,
+                                         school=>$school,
+                                         sophomorix_config=>\%sophomorix_config,
+					});
+    #print Dumper ($ref_examusers);
+    &print_title("Resetting examusers of school $school");
 
-    if ($#paritcipants==-1){
-        print "\nWARNING: No users in exam mode found\n\n";
-    } else {
-        my $participants=join(",",@paritcipants);
-        my $command="/usr/sbin/sophomorix-exam-mode --unset --subdir transfer --participants ".$participants;
-        print $command."\n";
-        &call_sophomorix_command($Conf::log_level,$json,$command);
-    }
+    my $participants=join(",",@{ $ref_examusers->{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$school}{'examuser'} } );
+    my $command="/usr/sbin/sophomorix-exam-mode --unset --subdir transfer --participants ".$participants;
+    #print $command."\n";
+    &call_sophomorix_command($Conf::log_level,$json,$command);
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
