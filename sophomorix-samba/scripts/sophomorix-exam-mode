@@ -27,6 +27,7 @@ use Text::Iconv;
 use Sophomorix::SophomorixBase qw(
                                  print_line
                                  print_title
+                                 create_schoollist
                                  unlock_sophomorix
                                  lock_sophomorix
                                  log_script_start
@@ -67,6 +68,7 @@ use Sophomorix::SophomorixSambaAD qw(
                                  AD_dn_fetch_multivalue
                                  AD_get_sessions
                                  AD_get_user
+                                 AD_get_examusers
                                  AD_dns_get
                                  AD_object_search
                                  AD_examuser_create
@@ -81,7 +83,7 @@ $Conf::log_level=1;
 my $help=0;
 my $info=0;
 my $json=0;
-my $school="---";
+my $school="";
 
 my $supervisor="";
 my $participants="";
@@ -99,7 +101,7 @@ my $testopt=GetOptions(
            "json|j+" => \$json,
            "verbose|v+" => \$Conf::log_level,
            "reset-all-exam-mode-users" => \$reset_all_exam_mode_users,
-           "school" => \$school,
+           "school=s" => \$school,
            "supervisor=s" => \$supervisor,
            "participants|m=s" => \$participants,
            "subdir=s" => \$subdir,
@@ -145,31 +147,35 @@ Please see the sophomorix-exam-mode(8) man pages for full documentation
    exit;
 }
 
+
+# --school <school1,school2, ...>
+my @opt_schoollist=&create_schoollist($school,\%sophomorix_config);
+
+
+
 # --info
 if ($info==1) {
-    # sophomorixExamMode other than ---
-    my $filter="(&(objectClass=user)".
-               "(sophomorixRole=examuser)".
-               "(!(sophomorixExamMode=---)))";
-    my $mesg = $ldap->search(
-                      base   => $root_dse,
-                      scope => 'sub',
-                      filter => $filter,
-                      attrs => ['sAMAccountName',
-                                'sophomorixExamMode',
-                     ]);
+    my $ref_examusers=&AD_get_examusers({ldap=>$ldap,
+                                         root_dse=>$root_dse,
+                                         root_dns=>$root_dns,
+                                         school=>$school,
+                                         sophomorix_config=>\%sophomorix_config,
+					});
+    #print Dumper ($ref_examusers);
+    my $jsoninfo="EXAMUSER";
+    my $jsoncomment="All Exam Users";
 
-    my $max_user = $mesg->count;
-    print "+--------------------+--------------------+\n";
-    printf "|%-20s|%-20s|\n","participant","supervisor";
-    print "+--------------------+--------------------+\n";
-    for( my $index = 0 ; $index < $max_user ; $index++) {
-        my $entry = $mesg->entry($index);
-        my $sam=$entry->get_value('sAMAccountName');
-        printf "|%-20s|%-20s|\n",$entry->get_value('sAMAccountName'),$entry->get_value('sophomorixExamMode');
-    }
-    print "+--------------------+--------------------+\n";
+    &json_dump({json => $json,
+                jsoninfo => $jsoninfo,
+                jsoncomment => $jsoncomment,
+                object_name => $school,
+                log_level => $Conf::log_level,
+                hash_ref => $ref_examusers,
+                sophomorix_config => \%sophomorix_config,
+               });
+    exit;
 }
+
 
 
 &result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);

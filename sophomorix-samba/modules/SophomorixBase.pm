@@ -344,6 +344,8 @@ sub json_dump {
         } elsif ($jsoninfo eq "USER"){
             # incl. administrators            
             &_console_print_user_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "EXAMUSER"){
+            &_console_print_examusers($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
             &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECT"){
@@ -2473,6 +2475,40 @@ sub _console_print_device_full {
         #    $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Data'};
         printf "%29s: %-40s\n","dnsRecord_Data","todo ???";
     }
+}
+
+
+
+sub _console_print_examusers {
+    my ($ref_examusers,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    # one user per line
+
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    my @rolelist=("teacher","student");
+    my $line= "+-----------------+---------------+----------------------------------------------+\n";
+    my $line2="+================================================================================+\n";
+
+    foreach my $school (@school_list){
+        &print_title(" $ref_examusers->{'COUNTER'}{$school} examuser(s) in school $school:");
+        print $line;
+        printf "| %-16s| %-14s| %-45s|\n","participant","supervisor", "participants displayName";
+        print $line;
+	foreach my $examuser ( @{ $ref_examusers->{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$school}{'examuser'} } ){
+	    printf "| %-16s| %-14s| %-38s\n",
+                   $examuser,
+                   $ref_examusers->{'EXAMUSERS'}{$examuser}{'sophomorixExamMode'},
+	           $ref_examusers->{'EXAMUSERS'}{$examuser}{'displayName'};
+	}
+        print $line;
+        print "$ref_examusers->{'COUNTER'}{$school} examuser(s) in school $school","\n";
+	print "\n";
+    } # school end
 }
 
 
