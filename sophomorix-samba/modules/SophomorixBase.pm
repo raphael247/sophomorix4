@@ -2509,6 +2509,7 @@ sub _console_print_examusers {
         print "$ref_examusers->{'COUNTER'}{$school} examuser(s) in school $school","\n";
 	print "\n";
     } # school end
+    print "Total number of examusers on this server: $ref_examusers->{'COUNTER'}{'TOTAL'}\n";
 }
 
 

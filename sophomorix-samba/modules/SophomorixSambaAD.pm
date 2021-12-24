@@ -7370,6 +7370,7 @@ sub AD_get_examusers {
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
 
     my %examusers=();
+    $examusers{'COUNTER'}{'TOTAL'}=0;
     foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
         # set back school counters
         $examusers{'COUNTER'}{$school}=0;
@@ -7407,8 +7408,8 @@ sub AD_get_examusers {
         my $role=$entry->get_value('sophomorixRole');
         my $status=$entry->get_value('sophomorixStatus');
         my $schoolname=$entry->get_value('sophomorixSchoolname');
-        # sophomorix user
         $examusers{'COUNTER'}{$schoolname}++;
+        $examusers{'COUNTER'}{'TOTAL'}++;
         $examusers{'EXAMUSERS'}{$sam}{'DN'}=$dn;
         $examusers{'EXAMUSERS'}{$sam}{'sophomorixStatus'}=$status;
         $examusers{'EXAMUSERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
