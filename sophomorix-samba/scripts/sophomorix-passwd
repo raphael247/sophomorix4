@@ -333,6 +333,7 @@ if ($class ne ""){
 @userlist = sort (@userlist);
 my $userlist_count=$#userlist+1;
 my $user_filter="";
+my %user=();
 if ($#userlist==0){
     $user_filter="(sAMAccountName=$user)";
 } else {
@@ -340,6 +341,7 @@ if ($#userlist==0){
     $user_filter="(| ";
     foreach my $user (@userlist){
         $user_filter=$user_filter."(sAMAccountName=$user) ";
+	$user{$user}="option";
     }
     $user_filter=$user_filter.")";
 }
@@ -414,9 +416,11 @@ if ($test_firstpassword==1){
     my $count_success=0;
     my $count_fail=0;
     my $count_nofirstpass=0;
+    my $count_nonexisting=0;
     my @success=();
     my @fail=();
     my @nofirst=();
+    my @nonexisting=();
     my $log_dir=$sophomorix_config{'INI'}{'PATHS'}{'LIB'}."/tmp_sophomorix-passwd";
     my $log_file=$log_dir."/test-firstpassword.sh";
 
@@ -455,6 +459,7 @@ if ($test_firstpassword==1){
         my $class=$entry->get_value ('sophomorixAdminClass');
         $count_tested++;
         print "* $count_tested) $sam_account: $dn\n";
+	$user{$sam_account}="existing";
         my ($res,$testpassword)=&AD_login_test($ldap,$root_dse,$dn,$password);
         if ($res==0){
             print "   * Login with sophomorixFirstPassword $testpassword OK!\n";
@@ -471,19 +476,30 @@ if ($test_firstpassword==1){
             push @fail, "Failed: $dn\n";
         }
     }
-    &print_title("Test result:");
-    if($Conf::log_level>=2){
-        @success = sort @success;
-	@fail = sort @fail;
-	@nofirst = sort @nofirst;
-        foreach my $line (@success,@fail,@nofirst){
-            print "$line";
-        } 
-	&print_line;
+
+    foreach my $user (@userlist){
+	if ($user{$user} eq "existing"){
+            # thats fine
+	} else {
+            push @nonexisting, "NOT OK: Nonexisting user $user\n";
+	    $count_nonexisting++;
+	}
     }
-    print "$count_tested tested:  $count_success OK,",
-          "  $count_fail Failed Logins,",
-          " $count_nofirstpass Without Firstpassword Attribute\n";
+
+    &print_title("Test result:");
+    @success = sort @success;
+    @fail = sort @fail;
+    @nofirst = sort @nofirst;
+    @nonexisting = sort @nonexisting;
+    foreach my $line (@success,@fail,@nofirst,@nonexisting){
+        print "$line";
+    }
+    &print_line;
+    print "$userlist_count tested:  $count_success OK,",
+          " $count_fail Failed Logins,",
+	  " $count_nofirstpass Without Firstpassword Attribute,",
+	  " $count_nonexisting Nonexisting",
+	  "\n";
     # print the command
     print LOG "";
     close(LOG);
