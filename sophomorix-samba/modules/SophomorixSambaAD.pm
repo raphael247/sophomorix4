@@ -3294,12 +3294,22 @@ sub AD_user_update {
 	if ($hide_pwd==1){
 	    print "Executing (password omitted by --hide):\n"; 
             print "  $smbpasswd_display\n";
-	    system($smbpasswd_command);
 	} else {
 	    print "Executing:\n"; 
             print "  $smbpasswd_command\n";
-	    system($smbpasswd_command);
 	}
+	my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smbpasswd_command($smbpasswd_command);
+	if ($return_value==0){
+	    # OK
+	} else {
+            my $error_string=join("|",@out_lines);
+	    &Sophomorix::SophomorixBase::result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,"",$error_string);
+	    #&Sophomorix::SophomorixBase::log_script_exit($error_string,1,1,0,
+	    #					         \@arguments,
+            #                                            $ref_sophomorix_result,
+	    #						 $ref_sophomorix_config,
+	    #						 $json);
+        }
     }
     
     print "Logging user update\n";

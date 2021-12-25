@@ -88,6 +88,7 @@ $Data::Dumper::Terse = 1;
             read_sophomorix_kill
             run_hook_scripts
             smb_command
+            smbpasswd_command
             smb_file_rewrite
             );
 
@@ -5688,6 +5689,16 @@ sub backup_auk_file {
 
 
 # run smb commands
+sub smbpasswd_command {
+    my ($smb_command)=@_;
+    my $smb_command_out=`$smb_command 2>&1`; # redirect STDERR to STDOUT
+    my $smb_command_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    my @returned_lines=split("\n",$smb_command_out);
+    return ($smb_command_return,@returned_lines);
+}
+
+
+
 sub smb_command {
     my ($smb_display_command,$smb_admin_pass)=@_;
     # Parameter:

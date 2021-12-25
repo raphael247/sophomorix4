@@ -162,7 +162,7 @@ my %sophomorix_result=&result_sophomorix_init("sophomorix-passwd");
 if ($use_smbpasswd==1){
     $use_smbpasswd="TRUE";
 } else {
-    $use_smbpasswd="FALSE";
+    $use_smbpasswd="TRUE"; # smbpasswd is the default
 }
 
 
@@ -204,7 +204,7 @@ Options:
 
 Create and set password:
   --pass <password>, --password <password>
-  --pass <password>, --use-smbpasswd       (use smbpasswd to set the password)
+  --pass <password>, --use-smbpasswd       (use smbpasswd to set the password, this is the default)
   --interactive                            (query new password twice on console)
   --random <num>                           (create random password of <num> characters for each user individually)
   --random <num> --common                  (create random password of <num> characters once and apply it to all users)
