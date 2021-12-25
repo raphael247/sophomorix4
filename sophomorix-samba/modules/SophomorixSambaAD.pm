@@ -3304,11 +3304,6 @@ sub AD_user_update {
 	} else {
             my $error_string=join("|",@out_lines);
 	    &Sophomorix::SophomorixBase::result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,"",$error_string);
-	    #&Sophomorix::SophomorixBase::log_script_exit($error_string,1,1,0,
-	    #					         \@arguments,
-            #                                            $ref_sophomorix_result,
-	    #						 $ref_sophomorix_config,
-	    #						 $json);
         }
     }
     
