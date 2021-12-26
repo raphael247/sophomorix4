@@ -6047,14 +6047,22 @@ sub get_plain_password {
         if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
 	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
-            $password=$DevelConf::student_password_default;
+	    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'} eq ""){
+		$password=$DevelConf::student_password_default;
+	    } else {
+                $password=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'};
+	    }
 	}
     } elsif ($role eq "student") {
         # Student
         if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
 	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
-            $password=$DevelConf::teacher_password_default;
+	    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'} eq ""){
+                $password=$DevelConf::teacher_password_default;
+	    } else {
+                $password=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'};
+	    }
         }
     }
     return $password;
