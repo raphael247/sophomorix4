@@ -23,7 +23,7 @@ jobs:
         run: make deb # sophomorix package build command
 
       - name: Copy artifacts
-        run: mkdir package && cp ../sophomorix* ./package
+        run: mkdir package && cp ../sophomorix-* ./package && cp ../sophomorix4_* ./package
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
