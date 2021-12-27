@@ -59,3 +59,25 @@ Create an official package for linuxmuster 7.x/bionic:
    incoming = ~/incoming
    post_upload_command = ssh -i ~/.ssh/>>keyfile<< >>username<<@linuxmuster.net mini-dinstall -b
    allow_unsigned_uploads = true
+
+
+Build Process on github:
+=======================================================
+
+0. configuration file is:
+   .github/workflows/release.yml
+
+1. The build process inludes only files that are committed to the repository on github
+   --> commit all changes and push them to gizhub
+
+2. update versions in debian/control
+   i.e. replace 3.15.2 with 3.15.3
+
+3. update changelog file:
+   # cd sophomorix4
+   # dch -i 
+     -> set version number (example: 3.15.3-1)
+     -> add a comment to the changelog
+        * use multilines here
+     -> set a valid repo like lmn7 OR ...
+        see configuration file .github/workflows/release.yml
