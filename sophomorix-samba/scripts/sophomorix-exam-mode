@@ -315,10 +315,14 @@ if ($reset_all_exam_mode_users==1){
     #print Dumper ($ref_examusers);
     &print_title("Resetting examusers of school $school");
 
-    my $participants=join(",",@{ $ref_examusers->{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$school}{'examuser'} } );
-    my $command="/usr/sbin/sophomorix-exam-mode --unset --subdir transfer --participants ".$participants;
-    #print $command."\n";
-    &call_sophomorix_command($Conf::log_level,$json,$command);
+    if (not exists $ref_examusers->{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$school}{'examuser'}){
+        print "WARNING: No examusers found in school $school\n";
+    } else {
+        my $participants=join(",",@{ $ref_examusers->{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$school}{'examuser'} } );
+        my $command="/usr/sbin/sophomorix-exam-mode --unset --subdir transfer --participants ".$participants;
+        #print $command."\n";
+        &call_sophomorix_command($Conf::log_level,$json,$command);
+    }
     &AD_unbind_admin($ldap);
     &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
