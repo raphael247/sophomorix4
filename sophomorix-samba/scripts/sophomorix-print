@@ -639,11 +639,6 @@ sub latex_datablock_from_list {
     my $dataline_count=0; # counts pp entries
     my $last_count=$#list+1; # number of elements starting with 1,2,...
     foreach my $item (@list){
-        $dataline_count++;
-        if ($dataline_count==1){
-            # first sophomorixdatabox must be preceeded by sophomorixnewpage
-            $latex_datablock=$latex_datablock."\\sophomorixnewpage{".$chead."}{}{}{}{}{}{}{}{}%\n";
-        }
         my @data=split(/;/,$item);
         my $lastname= &string_to_latex($data[0]);
         my $firstname=&string_to_latex($data[1]);
@@ -653,6 +648,12 @@ sub latex_datablock_from_list {
         my $role=     &string_to_latex($data[8]);
 	my $workgroup=&string_to_latex($sophomorix_config{'samba'}{'smb.conf'}{'global'}{'workgroup'});
         my $class=&string_to_latex($data[5]);
+	my $chead_latex=&string_to_latex($chead);
+        $dataline_count++;
+        if ($dataline_count==1){
+            # first sophomorixdatabox must be preceeded by sophomorixnewpage
+            $latex_datablock=$latex_datablock."\\sophomorixnewpage{".$chead_latex."}{}{}{}{}{}{}{}{}%\n";
+        }
         $latex_datablock=$latex_datablock."\\sophomorixdatabox{".$lastname."}".
                                           "{".$firstname."}".
                                           "{".$login."}".

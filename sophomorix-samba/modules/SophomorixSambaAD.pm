@@ -75,6 +75,7 @@ $Data::Dumper::Terse = 1;
             AD_create_new_webui_string
             AD_get_quota
             AD_smbcquotas_queryuser
+            AD_get_examusers
             AD_get_users_v
             AD_get_groups_v
             AD_get_shares_v
@@ -3293,12 +3294,17 @@ sub AD_user_update {
 	if ($hide_pwd==1){
 	    print "Executing (password omitted by --hide):\n"; 
             print "  $smbpasswd_display\n";
-	    system($smbpasswd_command);
 	} else {
 	    print "Executing:\n"; 
             print "  $smbpasswd_command\n";
-	    system($smbpasswd_command);
 	}
+	my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smbpasswd_command($smbpasswd_command);
+	if ($return_value==0){
+	    # OK
+	} else {
+            my $error_string=join("|",@out_lines);
+	    &Sophomorix::SophomorixBase::result_sophomorix_add($ref_sophomorix_result,"ERROR",-1,"",$error_string);
+        }
     }
     
     print "Logging user update\n";
@@ -7371,6 +7377,69 @@ sub AD_get_groups_v {
         }
     }
     return \%groups;
+}
+
+
+
+sub AD_get_examusers {
+    my ($arg_ref) = @_;
+    my $ldap = $arg_ref->{ldap};
+    my $root_dse = $arg_ref->{root_dse};
+    my $root_dns = $arg_ref->{root_dns};
+    my $school = $arg_ref->{school};
+    my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
+
+    my %examusers=();
+    $examusers{'COUNTER'}{'TOTAL'}=0;
+    foreach my $school (@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} }){
+        # set back school counters
+        $examusers{'COUNTER'}{$school}=0;
+    }
+
+    ##################################################
+    my $filter="(&(objectClass=user)".
+               "(sophomorixRole=examuser)".
+	       "(!(sophomorixExamMode=---)))";
+
+    # print "Filter: $filter\n";
+    my $mesg = $ldap->search(
+                      base   => $root_dse,
+                      scope => 'sub',
+                      filter => $filter,
+                      attr => ['sAMAccountName',
+                               'cn',
+                               'displayName',
+                               'sophomorixRole',
+                               'sophomorixStatus',
+                               'sophomorixSchoolname',
+                               'sophomorixComment',
+                               'sophomorixAdminClass',
+                               'sophomorixExamMode',
+                              ]);
+    &AD_debug_logdump($mesg,2,(caller(0))[3]);
+    my $max = $mesg->count;
+
+    ##################################################
+    # walk through all examusers
+    for( my $index = 0 ; $index < $max ; $index++) {
+        my $entry = $mesg->entry($index);
+        my $dn=$entry->dn();
+        my $sam=$entry->get_value('sAMAccountName');
+        my $role=$entry->get_value('sophomorixRole');
+        my $status=$entry->get_value('sophomorixStatus');
+        my $schoolname=$entry->get_value('sophomorixSchoolname');
+        $examusers{'COUNTER'}{$schoolname}++;
+        $examusers{'COUNTER'}{'TOTAL'}++;
+        $examusers{'EXAMUSERS'}{$sam}{'DN'}=$dn;
+        $examusers{'EXAMUSERS'}{$sam}{'sophomorixStatus'}=$status;
+        $examusers{'EXAMUSERS'}{$sam}{'displayName'}=$entry->get_value('displayName');
+        $examusers{'EXAMUSERS'}{$sam}{'sophomorixRole'}=$role;
+        $examusers{'EXAMUSERS'}{$sam}{'sophomorixComment'}=$entry->get_value('sophomorixComment');
+        $examusers{'EXAMUSERS'}{$sam}{'sophomorixAdminClass'}=$entry->get_value('sophomorixAdminClass');
+        $examusers{'EXAMUSERS'}{$sam}{'sophomorixExamMode'}=$entry->get_value('sophomorixExamMode');
+        push @{ $examusers{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$schoolname}{$role} },$sam;
+    }
+    return \%examusers;
 }
 
 

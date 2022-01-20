@@ -88,6 +88,7 @@ $Data::Dumper::Terse = 1;
             read_sophomorix_kill
             run_hook_scripts
             smb_command
+            smbpasswd_command
             smb_file_rewrite
             );
 
@@ -344,6 +345,8 @@ sub json_dump {
         } elsif ($jsoninfo eq "USER"){
             # incl. administrators            
             &_console_print_user_full($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
+        } elsif ($jsoninfo eq "EXAMUSER"){
+            &_console_print_examusers($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECTS_OVERVIEW"){
             &_console_print_projects_overview($hash_ref,$object_name,$log_level,$ref_sophomorix_config);
         } elsif ($jsoninfo eq "PROJECT"){
@@ -2473,6 +2476,41 @@ sub _console_print_device_full {
         #    $ref_devices->{'DEVICES'}{$device}{'dnsNode_REVERSE'}{$device}{'dnsRecord_Data'};
         printf "%29s: %-40s\n","dnsRecord_Data","todo ???";
     }
+}
+
+
+
+sub _console_print_examusers {
+    my ($ref_examusers,$school_opt,$log_level,$ref_sophomorix_config)=@_;
+    # one user per line
+
+    my @school_list;
+    if ($school_opt eq ""){
+        @school_list=@{ $ref_sophomorix_config->{'LISTS'}{'SCHOOLS'} };
+    } else {
+        @school_list=($school_opt);
+    }
+
+    my @rolelist=("teacher","student");
+    my $line= "+-----------------+---------------+----------------------------------------------+\n";
+    my $line2="+================================================================================+\n";
+
+    foreach my $school (@school_list){
+        &print_title(" $ref_examusers->{'COUNTER'}{$school} examuser(s) in school $school:");
+        print $line;
+        printf "| %-16s| %-14s| %-45s|\n","participant","supervisor", "participants displayName";
+        print $line;
+	foreach my $examuser ( @{ $ref_examusers->{'LISTS'}{'EXAMUSER_by_sophomorixSchoolname'}{$school}{'examuser'} } ){
+	    printf "| %-16s| %-14s| %-38s\n",
+                   $examuser,
+                   $ref_examusers->{'EXAMUSERS'}{$examuser}{'sophomorixExamMode'},
+	           $ref_examusers->{'EXAMUSERS'}{$examuser}{'displayName'};
+	}
+        print $line;
+        print "$ref_examusers->{'COUNTER'}{$school} examuser(s) in school $school","\n";
+	print "\n";
+    } # school end
+    print "Total number of examusers on this server: $ref_examusers->{'COUNTER'}{'TOTAL'}\n";
 }
 
 
@@ -5651,6 +5689,16 @@ sub backup_auk_file {
 
 
 # run smb commands
+sub smbpasswd_command {
+    my ($smb_command)=@_;
+    my $smb_command_out=`$smb_command 2>&1`; # redirect STDERR to STDOUT
+    my $smb_command_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
+    my @returned_lines=split("\n",$smb_command_out);
+    return ($smb_command_return,@returned_lines);
+}
+
+
+
 sub smb_command {
     my ($smb_display_command,$smb_admin_pass)=@_;
     # Parameter:
@@ -5999,14 +6047,22 @@ sub get_plain_password {
         if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
 	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
-            $password=$DevelConf::student_password_default;
+	    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'} eq ""){
+		$password=$DevelConf::student_password_default;
+	    } else {
+                $password=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'};
+	    }
 	}
     } elsif ($role eq "student") {
         # Student
         if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
 	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
-            $password=$DevelConf::teacher_password_default;
+	    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'} eq ""){
+                $password=$DevelConf::teacher_password_default;
+	    } else {
+                $password=$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'};
+	    }
         }
     }
     return $password;

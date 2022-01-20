@@ -32,6 +32,61 @@ Host fleischsalat
 Todo:
 ------------------------------------------------------------
 
+New version
+  * fixed nonworking printout for nonlatex characters in class
+  * added option to sophomorix-exam-mode:
+    --reset-all-exam-mode-users --school <school>
+
+
+todo: smbpasswd: make this the default
+
+Funktion um aus einer Klasse 2 managementgruppen zu machen
+  - status M
+  - hidden=TRUE
+  - type=managedsubgroup
+Klasse (m2kk3t) ...
+  sophomorixMembers
+  sophomorixAdmins
+  ... durchgehen.
+         dann
+         m2kk3t-teachers
+         m2kk3t-students
+
+TEACHER_SUBGROUP=TRUE/FALSE
+  -> Erzeugen/Aktualisieren der Gruppe
+  -> Löschen der Gruppe
+STUDENT_SUBGROUP=TRUE/FALSE
+  -> Erzeugen/Aktualisieren der Gruppe
+  -> Löschen der Gruppe
+
+sollte mit
+  sophomorix-add
+  sophomorix-update
+  aktualisiert werden
+Umstellung mit sophomorix-update: gruppeninfo am Schluss
+
+
+Nicht mehr erforderlich
+sophomorix-managementgroup --update-managed-class-subgroups --school ...
+sophomorix-managementgroup --update-managed-project-subgroups --school ...
+  -> geht alle klassen durch (adminclass und extraclass)
+  -> legt die managed subgroups an (MANAGED_CLASS_SUBGROUPS=TRUE)
+     -> füllt sie mit usern
+  -> löscht die managed subgroups (MANAGED_CLASS_SUBGROUPS=FALSE)
+und um sie anzuziugen (das sind zu viele, um sie mit internet usw anzuzeigen):
+
+sophomorix-managementgroup --show-managed-class-subgroups --school ...
+sophomorix-managementgroup --show-managed-project-subgroups --school ...
+
+Triggern von obigen funktionen:
+sophomorix-check/sophomorix-update
+sophomorix-class --members/addmembers/removemembers
+
+
+
+
+
+
 was mach ich mit der proxy gpo:
   muss da einfach nur die Datei rein?
   firewall.linuxmuster.lan, port ist vordefiniert
@@ -87,28 +142,7 @@ Konfiguration:
 &AD_update_managed_class_subgroups('Klasse=...')
 &AD_update_managed_class_subgroups('school=....')
 
-Funktion um aus einer Klasse 2 managementgruppen zu machen
-  - status M
-  - hidden=TRUE
-  - type=managedsubgroup
-Klasse (m2kk3t) und Mitglieder durchgehen.
-         dann
-         m2kk3t-teachers
-         m2kk3t-students
-sophomorix-managementgroup --update-managed-class-subgroups --school ...
-sophomorix-managementgroup --update-managed-project-subgroups --school ...
-  -> geht alle klassen durch (adminclass und extraclass)
-  -> legt die managed subgroups an (MANAGED_CLASS_SUBGROUPS=TRUE)
-     -> füllt sie mit usern
-  -> löscht die managed subgroups (MANAGED_CLASS_SUBGROUPS=FALSE)
-und um sie anzuzeiugen (das sind zu viele, um sie mit internet usw anzuzeigen):
 
-sophomorix-managementgroup --show-managed-class-subgroups --school ...
-sophomorix-managementgroup --show-managed-project-subgroups --school ...
-
-Triggern von obigen funktionen:
-sophomorix-check/sophomorix-update
-sophomorix-class --members/addmembers/removemembers
 ------------------------------------------------------------
 Gruppe aller Schüler einer Schule. Wurde die vergessen?
 
@@ -127,7 +161,7 @@ MIT OPTION: nur diese Schulen
 Ausser bei Auflistungen
 
 example code at sophomorix-check:
-1) schoollist from sophomorix-config
+1) schoollist from sophomorix-config (all schools on this server, for listing)
 2) override with school parameter --school <school1>,<school2>,... (put only these schools in @schoollist)
 
 with each script: 

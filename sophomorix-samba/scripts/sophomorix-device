@@ -2144,7 +2144,10 @@ sub update_printer_gpos {
                 my $printserver=$ref_sophomorix_config->{'SCHOOLS'}{$school}{'PRINTSERVER'};
                 if ($printserver eq ""){
                     $printserver=$ref_sophomorix_config->{'samba'}{'smb.conf'}{'global'}{'netbios name'};
-                }
+                } else {
+		    # make sure / are replaced in sed command correctly
+                    #$printserver=~s/\//\\\//g;
+		}
                 my $replace = "-e \"s/\@\@LINUXMUSTER\@\@/$workgroup/g\" ".
                               "-e \"s/\@\@PRINTSERVER\@\@/$printserver/g\" ".
                               "-e \"s/\@\@PRINTER_LOWERCASE\@\@/$printer_lowercase/g\" ".
