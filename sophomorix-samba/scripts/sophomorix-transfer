@@ -456,7 +456,8 @@ if ($list_home_dir ne ""){
     #                    sophomorix_config=>\%sophomorix_config,
     #                    sophomorix_result=>\%sophomorix_result,
     #                   });
-    
+    &AD_unbind_admin($ldap);
+    &log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
     exit;
 }
 
