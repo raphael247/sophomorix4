@@ -1598,6 +1598,8 @@ sub smbclient_mput_recurse {
             my $smb_dir_home=$home_directory_AD;
             $smb_dir_home=~s/\\/\//g;
             my $smb_dir_sub=$smb_dir_home."/".$target_subdir;
+#            my ($string1,$rel_path_home)=split("/".$school_AD."/",$smb_dir_home);
+#            my ($string2,$rel_path_sub)=split("/".$school_AD."/",$smb_dir_sub);
             my ($string1,$rel_path_home)=split(/$school_AD/,$smb_dir_home);
             my ($string2,$rel_path_sub)=split(/$school_AD/,$smb_dir_sub);
 
