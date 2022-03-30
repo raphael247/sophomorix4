@@ -7202,6 +7202,30 @@ sub AD_get_full_devicedata {
         @{  $devices{'DEVICES'}{$device}{'computer'}{'memberOf'} }= 
             sort $entry->get_value('memberOf');
 
+	# Intrinsic attributes
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic1'}=$entry->get_value('sophomorixIntrinsic1');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic2'}=$entry->get_value('sophomorixIntrinsic2');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic3'}=$entry->get_value('sophomorixIntrinsic3');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic4'}=$entry->get_value('sophomorixIntrinsic4');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic5'}=$entry->get_value('sophomorixIntrinsic5');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti1'} } = sort $entry->get_value('sophomorixIntrinsicMulti1');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti2'} } = sort $entry->get_value('sophomorixIntrinsicMulti2');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti3'} } = sort $entry->get_value('sophomorixIntrinsicMulti3');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti4'} } = sort $entry->get_value('sophomorixIntrinsicMulti4');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti5'} } = sort $entry->get_value('sophomorixIntrinsicMulti5');
+
+        # custom attributes
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustom1'}=$entry->get_value('sophomorixCustom1');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustom2'}=$entry->get_value('sophomorixCustom2');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustom3'}=$entry->get_value('sophomorixCustom3');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustom4'}=$entry->get_value('sophomorixCustom4');
+        $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustom5'}=$entry->get_value('sophomorixCustom5');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti1'} } = sort $entry->get_value('sophomorixCustomMulti1');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti2'} } = sort $entry->get_value('sophomorixCustomMulti2');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti3'} } = sort $entry->get_value('sophomorixCustomMulti3');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti4'} } = sort $entry->get_value('sophomorixCustomMulti4');
+        @{ $devices{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti5'} } = sort $entry->get_value('sophomorixCustomMulti5');
+	
         # samba
         $devices{'DEVICES'}{$device}{'computer'}{'accountExpires'}=
             $entry->get_value('accountExpires');
@@ -7242,7 +7266,7 @@ sub AD_get_full_devicedata {
     $devices{'COUNTER'}{'dnsNode_REVERSE'}{'TOTAL'}=$#{ $devices{'LISTS'}{'dnsNode_REVERSE'} }+1;
     $devices{'COUNTER'}{'computer'}{'TOTAL'}=$#{ $devices{'LISTS'}{'computer'} }+1;
     
-    return \%devices;;
+    return \%devices;
 }
 
 

@@ -2316,6 +2316,73 @@ sub _console_print_device_full {
                 printf "%29s: %-40s\n","servicePrincipalName",$item;
         	}
 
+            # custom
+	    print "------------- sophomorixCustom: ------------------------------------------------\n";
+
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom1'}){
+                printf "%30s: %-40s\n","sophomorixCustom1",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom1'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom2'}){
+                printf "%30s: %-40s\n","sophomorixCustom2",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom2'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom3'}){
+                printf "%30s: %-40s\n","sophomorixCustom3",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom3'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom4'}){
+                printf "%30s: %-40s\n","sophomorixCustom4",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom4'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom5'}){
+                printf "%30s: %-40s\n","sophomorixCustom5",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustom5'};
+            }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti1'} } ){
+                printf "%30s: %-40s\n","sophomorixCustomMulti1",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti2'} } ){
+                printf "%30s: %-40s\n","sophomorixCustomMulti2",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti3'} } ){
+                printf "%30s: %-40s\n","sophomorixCustomMulti3",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti4'} } ){
+                printf "%30s: %-40s\n","sophomorixCustomMulti4",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixCustomMulti5'} } ){
+                printf "%30s: %-40s\n","sophomorixCustomMulti5",$item;
+	    }
+
+            # intrinsic
+            print "---------- sophomorixIntrinsic: ------------------------------------------------\n";
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic1'}){
+                printf "%30s: %-40s\n","sophomorixIntrinsic1",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic1'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic2'}){
+                printf "%30s: %-40s\n","sophomorixIntrinsic2",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic2'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic3'}){
+                printf "%30s: %-40s\n","sophomorixIntrinsic3",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic3'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic4'}){
+                printf "%30s: %-40s\n","sophomorixIntrinsic4",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic4'};
+            }
+            if (defined $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic5'}){
+                printf "%30s: %-40s\n","sophomorixIntrinsic5",$ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsic5'};
+            }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti1'} } ){
+                printf "%30s: %-40s\n","sophomorixIntrinsicMulti1",$item;
+ 	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti2'} } ){
+                printf "%30s: %-40s\n","sophomorixIntrinsicMulti2",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti3'} } ){
+                printf "%30s: %-40s\n","sophomorixIntrinsicMulti3",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti4'} } ){
+                printf "%30s: %-40s\n","sophomorixIntrinsicMulti4",$item;
+	    }
+            foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'sophomorixIntrinsicMulti5'} } ){
+                printf "%30s: %-40s\n","sophomorixIntrinsicMulti5",$item;
+	    }
+
             print $line;
             foreach my $item ( @{ $ref_devices->{'DEVICES'}{$device}{'computer'}{'memberOf'} } ){
                 print "memberOf: $item\n";
