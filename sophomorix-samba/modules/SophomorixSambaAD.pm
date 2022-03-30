@@ -5396,6 +5396,7 @@ sub AD_get_AD_for_device {
                                     'sophomorixComputerMAC',
                                     'sophomorixComputerRoom',
                                     'sophomorixComputerDefaults',
+				    'sophomorixIntrinsic1',
                                    ]);
         my $max_computer = $mesg->count; 
         &Sophomorix::SophomorixBase::print_title("$max_computer Computers found in AD");
@@ -5427,6 +5428,7 @@ sub AD_get_AD_for_device {
             $AD{'computer'}{$sam}{'sophomorixComputerIP'}=$entry->get_value('sophomorixComputerIP');
             $AD{'computer'}{$sam}{'sophomorixComputerMAC'}=$entry->get_value('sophomorixComputerMAC');
             $AD{'computer'}{$sam}{'sophomorixComputerRoom'}=$entry->get_value('sophomorixComputerRoom');
+            $AD{'computer'}{$sam}{'sophomorixIntrinsic1'}=$entry->get_value('sophomorixIntrinsic1');
             @{ $AD{'computer'}{$sam}{'sophomorixComputerDefaults'} }=$entry->get_value('sophomorixComputerDefaults');
 
             # lists

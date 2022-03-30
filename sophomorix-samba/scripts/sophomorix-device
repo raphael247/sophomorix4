@@ -717,6 +717,19 @@ foreach my $device (keys %{$devices_file{'computer'}}) {
             }
         }
 
+        # device group at device
+        if (defined $ref_AD_device->{'computer'}{$device}{'sophomorixIntrinsic1'}){
+            if ($devices_file{'computer'}{$device}{'DGR_FROM_FILE'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixIntrinsic1'}){
+                # no update if equal
+            } else {
+                $update_computer{$device}{'REPLACE'}{'sophomorixIntrinsic1'}=$devices_file{'computer'}{$device}{'DGR_FROM_FILE'};
+                $update++;
+            }
+        } else {
+           $update_computer{$device}{'REPLACE'}{'sophomorixIntrinsic1'}=$devices_file{'computer'}{$device}{'DGR_FROM_FILE'};
+                $update++;
+	}
+
         # sophomorixComputerRoom
         if (defined $ref_AD_device->{'computer'}{$device}{'sophomorixComputerRoom'}){
             if ($devices_file{'computer'}{$device}{'sophomorixComputerRoom'} eq $ref_AD_device->{'computer'}{$device}{'sophomorixComputerRoom'}){
@@ -1657,7 +1670,8 @@ sub analyze_device_line {
         # save data into hash for reuse
         push @domcomputers_file, $dnsnode_name;
         $devices_file{'device'}{$dnsnode_name}{'ROOM_BASENAME'}=$room;            # 01
-        $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr_token;                 # 03
+        $devices_file{'device'}{$dnsnode_name}{'DGR_FROM_FILE'}=$dgr;             # 03
+        $devices_file{'device'}{$dnsnode_name}{'DGR'}=$dgr_token;                 # 03 modified
 
         $devices_file{$dgr_type}{$dgr_token}{'member'}{$dnsnode_name}=$ws_token_account;
         $devices_file{$dgr_type}{$dgr_token}{'SCHOOL'}=$school;
@@ -1742,6 +1756,7 @@ sub analyze_device_line {
             $devices_file{'computer'}{$ws_token_account}{'sophomorixComment'}=$sophomorix_comment;
             $devices_file{'computer'}{$ws_token_account}{'sophomorixComputerIP'}=$ip;
             $devices_file{'computer'}{$ws_token_account}{'sophomorixComputerMAC'}=$mac;
+            $devices_file{'computer'}{$ws_token_account}{'DGR_FROM_FILE'}=$dgr;
             $devices_file{'computer'}{$ws_token_account}{'sophomorixComputerRoom'}=$room_token;
         }
     }
