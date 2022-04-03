@@ -1,0 +1,35 @@
+Using python module instead of smbclient-wrapper
+
+Which python module to use:
+import smbclient
+
+current release:
+https://github.com/jborean93/smbprotocol
+
+example code:
+############################################################
+
+import smbclient
+import os
+
+home = '\\\\lmn\\default-school\\teachers\\dr'
+testfile = f'{home}\\testfile.txt'
+
+# UID and GID sufficient to use automatically kerberos
+os.setgid(100)
+# UID of user dr
+os.setuid(3001046)
+
+smbclient.ClientConfig(user='dr', auth_protocol='kerberos')
+
+with smbclient.open_file(testfile, mode='r') as f:
+    content = f.read()
+
+with smbclient.open_file(testfile, mode='w') as f:
+    f.write(f'{content}\n\nET VOILA !')
+
+
+############################################################
+more examples:
+############################################################
+https://github.com/linuxmuster/linuxmuster-webui7/blob/home/usr/lib/linuxmuster-webui/plugins/lmn_samba_share/views.py
