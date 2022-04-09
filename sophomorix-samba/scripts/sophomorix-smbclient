@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+
+import sophomorix_smbclient
+
+items = ["null","eins","zwei"]
+items.append("drei")
+items.remove("eins")
+print(items)
+#print(f"{len(items)} Elements")
+
+if "drei" in items:
+    print("Found")
+else:
+   print("not found")
+
+# complex datastructure
+
+   
+print()
+sophomorix_smbclient.print_data(name="Test",item="Computer")
+print()
+return_value=sophomorix_smbclient.print_data(item="MyItem")   
+print(f"The function returned {return_value}")
+
+
+users = {} # creates dictionary
+users['sAMAccountName'] = {} # creates dictionary
+
+# first user
+username = 'richi23'
+users['sAMAccountName'][username] = {} # creates key, must be there
+users['sAMAccountName'][username]['lastname'] = 'Blackmore'
+users['sAMAccountName'][username]['firstname'] = 'Ritchie'
+users['sAMAccountName'][username]['aliases'] = ['Rich','Richard']
+users['sAMAccountName'][username]['morning_greeting'] = 'Morning Ritchie!'
+users['sAMAccountName'][username]['evening_greeting'] = 'Good evening Mr. Blackmore'
+
+# second user
+username = 'jon23'
+users['sAMAccountName'][username] = {} # creates key, must be there
+users['sAMAccountName'][username]['lastname'] = 'Lord'
+users['sAMAccountName'][username]['firstname'] = 'Jon'
+users['sAMAccountName'][username]['aliases'] = ['John','Johnny']
+users['sAMAccountName'][username]['morning_greeting'] = 'Morning Jon!'
+users['sAMAccountName'][username]['evening_greeting'] = 'Good evening Mr. Lord'
+
+sophomorix_smbclient.greeting(users,'richi23')
+sophomorix_smbclient.greeting(users,'jon23')
+
+print ("Listing:")
+dir()
