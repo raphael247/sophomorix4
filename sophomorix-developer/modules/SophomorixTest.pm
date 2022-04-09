@@ -423,6 +423,7 @@ sub AD_test_object {
     my $s_ip = $arg_ref->{sophomorixComputerIP};
     my $s_mac = $arg_ref->{sophomorixComputerMAC};
     my $s_room = $arg_ref->{sophomorixComputerRoom};
+    my $s_intrinsic1 = $arg_ref->{sophomorixIntrinsic1};
 
     # sophomorix user
     my $s_admin_class = $arg_ref->{sophomorixAdminClass};
@@ -588,6 +589,10 @@ sub AD_test_object {
         if (defined $s_room){
             is ($entry->get_value ('sophomorixComputerRoom'),$s_room,
 		"  * sophomorixComputerRoom is $s_room");
+        }
+        if (defined $s_intrinsic1){
+            is ($entry->get_value ('sophomorixIntrinsic1'),$s_intrinsic1,
+		"  * sophomorixIntrinsic1 is $s_intrinsic1");
         }
         if (defined $s_exit_admin_class){
             is ($entry->get_value ('sophomorixExitAdminClass'),$s_exit_admin_class,
