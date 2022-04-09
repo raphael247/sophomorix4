@@ -1228,6 +1228,7 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
         my $filename=$devices_file{'computer'}{$computer}{'FILENAME'};
         my $ipv4=$devices_file{'computer'}{$computer}{'sophomorixComputerIP'};
         my $mac=$devices_file{'computer'}{$computer}{'sophomorixComputerMAC'};
+        my $dgr_from_file=$devices_file{'computer'}{$computer}{'DGR_FROM_FILE'};
 
         # create school
         &AD_school_create({ldap=>$ldap,
@@ -1263,6 +1264,7 @@ if ($sync==1 and $no_sync==0){ # $no_sync==0 -> SYNC
                              filename=>$filename,
                              ipv4=>$ipv4,
                              mac=>$mac,
+			     dgr_from_file=>$dgr_from_file,
                              json=>$json,
                              sophomorix_config=>\%sophomorix_config,
                              sophomorix_result=>\%sophomorix_result,

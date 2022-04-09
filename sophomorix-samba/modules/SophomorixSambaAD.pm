@@ -1638,6 +1638,7 @@ sub AD_computer_create {
     my $school = $arg_ref->{school};
     my $filename = $arg_ref->{filename};
     my $mac = $arg_ref->{mac};
+    my $dgr_from_file = $arg_ref->{dgr_from_file};
     my $ipv4 = $arg_ref->{ipv4};
     my $creationdate = $arg_ref->{creationdate};
     my $json = $arg_ref->{json};
@@ -1737,6 +1738,7 @@ sub AD_computer_create {
 #                   sophomorixExitAdminClass => "unknown", 
                    sophomorixComputerIP => $ipv4,
                    sophomorixComputerMAC => $mac,
+                   sophomorixIntrinsic1 => $dgr_from_file,
                    sophomorixComputerRoom => $room,
                    sophomorixStatus => "P",
                    sophomorixAdminClass => $room,    
