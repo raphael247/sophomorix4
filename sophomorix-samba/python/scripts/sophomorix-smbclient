@@ -1,55 +1,65 @@
 #!/usr/bin/python3
 
+# austeilen: /usr/sbin/sophomorix-transfer -jj --scopy --from-user rrrr --to-user t20,t13,t02,t10,t16,t11,t17,t08,t26,t03,t14,t19,t06,t09,t22,t15,t24,t25,t21,t18,t01,t23,t04,t05,t12,t07 --from-path transfer/ausdruck-fertig.pdf --to-path transfer/rrrr_test/
+
+# einsammeln:
+# /usr/sbin/sophomorix-transfer -jj --move --keep-source-directory --from-user t20,t13,t02,t10,t16,t11,t17,t08,t26,t03,t14,t19,t06,t09,t22,t15,t24,t25,t21,t18,t01,t23,t04,t05,t12,t07, --to-user rrrr --from-path transfer/rrrr_test --to-path transfer/collected/20220401_15-30-04-test/ --to-path-addon fullinfo --no-target-directory::18230:: 
+
 import sophomorix.sophomorix_smbclient
 import argparse
 
 parser = argparse.ArgumentParser(add_help = True, description = "SMB client for sophomorix.")
+parser.add_argument('--scopy',
+                    action="store_true", # 'True', if option is given, else 'False'
+                    help='copy the files with sever-site copy method')
+parser.add_argument('from_user',
+                    type=str,
+                    help='user that has the source data')
+parser.add_argument('--from-path',
+                    type=str,
+                    default='transfer',
+                    help='subdir in users home that contains the source data')
+parser.add_argument('to_users',
+                    nargs='+', # at least one argument, maybe more
+                    type=str,
+                    help='target data users ')
+parser.add_argument('--to-path',
+                    type=str,
+                    default='transfer',
+                    help='subdir in target users home')
+arguments = parser.parse_args()
+config = vars(arguments)
+
+# the arguments are collected in the dictionary 'config'
+print(config)
+
+print("############################################################")
+
+# select one value from the arguments object
+print(f"1) The source user is: {arguments.from_user}")
+print(f"1) The target users are: {arguments.to_users}")
+
+# select one value from the config dictionary
+print(f"2) The source user is: {config['from_user']}")
+print(f"2) The target users are: {config['to_users']}")
 
 
-# items = ["null","eins","zwei"]
-# items.append("drei")
-# items.remove("eins")
-# print(items)
-# #print(f"{len(items)} Elements")
-
-# if "drei" in items:
-#     print("Found")
-# else:
-#    print("not found")
-
-# # complex datastructure
-
-   
-# print()
-# sophomorix_smbclient.print_data(name="Test",item="Computer")
-# print()
-# return_value=sophomorix_smbclient.print_data(item="MyItem")   
-# print(f"The function returned {return_value}")
+sophomorix.sophomorix_smbclient.scopy(config)
 
 
-# users = {} # creates dictionary
-# users['sAMAccountName'] = {} # creates dictionary
 
-# # first user
-# username = 'richi23'
-# users['sAMAccountName'][username] = {} # creates key, must be there
-# users['sAMAccountName'][username]['lastname'] = 'Blackmore'
-# users['sAMAccountName'][username]['firstname'] = 'Ritchie'
-# users['sAMAccountName'][username]['aliases'] = ['Rich','Richard']
-# users['sAMAccountName'][username]['morning_greeting'] = 'Morning Ritchie!'
-# users['sAMAccountName'][username]['evening_greeting'] = 'Good evening Mr. Blackmore'
 
-# # second user
-# username = 'jon23'
-# users['sAMAccountName'][username] = {} # creates key, must be there
-# users['sAMAccountName'][username]['lastname'] = 'Lord'
-# users['sAMAccountName'][username]['firstname'] = 'Jon'
-# users['sAMAccountName'][username]['aliases'] = ['John','Johnny']
-# users['sAMAccountName'][username]['morning_greeting'] = 'Morning Jon!'
-# users['sAMAccountName'][username]['evening_greeting'] = 'Good evening Mr. Lord'
 
-# sophomorix_smbclient.greeting(users,'richi23')
-# sophomorix_smbclient.greeting(users,'jon23')
 
-# print ("Listing:")
-# dir()
+# calling the script with:
+# sophomorix-smbclient --scopy ritchie  --from-path subdir bz lordjo --to-path transfer/downstream/subdir  
+
+# Questions:
+# 1) split sophomorix-smbclient in multiple scripts:
+#    sophomorix-distribute
+#       one user -> multiple users
+#    sophomorix-collect
+#       multiple user -> one user
+#
+# 2) dictionary that is expected from scopy function
+#   can webui organize data the same way before calling

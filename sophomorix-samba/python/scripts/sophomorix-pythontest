@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+import sophomorix.sophomorix_smbclient
+
+users = {} # creates dictionary
+users['sAMAccountName'] = {} # creates dictionary
+
+# first user
+username = 'richi23'
+users['sAMAccountName'][username] = {} # creates key, must be there
+users['sAMAccountName'][username]['lastname'] = 'Blackmore'
+users['sAMAccountName'][username]['firstname'] = 'Ritchie'
+users['sAMAccountName'][username]['aliases'] = ['Rich','Richard']
+users['sAMAccountName'][username]['morning_greeting'] = 'Morning Ritchie!'
+users['sAMAccountName'][username]['evening_greeting'] = 'Good evening Mr. Blackmore'
+
+# second user
+username = 'jon23'
+users['sAMAccountName'][username] = {} # creates key, must be there
+users['sAMAccountName'][username]['lastname'] = 'Lord'
+users['sAMAccountName'][username]['firstname'] = 'Jon'
+users['sAMAccountName'][username]['aliases'] = ['John','Johnny']
+users['sAMAccountName'][username]['morning_greeting'] = 'Morning Jon!'
+users['sAMAccountName'][username]['evening_greeting'] = 'Good evening Mr. Lord'
+
+sophomorix.sophomorix_smbclient.greeting(users,'richi23')
+sophomorix.sophomorix_smbclient.greeting(users,'jon23')
+
+
