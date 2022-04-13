@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-print('Loading sophomorix_smbclient.py ...')
+print('Loading module sophomorix_smbclient.py ...')
 
 import pprint
 
@@ -20,4 +20,4 @@ def greeting(users,username):
     print()
 
 
-print('... sophomorix_smbclient.py loaded')
+print('... module sophomorix_smbclient.py loaded')

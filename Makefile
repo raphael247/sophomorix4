@@ -36,7 +36,7 @@ LOGDIR=$(DESTDIR)/var/log/sophomorix
 PERLMOD=$(DESTDIR)/usr/share/perl5/Sophomorix
 
 # Python modules
-PYTHONMOD=$(DESTDIR)/usr/lib/python3/dist-packages/
+PYTHONMOD=$(DESTDIR)/usr/lib/python3/dist-packages/sophomorix
 
 # Dokumentation
 #DOCDEBDIR=$(DESTDIR)/usr/share/doc
@@ -152,7 +152,7 @@ install-sophomorix-samba:
 	@install -d -m700 -oroot -groot $(LOGDIR)
 	@install -d -m700 -oroot -groot $(LOGDIR)/user
 	@install -d -m700 -oroot -groot $(LOGDIR)/cron
-# Install the scripts
+# Install the perl scripts
 	@install -d $(DESTDIR)/usr/sbin
 	@install -oroot -groot --mode=0744 sophomorix-samba/scripts/sophomorix-*[a-z1-9] $(DESTDIR)/usr/sbin
 # Install the perl modules
@@ -161,6 +161,8 @@ install-sophomorix-samba:
 # Install the python modules
 	@install -d -m755 -oroot -groot $(PYTHONMOD)
 	@install -oroot -groot --mode=0644 sophomorix-samba/python/modules/sophomorix_*[a-z1-9.]py $(PYTHONMOD)
+# Install the python scripts
+	@install -oroot -groot --mode=0744 sophomorix-samba/python/scripts/sophomorix-*[a-z1-9] $(DESTDIR)/usr/sbin
 # install schema
 	@install -d -m755 -oroot -groot $(SCHEMA)/
 	@install -oroot -groot --mode=0644 sophomorix-samba/schema/1_sophomorix-attributes.ldif $(SCHEMA)/
