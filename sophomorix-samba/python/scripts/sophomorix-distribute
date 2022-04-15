@@ -10,7 +10,8 @@ import argparse
 
 parser = argparse.ArgumentParser(add_help = True, description = "SMB client for sophomorix.")
 parser.add_argument('--scopy',
-                    action="store_true", # 'True', if option is given, else 'False'
+                    action="store_true", # 'True' is the  default
+                    default=True,
                     help='copy the files with sever-site copy method')
 parser.add_argument('from_user',
                     type=str,

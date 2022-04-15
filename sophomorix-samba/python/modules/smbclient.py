@@ -43,8 +43,8 @@ def distribute(config):
         print('Key :: ', key)
         if(isinstance(values, list)):
             for value in values:
-                source=config['from_user']+"/"+config['from_path']
-                target=value+"/"+config['to_path']
+                source=f"{config['from_user']}/{config['from_path']}"
+                target=f"{value}/{config['to_path']}"
                 print(f" What to do:  copy  {source}  to  {target}")
     return 0
 
