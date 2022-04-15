@@ -5,7 +5,7 @@
 # einsammeln:
 # /usr/sbin/sophomorix-transfer -jj --move --keep-source-directory --from-user t20,t13,t02,t10,t16,t11,t17,t08,t26,t03,t14,t19,t06,t09,t22,t15,t24,t25,t21,t18,t01,t23,t04,t05,t12,t07, --to-user rrrr --from-path transfer/rrrr_test --to-path transfer/collected/20220401_15-30-04-test/ --to-path-addon fullinfo --no-target-directory::18230:: 
 
-import sophomorix.sophomorix_smbclient
+import sophomorix.smbclient
 import argparse
 
 parser = argparse.ArgumentParser(add_help = True, description = "SMB client for sophomorix.")
@@ -44,7 +44,7 @@ print(f"2) The source user is: {config['from_user']}")
 print(f"2) The target users are: {config['to_users']}")
 
 
-sophomorix.sophomorix_smbclient.scopy(config)
+sophomorix.smbclient.scopy(config)
 
 
 

@@ -160,7 +160,7 @@ install-sophomorix-samba:
 	@install -oroot -groot --mode=0644 sophomorix-samba/modules/Sophomorix*[a-z1-9.]pm $(PERLMOD)
 # Install the python modules
 	@install -d -m755 -oroot -groot $(PYTHONMOD)
-	@install -oroot -groot --mode=0644 sophomorix-samba/python/modules/sophomorix_*[a-z1-9.]py $(PYTHONMOD)
+	@install -oroot -groot --mode=0644 sophomorix-samba/python/modules/*[a-z1-9.]py $(PYTHONMOD)
 # Install the python scripts
 	@install -oroot -groot --mode=0744 sophomorix-samba/python/scripts/sophomorix-*[a-z1-9] $(DESTDIR)/usr/sbin
 # install schema
