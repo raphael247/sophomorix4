@@ -22,8 +22,17 @@ def greeting(users,username):
 
 
 ############################################################    
-def scopy(config):
-    """Übergabe mehrerer Daten"""
+def distribute(config):
+    """Distribute data from one user to (one or multiple) other user(s)
+
+    config is a dictionary with the following keys:
+
+    :scopy: True if data should be copied with server-site copy method
+    :from_user: source user
+    :from_path: sub dir in home of source user
+    :to_users: list of target users
+    :to_path: sub dir in home of target users
+    """
     print()
     print("The following dictionary was received:")
     print(config)
