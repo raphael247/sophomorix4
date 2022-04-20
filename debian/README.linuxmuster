@@ -82,14 +82,14 @@ Build Process on github:
      -> set a valid repo like lmn7 OR lmn71...
         see configuration file .github/workflows/release.yml
 
-4. commit an push all changes
+4. commit and push all changes
 
 5. Tag the commit like:
    To later trigger the build use tagslike this:
    # git tag v3.90.2-1
    (Other tags will not trigger the build)
 
-5. Push the tag to github and trigger the package build:
+6. Push the tag to github and trigger the package build:
    # git push --tags
    (To remove Tags and Releases: https://github.com/linuxmuster/sophomorix4 -> Releases)
    
@@ -105,10 +105,10 @@ Build Process on github:
 
    The package build also triggers a pull request to the linuxmuster/deb repo
 
-6. Go to the linuxmuster/deb repo: https://github.com/linuxmuster/deb
+7. Go to the linuxmuster/deb repo: https://github.com/linuxmuster/deb
    Merge the pull request triggered by the build
 
 
-7. Check if the packages are in the correct repo:
+8. Check if the packages are in the correct repo:
    https://github.com/linuxmuster/deb/tree/main/packages/sophomorix4
 
