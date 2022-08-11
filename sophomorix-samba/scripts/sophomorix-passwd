@@ -273,6 +273,8 @@ if ($info==1 and $user ne "") {
         print "$supplemental_credentials \n";
     }
     exit;
+} elsif ($info==1 and not $random==0){
+    # go on
 } elsif ($info==1){
     my $command="samba-tool domain passwordsettings show";
     print "\n# $command\n\n";
@@ -583,6 +585,18 @@ if ($random!=0){
         print "\nERROR: Random password length $random is shorter than required minimun of ",
               "$sophomorix_config{'samba'}{'domain_passwordsettings'}{'Minimum_password_length'}\n\n";
         exit;
+    }
+    if ($info==1){
+        print "100 valid passwords:\n";
+	my $i=1;
+	for ($i=1;$i<=100;$i++){
+	    $password=&create_plain_password("TRUE",$random,"",@password_chars);
+	    print "$i)  $password\n";
+	    #if (not $password=~m/[a-z]/){
+	    #    print "Password contains no small letters\n";
+	    #}
+	}
+	exit;
     }
 }
 

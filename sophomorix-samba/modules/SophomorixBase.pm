@@ -6145,20 +6145,17 @@ sub create_plain_password {
         my $random_letter = $letters[int rand @letters];
         $password=$random_letter.$birthdate;
     } else {
-        until ($password=~m/[!,\$,&,\(,\),?]/ and 
+        until ($password=~m/[!\$&\(\)?]/ and 
                $password=~m/[a-z]/ and 
                $password=~m/[A-Z]/ and
                $password=~m/[0-9]/
               ){
             $password="";
             for ($i=1;$i<=$num;$i++){
-                $password=$password.$password_chars[int (rand $#password_chars)];
+                $password=$password.$password_chars[int (rand $#password_chars+1)];
             }
 	    #print "Password to test: $password\n";
         }
-	if (not $password=~m/[a-z]/){
-	    print "Password contains no small letters\n";
-	}
     }
     #print "Password OK: $password\n";
     return $password;
