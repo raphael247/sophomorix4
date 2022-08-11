@@ -406,23 +406,23 @@ sub json_dump {
         &print_title("DUMP: $jsoncomment");
         print {$ref_sophomorix_config->{'INI'}{'VARS'}{'JSON_PRINTOUT'}} Dumper( $hash_ref );
     } elsif ($json==4){
-        # pretty output
+        # pretty output in file
         $hash_ref->{'JSONINFO'}=$jsoninfo;
         $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_pretty_printed = $json_obj->pretty->encode( $hash_ref );
-        my $output="/root/output.json";
+        my $output=$ref_sophomorix_config->{'INI'}{'PATHS'}{'JSON_OUTPUT_PATH'}."/output.json";
 	print "output to file $output\n";
         open(my $fh, ">", $output);
         print $fh $utf8_pretty_printed;
         close($fh);
     } elsif ($json==5){
-        # pretty output
+        # compact output in file
         $hash_ref->{'JSONINFO'}=$jsoninfo;
         $hash_ref->{'JSONCOMMENT'}=$jsoncomment;
         my $json_obj = JSON->new->allow_nonref;
         my $utf8_json_line   = $json_obj->encode( $hash_ref  );
-        my $output="/root/output.json";
+        my $output=$ref_sophomorix_config->{'INI'}{'PATHS'}{'JSON_OUTPUT_PATH'}."/output.json";
 	print "output to file $output\n";
         open(my $fh, ">", $output);
         print $fh $utf8_json_line;
@@ -6156,6 +6156,9 @@ sub create_plain_password {
             }
 	    #print "Password to test: $password\n";
         }
+	if (not $password=~m/[a-z]/){
+	    print "Password contains no small letters\n";
+	}
     }
     #print "Password OK: $password\n";
     return $password;
