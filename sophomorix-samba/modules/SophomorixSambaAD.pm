@@ -540,7 +540,6 @@ sub AD_dns_zonekill {
 
 sub AD_gpo_listall {
     my ($arg_ref) = @_;
-    my $json = $arg_ref->{json};
     my $ref_sophomorix_config = $arg_ref->{sophomorix_config};
     my $ref_result = $arg_ref->{sophomorix_result};
     my %gpo=();
@@ -586,24 +585,16 @@ sub AD_gpo_listall {
         }
     }
 
-    # what to do/return
-    if ($json==-1){
-        return \%gpo;
-    } elsif ($json==0){
-        #print $gpo_listall_out;
-	#print "\n\n";
-        print $gpo_out;
-    } elsif ($json>0){
-        print Dumper(\%gpo);
-    }
+    return \%gpo;
+    # deprecated:
+    # print $gpo_out;
 }
 
 
 
 sub AD_gpo_get_uuid {
     my ($gpo,$gpo_type,$ref_sophomorix_config,$ref_result)=@_;
-    my $ref_gpo=&AD_gpo_listall({json=>-1,
-                                 sophomorix_config=>$ref_sophomorix_config,
+    my $ref_gpo=&AD_gpo_listall({sophomorix_config=>$ref_sophomorix_config,
                                  sophomorix_result=>$ref_result,
                                });
     my $gpo_real="sophomorix".":".$gpo_type.":".$gpo;
@@ -826,8 +817,7 @@ sub AD_gpo_kill {
 
     &Sophomorix::SophomorixBase::print_title("Killing gpo $gpo_real (start)");
     # find out the iD of the named gpo
-    my $ref_gpo=&AD_gpo_listall({json=>-1,
-                                 sophomorix_config=>$ref_sophomorix_config,
+    my $ref_gpo=&AD_gpo_listall({sophomorix_config=>$ref_sophomorix_config,
                                  sophomorix_result=>$ref_result,
                                });
     my $uuid="";
