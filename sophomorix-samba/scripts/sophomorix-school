@@ -314,10 +314,18 @@ if ($school ne "" and $kill==1){
 
 # --gpo-listall
 if ($gpo_listall==1){
-    &AD_gpo_listall({json=>$json,
-                     sophomorix_config=>\%sophomorix_config,
-                     sophomorix_result=>\%sophomorix_result,
-                  });
+    my $ref_gpo=&AD_gpo_listall({json=>-1,
+                                 sophomorix_config=>\%sophomorix_config,
+                                 sophomorix_result=>\%sophomorix_result,
+		               });
+    &json_dump({json => $json,
+                jsoninfo => "GPOS",
+                jsoncomment => "All GPOs of the samba server",
+                log_level => $Conf::log_level,
+                hash_ref=>$ref_gpo,
+                sophomorix_config=>\%sophomorix_config,
+               });
+
     exit;
 }
 
