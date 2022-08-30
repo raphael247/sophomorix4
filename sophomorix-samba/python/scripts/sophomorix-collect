@@ -9,26 +9,26 @@ import sophomorix.smbclient
 import argparse
 
 parser = argparse.ArgumentParser(add_help = True,
-                                 description = "SMB client for sophomorix to distrubute data from one user to multiple users")
+                                 description = "SMB client for sophomorix to collect data from multiple users to one user")
 parser.add_argument('--scopy',
                     action="store_true", # 'True' is the  default
                     default=True,
                     help='copy the files with sever-site copy method')
-parser.add_argument('from_user',
+parser.add_argument('to_user',
                     type=str,
-                    help='single user that has the source data')
+                    help='single user that collects data')
 parser.add_argument('--from-path',
                     type=str,
                     default='transfer',
-                    help='subdir in users home that contains the source data')
-parser.add_argument('to_users',
+                    help='subdir in (multiple) users home that contains the source data')
+parser.add_argument('from_users',
                     nargs='+', # at least one argument, maybe more
                     type=str,
-                    help='(multiple) target data users ')
+                    help='(multiple) users that have the source data that is collected')
 parser.add_argument('--to-path',
                     type=str,
                     default='transfer',
-                    help='subdir in target users home')
+                    help='subdir in single target users home')
 arguments = parser.parse_args()
 config = vars(arguments)
 
@@ -38,20 +38,19 @@ print(config)
 print("############################################################")
 
 # select one value from the arguments object
-print(f"1) The source user is: {arguments.from_user}")
-print(f"1) The target users are: {arguments.to_users}")
+print(f"1) The target user is: {arguments.to_user}")
+print(f"1) The source users are: {arguments.from_users}")
 
 # select one value from the config dictionary
-print(f"2) The source user is: {config['from_user']}")
-print(f"2) The target users are: {config['to_users']}")
+print(f"2) The target user is: {config['to_user']}")
+print(f"2) The source users are: {config['from_users']}")
 
 
-sophomorix.smbclient.distribute(config)
+sophomorix.smbclient.collect(config)
 
 
-#help(sophomorix.smbclient.distribute)
+#help(sophomorix.smbclient.collect)
 
 
-# example:
-# 
-# sophomorix-distribute --scopy chef maier mueller burger --from-path tele --to-path fon
+
+

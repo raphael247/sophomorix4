@@ -49,6 +49,34 @@ def distribute(config):
     return 0
 
 
+############################################################    
+def collect(config):
+    """Collect data from (one or multiple) user(s) to another user
+
+    config is a dictionary with the following keys:
+
+    :scopy: True if data should be copied with server-site copy method
+    :from_users: list of source users
+    :from_path: sub dir in home of source users
+    :to_user: target user
+    :to_path: sub dir in home of target user
+    """
+    print()
+    print("The following dictionary was received:")
+    print(config)
+    print()
+    print(f"The resulting loop is:")
+    
+    for key, values in config.items():
+        print('Key :: ', key)
+        if(isinstance(values, list)):
+            for value in values:
+                target=f"{config['to_user']}/{config['to_path']}"
+                source=f"{value}/{config['from_path']}"
+                print(f" What to do:  copy  {source}  to  {target}")
+    return 0
+
+
     
 
 print('... module sophomorix_smbclient.py loaded')
