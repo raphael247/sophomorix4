@@ -4533,6 +4533,20 @@ sub load_school_ini {
                     $ref_sophomorix_config->{'FILES'}{$file_type}{$filename}{FILTERSCRIPT};
             }
 
+            if ($name eq "students"){
+                if (defined $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_MAP} and
+		    $ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_MAP} ne ""){
+		    @classname_map=split(/,/,$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_MAP});
+		    foreach my $map (@classname_map){
+			($old_classname,$new_classname)=split(/=/,$map);
+			$old_classname=&remove_embracing_whitespace($old_classname);
+			$new_classname=&remove_embracing_whitespace($new_classname);
+			$ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_MAP_KEY_VALUE}{$old_classname}=
+			    $new_classname;
+		    }
+		}
+	    }
+
             if ($name eq "students" or
                 $name eq "extrastudents"or
                 $name eq "teachers"

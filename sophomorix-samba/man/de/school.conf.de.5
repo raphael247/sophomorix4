@@ -170,9 +170,21 @@ Die Einstellung gibt das Passwort vor, das genutzt wird, wenn RANDOM_PWD auf 'no
 
 .B TOLERATION_TIME
 
-Text
+Number of days a user is in tolerated state (no entry in files, user account still usable)
 
 .B DEACTIVATION_TIME
+
+Number of days a user is in deactivated state (no entry in files, user account deactivated)
+
+.B CLASSNAME_MAP
+
+Mit diesem Parameter für students.csv kann man Klassennamen anpassen ohne die Export-Datei des Schulverwaltungsprogramms zu editieren:
+
+Das Beispiel: CLASSNAME_MAP=7a=siebena,8a=achta
+
+benennt alle Klassen 7a in siebena um. Und alle Klassen 8a in achta.
+
+Das Umbenennen erfolgt NACHDEM die Klassennamen bearbeitet wurden (Kleinbuchstaben, / entfernen, ...)
 
 .SH Section [devicefile.devices.csv]:
 

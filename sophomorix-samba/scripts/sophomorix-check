@@ -2323,6 +2323,10 @@ sub check_class {
     if ($sophomorix_config{'FILES'}{$type}{$filename}{'FORCE_GROUP'} eq "TRUE"){
         $class=$sophomorix_config{'FILES'}{$type}{$filename}{'FORCE_GROUPNAME'};
     }
+    # apply CLASSNAME_MAP if existing
+    if (exists $sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_MAP_KEY_VALUE}{$class}){
+	$class=$sophomorix_config{'FILES'}{'USER_FILE'}{$filename}{CLASSNAME_MAP_KEY_VALUE}{$class};
+    }
     return ($class_valid,$class,$error_strg);
 }
 
