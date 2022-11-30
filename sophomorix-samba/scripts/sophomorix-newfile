@@ -249,10 +249,13 @@ if ($filter_script eq "---"){
     system("mkdir -p $tmp_dir");
     system("cp '$newfile_abs' $tmp")
 } elsif ($filter_script eq "ERROR_FILTERSCRIPT"){
+    # this will never happen. The config check checks already if the configured script is existing and executable
     print "\nERROR: The configured Filter is not an executable script:\n";
     print "   $sophomorix_config{'FILES'}{'USER_FILE'}{$basename}{FILTERSCRIPT_CONFIGURED}\n";
     print "\n";
-    exit 88;
+    my $error_message="Your configured filter $filter_script ist not an executable script!";
+    &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 } else {
     # filter to tmp
     print "filtering, not cp\n";
@@ -298,17 +301,19 @@ print "     * filtered tmp to: $tmp\n";
 # exit if something is wrong
 ############################################################
 # EXIT if autoconversion to utf8 can't be done
-if ($ref_encoding_check_results->{$tmp}{'SURE'} ne "TRUE"){
+if ($enc eq "unknown" or ($ref_encoding_check_results->{$tmp}{'SURE'} ne "TRUE")){
     print "\n";
     print "ERROR: Encoding could not be determined for this file:\n";
     print "   $newfile\n";
     print "\n";
     print "NOT doing anything!\n";
     print "\n";
-    print "For hints what went wrong use:\n";
+    print "For hints to what went wrong use:\n";
     print "  sophomorix-check -vv --analyze $newfile\n";
     print "\n";
-    exit 88;
+    my $error_message="Encoding for $newfile could not be determined!";
+    &log_script_exit($error_message,1,1,0,
+                     \@arguments,\%sophomorix_result,\%sophomorix_config,$json);
 }
 
 
