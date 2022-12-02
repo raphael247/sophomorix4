@@ -33,6 +33,7 @@ use Sophomorix::SophomorixBase qw(
                                  log_script_start
                                  log_script_end
                                  log_script_exit
+                                 result_sophomorix_add_log
                                  backup_auk_file
                                  get_passwd_charlist
                                  get_plain_password
@@ -902,8 +903,27 @@ sub smbclient_scopy_recurse {
             ############################################################
             # A) source nonexisting
             if ($copy{'FROM'}{$from}{'TO'}{$to}{'SOURCE_NODE'} eq "NONEXISTING"){
-                &log_script_exit("ERROR Source file/dir nonexisting: $copy{'FROM'}{$from}{'TO'}{$to}{SOURCE_SCHOOL} -> $copy{'FROM'}{$from}{'TO'}{$to}{'SOURCE_PATH'}",1,1,0,
-                    $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
+		my $warning_message="WARNING: Source file/dir nonexisting: $copy{'FROM'}{$from}{'TO'}{$to}{SOURCE_SCHOOL}".
+		                    " -> $copy{'FROM'}{$from}{'TO'}{$to}{'SOURCE_PATH'}";
+		&result_sophomorix_add_log($ref_sophomorix_result,$warning_message);
+	        $copy_count++;
+		if ($json>=1){
+                    # prepare json object
+                    my %json_progress=();
+                    $json_progress{'JSONINFO'}="PROGRESS";
+                    $json_progress{'COMMENT_EN'}=$warning_message;
+                    $json_progress{'COMMENT_DE'}=$warning_message;
+                    $json_progress{'STEP'}=$copy_count;
+                    $json_progress{'FINAL_STEP'}=$copy{'OPTIONS'}{'MAX_COUNT'};
+                    # print JSON Object
+                    &Sophomorix::SophomorixBase::json_progress_print({ref_progress=>\%json_progress,
+                                                                      json=>$json,
+                                                                      sophomorix_config=>$ref_sophomorix_config,
+								     });
+		}
+		next;
+                #&log_script_exit("ERROR Source file/dir nonexisting: $copy{'FROM'}{$from}{'TO'}{$to}{SOURCE_SCHOOL} -> $copy{'FROM'}{$from}{'TO'}{$to}{'SOURCE_PATH'}",1,1,0,
+                #    $ref_arguments,$ref_sophomorix_result,$ref_sophomorix_config,$json);
             } # end A)
 
 
