@@ -399,7 +399,7 @@ if ($list_home_dir ne ""){
 
 	# run the parallel processes
 	use Parallel::ForkManager;
-	my $pm = Parallel::ForkManager->new(2);
+	my $pm = Parallel::ForkManager->new(30);
 
         $pm -> run_on_finish ( # called BEFORE the first call to start()
             sub {
