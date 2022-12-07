@@ -431,8 +431,6 @@ sub set_members_from_file {
             }
         }
         close(CONFIG);
-	# print Dumper(\%config);
-
         # walk through all users
         my ($ref_AD_check) = &AD_get_AD_for_check({ldap=>$ldap,
                                                    root_dse=>$root_dse,
@@ -447,6 +445,57 @@ sub set_members_from_file {
                     "WARNING: Configured MEMBER_CLASS $class does not exist in school $school");
             }
 	}
+        # warn if user does not exist in this school
+        foreach my $user (keys %{ $config{'MEMBER_USER'} }){
+            if (not exists $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sAMAccountName'}{$user}){
+                &result_sophomorix_add_log(\%sophomorix_result,
+                    "WARNING: Configured MEMBER_USER $user does not exist in school $school");
+            }
+	}
+	#print Dumper($ref_AD_check);
+
+        my $ref_group_v=&AD_get_groups_v({ldap=>$ldap,
+                                          root_dse=>$root_dse,
+                                          root_dns=>$root_dns,
+                                          school=>$school,
+                                          sophomorix_config=>\%sophomorix_config,
+                                        });
+        # warn if configured project is not a project does not exist in this school
+        foreach my $project (keys %{ $config{'MEMBER_PROJECT'} }){
+	    # configured name must exist
+            if (not exists $ref_group_v->{'GROUPS'}{$project}
+	       ){
+                &result_sophomorix_add_log(\%sophomorix_result,
+					   "WARNING: Configured MEMBER_PROJECT $project does not exist");
+		next;
+            }
+	    # configured name must be a project
+            if ($ref_group_v->{'GROUPS'}{$project}{'sophomorixType'} ne "project"
+	       ){
+                &result_sophomorix_add_log(\%sophomorix_result,
+					   "WARNING: Configured MEMBER_PROJECT $project is not a project group");
+		next;
+            }
+	    # configured name must be a project in school
+            if ($ref_group_v->{'GROUPS'}{$project}{'sophomorixSchoolname'} ne $school
+	       ){
+                &result_sophomorix_add_log(\%sophomorix_result,
+					   "WARNING: Configured MEMBER_PROJECT $project is not in school $school");
+		next;
+            }
+	    # add the sAMAccountName of project student members of school to config
+	    foreach my $dn (@{ $ref_group_v->{'GROUPS'}{$project}{'member'}{'student'} }){
+		my @parts=split(",",$dn);
+                my ($unused,$sam)=split("=",$parts[0]);
+		$sam=~tr/A-Z/a-z/;
+		# add users only if they are in the same school as project
+                if (exists $ref_AD_check->{'LOOKUP_by_school'}{$school}{'user_BY_sAMAccountName'}{$sam}){
+		    $config{'PROJECT_MEMBER_STUDENT_USER_SCHOOL'}{$sam}=$dn;
+		}
+	    }
+	}
+        # print Dumper($ref_group_v);
+        # print Dumper(\%config);
 
         foreach my $sam (keys %{ $ref_AD_check->{'sAMAccountName'} }){
             if ($school eq "global"){
@@ -461,6 +510,14 @@ sub set_members_from_file {
             }
             # class
             if (exists $config{'MEMBER_CLASS'}{$ref_AD_check->{'sAMAccountName'}{$sam}{'sophomorixAdminClass'}}){
+                push @new_member,$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
+            }
+            # user
+            if (exists $config{'MEMBER_USER'}{$sam}){
+                push @new_member,$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
+            }
+            # project users
+            if (exists $config{'PROJECT_MEMBER_STUDENT_USER_SCHOOL'}{$sam}){
                 push @new_member,$ref_AD_check->{'sAMAccountName'}{$sam}{'dn'};
             }
         }
