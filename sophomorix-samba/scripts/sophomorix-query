@@ -32,6 +32,7 @@ $Conf::log_level=1; # remove later
 my $testopt=GetOptions(\%options, 
                         "help|h",
                         "json|j+",
+                        "json-path=s",
                         "verbose|v+",
                         "sam|sAMAccountName=s",
                         "sn=s",
@@ -122,6 +123,14 @@ Options
   show the search filter, searchbase 
 
   -i  / --info
+
+  -j         pretty json output
+  -jj        one line json output
+  -jjj       perl dump
+  -jjjj      pretty json output to /tmp/output.json
+  -jjjjj     one line json output to /tmp/output.json
+
+  --json-path /path/tpo/json/output/file
 
 Search for schools:
 --school-list
@@ -263,6 +272,13 @@ my $filter;
 my $base;
 my $scope="sub";
 my $search_object="all"; # all is the default if nothing is specified
+
+# json_output_path for -jjjj and -jjjjj
+my $json_output_path="/tmp";
+
+if (defined $options{'json-path'}){
+    $json_output_path=$options{'json-path'};
+}
 
 # the search results, displayed as JSON object
 my %search=();
@@ -1343,7 +1359,26 @@ sub json_printout {
         print STDERR "# JSON-end\n";
     } elsif ($json==3){
         print STDERR Dumper ($ref_search);
+    } elsif ($json==4){
+        # pretty output in file
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_pretty_printed = $json_obj->pretty->encode( $ref_search );
+        my $output=$json_output_path."/output.json";
+	print "output to file $output\n";
+        open(my $fh, ">", $output);
+        print $fh $utf8_pretty_printed;
+        close($fh);
+    } elsif ($json==5){
+        # compact output in file
+        my $json_obj = JSON->new->allow_nonref;
+        my $utf8_json_line   = $json_obj->encode( $ref_search  );
+        my $output=$json_output_path."/output.json";
+	print "output to file $output\n";
+        open(my $fh, ">", $output);
+        print $fh $utf8_json_line;
+        close($fh);
     }
+
 }
 
 
