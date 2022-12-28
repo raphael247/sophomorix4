@@ -3355,33 +3355,30 @@ sub AD_user_setquota {
     my $hard_bytes;
     my $soft_bytes;
     if ($quota==-1){
-	$hard_bytes=-1;
-	$soft_bytes=-1;
+    $hard_bytes=-1;
+    $soft_bytes=-1;
     } else {
         $hard_bytes=1024*1024*$quota; # bytes to MiB
         $soft_bytes=int(0.80*$hard_bytes/1024)*1024;
     }
 
     # check if msdfs is true, is so use the remote address for smbcquotas
-#    my $msdfs = $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes';
-#    print "HERE: >$msdfs<\n";
-#    if ($msdfs == 1){
-#            $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
-#                                  " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
-#                                  " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
-#                                  $smb_admin_pass."'".
-#                                  " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." ".$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs proxy'};
-#    }
-#    else
-#    {
-          my  $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+    my $msdfs = $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes';
+    if ($msdfs == 1){
+            $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                                   " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                   " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                   $smb_admin_pass."'".
-                                  " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
-#    }
-   print "HERE: >$smbcquotas_command<\n";
-
+                                  " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." ".$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs proxy'};
+    }
+    else
+    {
+            $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                                 " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
+                                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                 $smb_admin_pass."'".
+                                 " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
+    }
 
 
     ############################################################
