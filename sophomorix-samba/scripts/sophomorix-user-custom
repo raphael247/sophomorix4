@@ -1,0 +1,588 @@
+#!/usr/bin/perl -w
+# This script (sophomorix-user) is maintained by Rüdiger Beck
+# It is Free Software (License GPLv3)
+# If you find errors, contact the author
+# jeffbeck@web.de  or  jeffbeck@linuxmuster.net
+
+# modules
+use strict;
+#use Quota;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Sophomorix::SophomorixConfig;
+use List::MoreUtils qw(uniq);
+#use IMAP::Admin;
+#use DBI;
+use Net::LDAP;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse = 1; 
+use JSON;
+
+use Sophomorix::SophomorixBase qw(
+                                 print_line
+                                 print_title
+                                 unlock_sophomorix
+                                 lock_sophomorix
+                                 log_script_start
+                                 log_script_end
+                                 log_script_exit
+                                 backup_auk_file
+                                 get_passwd_charlist
+                                 get_plain_password
+                                 check_options
+                                 config_sophomorix_read
+                                 result_sophomorix_init
+                                 result_sophomorix_add
+                                 result_sophomorix_check_exit
+                                 result_sophomorix_print
+                                 remove_from_list
+                                 test_webui_permission
+                                 json_dump
+                                 );
+use Sophomorix::SophomorixSambaAD qw(
+                                 AD_school_create
+                                 AD_bind_admin
+                                 AD_unbind_admin
+                                 AD_get_user
+                                 AD_user_create
+                                 AD_user_update
+                                 AD_group_create
+                                 AD_group_kill
+                                 AD_group_addmember
+                                 AD_get_schoolname
+                                 AD_get_name_tokened
+                                 AD_group_update
+                                 AD_project_sync_members
+                                 AD_dn_fetch_multivalue
+                                 AD_dns_get
+                                 AD_get_users_v
+                                 AD_get_full_userdata
+                                 AD_debug_logdump
+                                 AD_object_search
+                                    );
+
+my @arguments = @ARGV;
+
+my $today=`date +%d.%m.%Y`;
+chomp($today);
+
+# ===========================================================================
+# Optionen verarbeiten
+# ==========================================================================
+$Conf::log_level=1;
+
+my $help=0;
+my $json=0;
+
+my $set_proxy_addresses;
+my $add_proxy_addresses;
+my $remove_proxy_addresses;
+
+my $custom_1;
+my $custom_2;
+my $custom_3;
+my $custom_4;
+my $custom_5;
+my $custom_multi_1;
+my $custom_multi_2;
+my $custom_multi_3;
+my $custom_multi_4;
+my $custom_multi_5;
+my $add_custom_multi_1;
+my $add_custom_multi_2;
+my $add_custom_multi_3;
+my $add_custom_multi_4;
+my $add_custom_multi_5;
+my $remove_custom_multi_1;
+my $remove_custom_multi_2;
+my $remove_custom_multi_3;
+my $remove_custom_multi_4;
+my $remove_custom_multi_5;
+
+my $user="";
+my $school="";
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+       "help|h" => \$help,
+       "json|j+" => \$json,
+       "verbose|v+" => \$Conf::log_level,
+       "school=s" => \$school,
+       "u|user=s" => \$user,
+       "set-proxy-addresses=s" => \$set_proxy_addresses,
+       "add-proxy-addresses=s" => \$add_proxy_addresses,
+       "remove-proxy-addresses=s" => \$remove_proxy_addresses,
+       "custom1=s" => \$custom_1,
+       "custom2=s" => \$custom_2,
+       "custom3=s" => \$custom_3,
+       "custom4=s" => \$custom_4,
+       "custom5=s" => \$custom_5,
+       "custom-multi1=s" => \$custom_multi_1,
+       "custom-multi2=s" => \$custom_multi_2,
+       "custom-multi3=s" => \$custom_multi_3,
+       "custom-multi4=s" => \$custom_multi_4,
+       "custom-multi5=s" => \$custom_multi_5,
+       "add-custom-multi1=s" => \$add_custom_multi_1,
+       "add-custom-multi2=s" => \$add_custom_multi_2,
+       "add-custom-multi3=s" => \$add_custom_multi_3,
+       "add-custom-multi4=s" => \$add_custom_multi_4,
+       "add-custom-multi5=s" => \$add_custom_multi_5,
+       "remove-custom-multi1=s" => \$remove_custom_multi_1,
+       "remove-custom-multi2=s" => \$remove_custom_multi_2,
+       "remove-custom-multi3=s" => \$remove_custom_multi_3,
+       "remove-custom-multi4=s" => \$remove_custom_multi_4,
+       "remove-custom-multi5=s" => \$remove_custom_multi_5,
+          );
+
+
+my %sophomorix_result=&result_sophomorix_init("sophomorix-user");
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt,\%sophomorix_result,$json);
+
+
+# Scriptname ermitteln
+my @list = split(/\//,$0);
+my $scriptname = pop @list;
+
+# --help
+if ($help==1) {
+   # Befehlbeschreibung
+   print('
+sophomorix-user-custom updates attributes that a user is allowed to modify.
+
+Options
+  -h   /  --help
+  -v   /  --verbose
+  -vv  /  --verbose --verbose
+
+Search for a user/users in sAMAccountName:
+  -u user   /   --user user
+  -u \'*\'   /   --user u*se*r (option is passed to ldap filter)
+Grep in the results:
+ -u *user* | grep -i --text <strg>
+  
+Choose the school:
+  --school <school>
+
+Updating the user configurable E-Mail address attribute proxyAddresses (multi-value):
+  --user <user> --set-proxy-addresses <address1>,<address2>,...
+  --user <user> --add-proxy-addresses <address>
+  --user <user> --remove-proxy-addresses <address>
+
+Updating sophomorixCustom1 - sophomorixCustom5:
+  --user <user> --custom<n> "Content of sophomorixCustom<n>"
+Updating sophomorixCustomMulti1 - sophomorixCustomMulti5:
+  --user <user> --custom-multi<n> "Content of sophomorixCustomMulti<n>"
+  --user <user> --add-custom-multi<n> "Added entry in sophomorixCustomMulti<n>"
+  --user <user> --remove-custom-multi<n> "Removed entry from sophomorixCustomMulti<n>"
+
+Please see the sophomorix-user-custom(8) man pages for full documentation
+');
+   print "\n";
+
+   exit;
+}
+
+my ($ldap,$root_dse) = &AD_bind_admin(\@arguments,\%sophomorix_result,$json);
+my $root_dns=&AD_dns_get($root_dse);
+my %sophomorix_config=&config_sophomorix_read($ldap,$root_dse,\%sophomorix_result);
+
+
+&result_sophomorix_check_exit(\%sophomorix_result,\%sophomorix_config,$json);
+&log_script_start(\@arguments,\%sophomorix_result,\%sophomorix_config);
+
+
+# get dn if user exists and continue
+############################################################
+my ($count,$dn,$cn)=&AD_object_search($ldap,$root_dse,"user",$user);
+
+if ($count>1){
+    print "\n$count users found. Cannot modify more than one user!\n";
+    print "Dont use * and stuff like this\n\n";
+    exit 77;
+} elsif ($count==0){
+    print "\nERROR retrieving user $user: $count users found.\n\n";
+    exit 77;
+}
+
+
+############################################################
+# --user <user> --custom1(-5) "Test for custom1(-5)"
+if ($user ne "" and defined $custom_1){
+    print "Updating sophomorixCustom1 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_1=>$custom_1,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_2){
+    print "Updating sophomorixCustom2 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_2=>$custom_2,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_3){
+    print "Updating sophomorixCustom3 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_3=>$custom_3,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_4){
+    print "Updating sophomorixCustom4 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_4=>$custom_4,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+if ($user ne "" and defined $custom_5){
+    print "Updating sophomorixCustom5 for user $user:\n";
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_5=>$custom_5,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                   });
+}
+
+
+############################################################
+# --user <user> --custom-multi1(-5) "Test for custom-multi1(-5)"
+if (defined $custom_multi_1 and $user ne ""){
+   my @permissions=split(/,/,$custom_multi_1);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_1=>$custom_multi_1,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $custom_multi_2 and $user ne ""){
+   my @permissions=split(/,/,$custom_multi_2);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_2=>$custom_multi_2,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $custom_multi_3 and $user ne ""){
+   my @permissions=split(/,/,$custom_multi_3);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_3=>$custom_multi_3,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $custom_multi_4 and $user ne ""){
+   my @permissions=split(/,/,$custom_multi_4);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_4=>$custom_multi_4,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $custom_multi_5 and $user ne ""){
+   my @permissions=split(/,/,$custom_multi_5);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_5=>$custom_multi_5,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+
+
+# --set-proxy-addresses <entry>
+if ($user ne "" and defined $set_proxy_addresses ){
+    #my @permissions=split(/,/,$custom_multi_1);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     proxy_addresses_set=>$set_proxy_addresses,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --add-proxy-addresses <entry>
+if ($user ne "" and defined $add_proxy_addresses ){
+    my @add=split(/,/,$add_proxy_addresses);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"proxyAddresses");
+    my @proxy_addresses_entry = uniq(@old,@add); 
+    my $proxy_addresses_entry=join(",",@proxy_addresses_entry);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     proxy_addresses_add=>$add_proxy_addresses,
+                     proxy_addresses_entry=>$proxy_addresses_entry,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --remove-proxy-addresses <entry>
+if ($user ne "" and defined $remove_proxy_addresses){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"proxyAddresses");
+    my @proxy_addresses_entry = &remove_from_list($remove_proxy_addresses,@old);
+    my $proxy_addresses_entry=join(",",@proxy_addresses_entry);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     proxy_addresses_remove=>$remove_proxy_addresses,
+                     proxy_addresses_entry=>$proxy_addresses_entry,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --add-custom-multi1(-5) "Test for custom-multi1(-5)"
+if (defined $add_custom_multi_1 and $user ne ""){
+    my @add=split(/,/,$add_custom_multi_1);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti1");
+    my @custom_multi_1 = uniq(@old,@add); 
+    my $custom_multi_1=join(",",@custom_multi_1);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_1=>$custom_multi_1,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $add_custom_multi_2 and $user ne ""){
+    my @add=split(/,/,$add_custom_multi_2);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti2");
+    my @custom_multi_2 = uniq(@old,@add); 
+    my $custom_multi_2=join(",",@custom_multi_2);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_2=>$custom_multi_2,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $add_custom_multi_3 and $user ne ""){
+    my @add=split(/,/,$add_custom_multi_3);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti3");
+    my @custom_multi_3 = uniq(@old,@add); 
+    my $custom_multi_3=join(",",@custom_multi_3);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_3=>$custom_multi_3,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $add_custom_multi_4 and $user ne ""){
+    my @add=split(/,/,$add_custom_multi_4);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti4");
+    my @custom_multi_4 = uniq(@old,@add); 
+    my $custom_multi_4=join(",",@custom_multi_4);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_4=>$custom_multi_4,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $add_custom_multi_5 and $user ne ""){
+    my @add=split(/,/,$add_custom_multi_5);
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti5");
+    my @custom_multi_5 = uniq(@old,@add); 
+    my $custom_multi_5=join(",",@custom_multi_5);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_5=>$custom_multi_5,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+# --remove-custom-multi1(-5) "Test for custom-multi1(-5)"
+if (defined $remove_custom_multi_1){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti1");
+    my @custom_multi_1 = &remove_from_list($remove_custom_multi_1,@old);
+    my $custom_multi_1=join(",",@custom_multi_1);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_1=>$custom_multi_1,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $remove_custom_multi_2){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti2");
+    my @custom_multi_2 = &remove_from_list($remove_custom_multi_2,@old);
+    my $custom_multi_2=join(",",@custom_multi_2);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_2=>$custom_multi_2,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $remove_custom_multi_3){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti3");
+    my @custom_multi_3 = &remove_from_list($remove_custom_multi_3,@old);
+    my $custom_multi_3=join(",",@custom_multi_3);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_3=>$custom_multi_3,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $remove_custom_multi_4){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti4");
+    my @custom_multi_4 = &remove_from_list($remove_custom_multi_4,@old);
+    my $custom_multi_4=join(",",@custom_multi_4);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_4=>$custom_multi_4,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+if (defined $remove_custom_multi_5){
+    my @old = &AD_dn_fetch_multivalue($ldap,$root_dse,$dn,"sophomorixCustomMulti5");
+    my @custom_multi_5 = &remove_from_list($remove_custom_multi_5,@old);
+    my $custom_multi_5=join(",",@custom_multi_5);
+    &AD_user_update({ldap=>$ldap,
+                     root_dse=>$root_dse,
+                     dn=>$dn,
+                     user=>$user,
+                     custom_multi_5=>$custom_multi_5,
+                     user_count=>"",
+                     max_user_count=>"-",
+                     json=>$json,
+                     sophomorix_config=>\%sophomorix_config,
+                     sophomorix_result=>\%sophomorix_result,
+                    });
+}
+
+&AD_unbind_admin($ldap);
+&log_script_end(\@arguments,\%sophomorix_result,\%sophomorix_config,$json);
+
+
