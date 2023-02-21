@@ -552,8 +552,9 @@ if (defined $options{'sam'} or
 
 if (defined $options{'anyname'}){
     $attr_filter=$attr_filter."(| ";
-    $attr_filter=$attr_filter."(givenName=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(sAMAccountName=".$options{'anyname'}.")";
     $attr_filter=$attr_filter."(sn=".$options{'anyname'}.")";
+    $attr_filter=$attr_filter."(givenName=".$options{'anyname'}.")";
     $attr_filter=$attr_filter."(description=".$options{'anyname'}.")";
     $attr_filter=$attr_filter."(sophomorixComment=".$options{'anyname'}.")";
     $attr_filter=$attr_filter."(sophomorixFirstnameASCII=".$options{'anyname'}.")";
@@ -755,6 +756,7 @@ if (defined $options{'user-minimal'}){
         'displayName',
         'sn',
         'givenName',
+	'homeDirectory',
         'sophomorixFirstnameASCII',
         'sophomorixSurnameASCII',
         'sophomorixFirstnameInitial',
