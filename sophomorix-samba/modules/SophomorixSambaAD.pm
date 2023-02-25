@@ -3362,9 +3362,10 @@ sub AD_user_setquota {
         $soft_bytes=int(0.80*$hard_bytes/1024)*1024;
     }
 
-    # check if msdfs is true, is so use the remote address for smbcquotas
-    my $msdfs = $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes';
-    if ($msdfs == 1){
+    # check if msdfs is true, if so use the remote address for smbcquotas
+    #my $msdfs = $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes';
+    if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} and
+	$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes'){
             $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                                   " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                   " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
