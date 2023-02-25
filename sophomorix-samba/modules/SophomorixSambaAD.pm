@@ -3366,24 +3366,34 @@ sub AD_user_setquota {
     #my $msdfs = $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes';
     if (exists $ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} and
 	$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs root'} eq 'yes'){
+            # setting quota on a remote server ->  ubuntu 22.04 or later expected, no -mNT1 option available
             $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                                   " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                   " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                   $smb_admin_pass."'".
-                                  " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." ".$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs proxy'};
-    }
-    else
-    {
+		                  " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." ".$ref_sophomorix_config->{'samba'}{'net_conf_list'}{$share}{'msdfs proxy'};
+    } else {
+	if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "18.04"){
+            # switch back to old protocol
+            $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+                                 " -mNT1".
+                                 " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
+                                 $smb_admin_pass."'".
+                                 " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
+        } else {
+            # ubuntu 22.04 or later expected, no -mNT1 option available
             $smbcquotas_command=$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
                                  " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
                                  " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin."%'".
                                  $smb_admin_pass."'".
                                  " -S UQLIM:".$user.":".$soft_bytes."/".$hard_bytes." //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
+	}
     }
 
 
     ############################################################
     # run the command
+    print "HERE: $smbcquotas_command\n";
     $smbcquotas_out=`$smbcquotas_command`;
     my $smbcquotas_return=${^CHILD_ERROR_NATIVE}; # return of value of last command
 
@@ -9349,12 +9359,24 @@ sub AD_smbclient_testfile {
 sub AD_smbcquotas_queryuser {
     my ($root_dns,$smb_admin_pass,$user,$share,$ref_sophomorix_config)=@_;
     print "Querying smbcquotas of user $user on share $share\n";
-    my $smbcquotas_command=
+    my $smbcquotas_command;
+    if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "18.04"){
+	# switch back to old protocol
+        $smbcquotas_command=
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " -mNT1".
+        " -U ".$DevelConf::sophomorix_file_admin."%'".
+        $smb_admin_pass."'".
+	    " -u $user //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
+    } else {
+        # ubuntu 22.04 or later expected, no -mNT1 option available
+        $smbcquotas_command=
         $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
         " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
-        " -u $user //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
+	    " -u $user //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/$share";
+    }
     my $display_command=$smbcquotas_command;
 
     # hide password
@@ -9413,20 +9435,32 @@ sub AD_smbcquotas_queryuser {
 
 sub AD_smbcquotas_testshare {
     my ($root_dns,$smb_admin_pass,$share,$ref_sophomorix_config,$ref_schools)=@_;
-    my $smbcquotas_command=
+    my $smbcquotas_command;
+    if ($ref_sophomorix_config->{'linux'}{'lsb-release'}{'DISTRIB_RELEASE'} eq "18.04"){
+        # switch back to old protocol
+        $smbcquotas_command=
+        $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
+        " -mNT1".
+        " -U ".$DevelConf::sophomorix_file_admin."%'".
+        $smb_admin_pass."'".
+	" -F //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$share;
+    } else {
+	# ubuntu 22.04 or later expected, no -mNT1 option available
+        $smbcquotas_command=
         $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS'}.
         " ".$ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCQUOTAS_PROTOCOL_OPT'}.
         " -U ".$DevelConf::sophomorix_file_admin."%'".
         $smb_admin_pass."'".
-        " -F //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$share;
-        my $return_quota=system("$smbcquotas_command > /dev/null");
-        if ($return_quota==0){
-            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";
-            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="OK";
-	}  else {
-            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
-            $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NOT OK";
-	}
+	" -F //".$ref_sophomorix_config->{'samba'}{'from_smb.conf'}{'ServerDNS'}."/".$share;
+    }
+    my $return_quota=system("$smbcquotas_command > /dev/null");
+    if ($return_quota==0){
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="TRUE";
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="OK";
+    }  else {
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTAS'}="FALSE";
+        $ref_schools->{'SHARES'}{$share}{'SMB_SHARE'}{'SMBCQUOTASDISPLAY'}="NOT OK";
+    }
 }
 
 

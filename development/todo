@@ -31,6 +31,33 @@ Host fleischsalat
 
 Todo:
 ------------------------------------------------------------
+Quota stuff:
+The following commands need -mNT1 option:
+
+
+The following commands do not work at all:
+  /usr/bin/smbcquotas --debuglevel=0 -U administrator%'flzsEHZGKxG1WRcf' -L //linuxmuster.local/abc
+  egal ob mit oder ohne -mNT1
+
+AD_user_setquota:
+  Option -mNT1 ist bei ubuntu 18.04 erforderlich:
+  The following comand works:
+     /usr/bin/smbcquotas  -mNT1 --debuglevel=0 -U administrator%'***' -S UQLIM:administrator:1263324160/1579155456 //bionic/default-school
+  The following command fails:
+     /usr/bin/smbcquotas  --debuglevel=0 -U administrator%'flzsEHZGKxG1WRcf' -S UQLIM:administrator:1263324160/1579155456 //bionic/default-school
+  
+  
+AD_smbcquotas_queryuser:
+  -> with ubuntu 18.04 option -mNT1 is used 
+AD_smbcquotas_testshare
+  -> with ubuntu 18.04 option -mNT1 is used 
+
+
+
+Debugging:
+Add Following line in the Tests, to make debugging easier: (sophomorix-test-1 ist ok)
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
+
 
 New version
   * fixed nonworking printout for nonlatex characters in class
