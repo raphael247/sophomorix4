@@ -706,7 +706,7 @@ sub AD_test_object {
             my $date=$entry->get_value ('sophomorixCreationDate');
             $test_date=substr($date,0,4); # first 4 chars
             # set string ok
-            my $strg_ok="2022";
+            my $strg_ok="2023";
             if ($s_creationdate eq "exists"){
                 # test first 4 digits
                 is ($test_date,$strg_ok,
@@ -723,7 +723,7 @@ sub AD_test_object {
             my $date=$entry->get_value ('sophomorixTolerationDate');
             $test_date=substr($date,0,4); # first 3 chars
             # set string ok
-            my $strg_ok="2022";
+            my $strg_ok="2023";
             if ($s_tolerationdate eq "exists"){
                 # test first 4 digits
                 is ($test_date,$strg_ok,
@@ -741,7 +741,7 @@ sub AD_test_object {
             my $date=$entry->get_value ('sophomorixDeactivationDate');
             $test_date=substr($date,0,4); # first 4 chars
             # set string ok
-            my $strg_ok="2022";
+            my $strg_ok="2023";
             if ($s_deactivationdate eq "exists"){
                 # test first 3 digits
                 is ($test_date,$strg_ok,
