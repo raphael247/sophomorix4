@@ -312,6 +312,7 @@ if ($add==1){
 ############################################################
 # Adding users --add
 ############################################################
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($cp_add==1){
     # copy sophomorix.add
     &run_command("cp -v $file_add_test $file_add");
@@ -334,6 +335,7 @@ if ($cp_add==1){
 #    &run_command("cp -v $file_school_uni /etc/linuxmuster/sophomorix/uni/uni.school.conf");
 }
 
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($add==1 or $test_add==1){
     if ($add==1){
         # run some commands (password should not be seen)
@@ -4051,6 +4053,7 @@ if ($add==1 or $test_add==1){
 ############################################################
 # killing migration users --migration-kill
 ############################################################
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($migration_kill==1){
     # killing the migration users
     &run_command("sophomorix-user $all_options -K --user fisch42");
@@ -4084,6 +4087,7 @@ if ($migration_kill==1){
 ############################################################
 # Modifying users --mod
 ############################################################
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($mod==1){
     #&run_command("sophomorix-quota $all_options");
     &run_command("sophomorix-user $all_options -T --user maiersa42");
@@ -6585,6 +6589,7 @@ if ($mod==1){
 ############################################################
 # Managing sessions --ses
 ############################################################
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($ses==1){
     print "Session tests\n";
     &run_command("sophomorix-session $all_options --create --supervisor maiersa42 --developer-session 666");
@@ -9396,6 +9401,7 @@ if ($ses==1){
 ############################################################
 # Moving users --update
 ############################################################
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($cp_update==1){
     # copy sophomorix.update
     &run_command("cp -v $file_update_test $file_update");
@@ -13093,6 +13099,7 @@ if ($update==1 or $test_update==1){
 ############################################################
 # Deleting users --kill
 ############################################################
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($cp_kill==1){
     # copy sophomorix.kill
     &run_command("cp -v $file_kill_test $file_kill");
@@ -15078,7 +15085,7 @@ if ($kill==1 or $test_kill==1){
 ############################################################
 # Deleting unused groups --groupkill-1
 ############################################################
-
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($groupkill_1==1 or $test_groupkill_1==1){
     if ($groupkill_1==1){
         # kill the classes, one exception: alumni
@@ -16443,7 +16450,7 @@ if ($groupkill_1==1 or $test_groupkill_1==1){
     &end_fs_test(\%fs_test_result);
 }
 
-
+print "Test-File: ", __FILE__, " Test-Line: ", __LINE__, "\n";
 if ($groupkill_2==1 or $test_groupkill_2==1){
     if ($groupkill_2==1){
         # remove files to allow deletion
