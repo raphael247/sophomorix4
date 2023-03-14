@@ -42,9 +42,9 @@ The following commands do not work at all:
 AD_user_setquota:
   Option -mNT1 ist bei ubuntu 18.04 erforderlich:
   The following comand works:
-     /usr/bin/smbcquotas  -mNT1 --debuglevel=0 -U administrator%'***' -S UQLIM:administrator:1263324160/1579155456 //bionic/default-school
+     /usr/bin/smbcquotas  -mNT1 --debuglevel=0 -U administrator%`cat /etc/linuxmuster/.secret/administrator` -S UQLIM:administrator:1263324160/1579155456 //bionic/default-school
   The following command fails:
-     /usr/bin/smbcquotas  --debuglevel=0 -U administrator%'flzsEHZGKxG1WRcf' -S UQLIM:administrator:1263324160/1579155456 //bionic/default-school
+     /usr/bin/smbcquotas  --debuglevel=0 -U administrator%`cat /etc/linuxmuster/.secret/administrator` -S UQLIM:administrator:1263324160/1579155456 //bionic/default-school
   
   
 AD_smbcquotas_queryuser:
