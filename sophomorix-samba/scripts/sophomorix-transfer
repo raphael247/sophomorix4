@@ -747,7 +747,7 @@ sub smbclient_scopy_recurse {
 
             my $smb_dir_home_from_user=$home_directory_AD_from_user;
             $smb_dir_home_from_user=~s/\\/\//g;
-            my ($string_from_user,$rel_path_home_from_user)=split(/$school_AD_from_user/,$smb_dir_home_from_user);
+            my ($string_from_user,$rel_path_home_from_user)=split("/".$school_AD_from_user."/",$smb_dir_home_from_user);
 
             # home relative to school
             $rel_path_home_from_user=~s/^\///g;
@@ -832,7 +832,7 @@ sub smbclient_scopy_recurse {
 
             my $smb_dir_home_to_user=$home_directory_AD_to_user;
             $smb_dir_home_to_user=~s/\\/\//g;
-            my ($string_to_user,$rel_path_home_to_user)=split(/$school_AD_to_user/,$smb_dir_home_to_user);
+            my ($string_to_user,$rel_path_home_to_user)=split("/".$school_AD_to_user."/",$smb_dir_home_to_user);
 
             # home relative to school
             $rel_path_home_to_user=~s/^\///g;
@@ -1196,7 +1196,7 @@ sub scan_smb_dir {
     if ($location eq "TO"){
         $school=$ref_copy->{'TO'}{$to}{'FROM'}{$from}{'TARGET_SCHOOL'};
 	$rel_path=$ref_copy->{'TO'}{$to}{'FROM'}{$from}{'TARGET_PATH'};
-       print "##### Scanning $location new:  School: $school Subdir: $ref_copy->{'TO'}{$to}{'FROM'}{$from}{'TARGET_PATH'} ...\n";
+        print "##### Scanning $location new:  School: $school Subdir: $ref_copy->{'TO'}{$to}{'FROM'}{$from}{'TARGET_PATH'} ...\n";
     } else {
 	$school=$ref_copy->{'FROM'}{$from}{'TO'}{$to}{'SOURCE_SCHOOL'};
 	$rel_path=$ref_copy->{'FROM'}{$from}{'TO'}{$to}{'SOURCE_PATH'};
@@ -1309,22 +1309,25 @@ sub get_type_inode {
             "%'******'".
             " //$root_dns/$school "." ".
             $ref_sophomorix_config->{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c 'stat \"$rel_path\"; exit;'";
+            " -c 'allinfo \"$rel_path\"; exit;'";
     my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
-    my $type; 
+    my $type;
     foreach my $stat (@out_lines){
-        if ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
+        if ($stat=~m/stream:/ and $stat=~m/[::\$DATA]/){ # only files contain stream data
+            $type="FILE";
+            last;
+        } elsif ($stat=~m/attributes/ and $stat=~m/D/){ # RD and D are Folder attributes
             $type="DIR";
             last;
-        } elsif ($stat=~m/regular file/ and $stat=~m/Blocks/ and $stat=~m/Size/){
-            $type="FILE";
+        } elsif ($stat=~m/attributes/ and $stat=~m/RD/){
+            $type="DIR";
             last;
         } else {
             $type="NONEXISTING";
             # nothing
         }
     }
-    
+
     return $type;
 }
 
@@ -1479,11 +1482,11 @@ sub smbclient_mget_recurse {
             "%'******'".
             " //$root_dns/$school_AD "." ".
             $sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT_PROTOCOL_OPT'}.
-            " -c 'cd \"$cd_path\"; stat \"$filename\"; exit;'";
+            " -c 'cd \"$cd_path\"; allinfo \"$filename\"; exit;'";
         my ($return_value,@out_lines)=&Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
 
         foreach my $stat (@out_lines){
-            if ($stat=~m/regular file/ and $stat=~m/Blocks/ and $stat=~m/Size/){
+            if ($stat=~m/stream:/ and $stat=~m/[::\$DATA]/){ # only files contain stream data
                 # file
                 print "   * $filename is a file ($file_path)\n";
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -1502,19 +1505,19 @@ sub smbclient_mget_recurse {
                     &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
                 }
                 last;
-            } elsif ($stat=~m/directory/ and $stat=~m/Blocks/ and $stat=~m/Size/){
+            } elsif ($stat=~m/attributes/ and $stat=~m/D/){ # RD and D are Folder attributes
                 print "   * $filename is a directory ($file_path)\n";
                 if ($copy_account_data==1){
                     # dir
                     $cd_path=$cd_path;
                     # prepare local unix path
                     $lcd_path=$lcd_path;
-		} else {
+                } else {
                     # dir
                     $cd_path=$cd_path."/".$filename;
                     # prepare local unix path
                     $lcd_path=$lcd_path."/".$filename;
-		}
+                }
                 system("mkdir -p $lcd_path");
 
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
@@ -1646,7 +1649,7 @@ sub smbclient_mput_recurse {
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".
-                    " //$root_dns/$school_AD "." -c 'cd \"$rel_path_sub\"; lcd \"$localdir\";".
+                    " //$root_dns/$school_AD "." -c 'cd \"$target_subdir\"; lcd \"$localdir\";".
                     " prompt; recurse; mput *; exit;'";
                 &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
             } else {
@@ -1654,7 +1657,7 @@ sub smbclient_mput_recurse {
                 my $smbclient_command=$sophomorix_config{'INI'}{'EXECUTABLES'}{'SMBCLIENT'}.
                     " --debuglevel=$debug_level -U ".$DevelConf::sophomorix_file_admin.
                     "%'******'".
-                    " //$root_dns/$school_AD "." -c '$md_commands cd \"$rel_path_sub\"; lcd \"$localdir\";".
+                    " //$root_dns/$school_AD "." -c '$md_commands cd \"$target_subdir\"; lcd \"$localdir\";".
                     " prompt; recurse; mput *; exit;'";
                 &Sophomorix::SophomorixBase::smb_command($smbclient_command,$smb_admin_pass);
             }
