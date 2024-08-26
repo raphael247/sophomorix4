@@ -4399,7 +4399,7 @@ sub check_config_ini {
                     my ($opt_type,$opt_default)=split(/\|/,$ref_school->{$section}{$parameter});
                     #print "$section is of type $opt_type, default is $opt_default\n";
                     if ($opt_type eq "BOOLEAN" or
-			($parameter eq "RANDOM_PWD" and $config{$section}{$parameter} ne "birthdate")
+			($parameter eq "RANDOM_PWD" and $config{$section}{$parameter} !~ m/^birthdate|dice$/)
 		       ){
                         # value in master is BOOLEAN|<default>
                         my $opt_given=$config{$section}{$parameter};
@@ -4418,7 +4418,9 @@ sub check_config_ini {
                                 ){
                             $ref_school->{$section}{$parameter}=$ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_FALSE'};
                         }
-                    }
+                    } elsif ($parameter eq "RANDOM_PWD" and $config{$section}{$parameter} =~ m/^birthdate|dice$/) {
+                        $ref_school->{$section}{$parameter}=$config{$section}{$parameter};
+		    }
                 } else {
                     # overwrite  $ref_school
                     $ref_school->{$section}{$parameter}=$config{$section}{$parameter};
@@ -6125,7 +6127,7 @@ sub get_plain_password {
     my $i;
     if ($role eq "teacher") {
         # Teacher
-        if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
+        if ( $random eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday" or $random eq "dice") {
 	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
 	    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'} eq ""){
@@ -6136,7 +6138,7 @@ sub get_plain_password {
 	}
     } elsif ($role eq "student") {
         # Student
-        if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday") {
+        if ($random  eq $ref_sophomorix_config->{'INI'}{'VARS'}{'BOOLEAN_TRUE'} or $random eq "birthday" or $random eq "dice") {
 	    $password=&create_plain_password($random,$length,$birthdate,@password_chars);
         } else {
 	    if ($ref_sophomorix_config->{'FILES'}{'USER_FILE'}{$file}{'DEFAULT_NONRANDOM_PWD'} eq ""){
@@ -6158,6 +6160,9 @@ sub create_plain_password {
         my @letters = ('A'..'Z');
         my $random_letter = $letters[int rand @letters];
         $password=$random_letter.$birthdate;
+    } elsif ($random eq "dice"){
+        $password=`diceware  -d . --no-caps -n $num -w de_8k`;
+	chomp($password);
     } else {
         until ($password=~m/[!\$&\(\)?]/ and 
                $password=~m/[a-z]/ and 
